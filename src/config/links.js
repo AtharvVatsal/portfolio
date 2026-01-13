@@ -2,11 +2,10 @@
 export const SOCIAL_LINKS = {
   github: 'https://github.com/AtharvVatsal',
   linkedin: 'https://www.linkedin.com/in/atharvvatsal',
-  instagram: 'https://instagram.com/@privet.avos',
-  photography: 'https://instagram.com/@privet.avos',
+  instagram: 'https://instagram.com/privet.avos',
+  photography: 'https://instagram.com/privet.avos',
   twitter: 'https://x.com/atharvvatsal',
 };
-
 // Project Links
 export const PROJECT_LINKS = {
   riskgrid: {
@@ -26,7 +25,6 @@ export const PROJECT_LINKS = {
     demo: null,
   },
 };
-
 // Contact Information
 export const CONTACT_INFO = {
   email: 'atharvvatsal@outlook.com',
@@ -35,6 +33,5 @@ export const CONTACT_INFO = {
   phoneAlt: '+91 86268796190',
   location: 'Himachal Pradesh, India',
 };
-
 // Resume Link
 export const RESUME_LINK = '/AtharvVatsalResume.pdf';
