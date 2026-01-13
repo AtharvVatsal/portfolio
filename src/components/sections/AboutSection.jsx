@@ -99,7 +99,7 @@ const AboutSection = ({ isVisible }) => {
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400 to-purple-500 blur-2xl opacity-30 group-hover:opacity-50 transition-opacity duration-700"></div>
               <div className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-white/20 shadow-2xl">
                 <img 
-                  src="/avPhoto.jpg" 
+                  src="/avPhoto.JPG" 
                   alt="Atharv Vatsal" 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
