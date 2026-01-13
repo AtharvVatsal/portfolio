@@ -7,7 +7,7 @@ import { roles, taglines } from '../../data';
 import { SOCIAL_LINKS } from '../../config/links';
 
 const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
-  const { currentTheme } = useTheme();
+  const { theme } = useTheme();
   const { displayText, currentIndex, cursorBlink } = useTypingEffect(roles);
   const greeting = useGreeting();
 

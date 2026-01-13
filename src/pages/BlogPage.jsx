@@ -11,7 +11,6 @@ import {
   PenLine,
   Sparkles,
   Home,
-  ImageIcon
 } from 'lucide-react';
 import { blogPosts, blogCategories } from '../data';
 import { useTheme } from '../context/ThemeContext';
