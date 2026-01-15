@@ -145,8 +145,11 @@ const PortfolioHome = () => {
 
         <SectionDivider color="purple" />
 
-        {/* Testimonials Section */}
-        <TestimonialsSection />
+        {/* Photography Section */}
+        <PhotographySection 
+          isVisible={visibleSections.has('photography')}
+          mousePosition={mousePosition}
+        />
 
         <SectionDivider color="cyan" />
 
@@ -155,11 +158,8 @@ const PortfolioHome = () => {
 
         <SectionDivider color="pink" />
 
-        {/* Photography Section */}
-        <PhotographySection 
-          isVisible={visibleSections.has('photography')}
-          mousePosition={mousePosition}
-        />
+        {/* Testimonials Section */}
+        <TestimonialsSection />
 
         <SectionDivider color="cyan" />
 
