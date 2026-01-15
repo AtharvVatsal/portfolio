@@ -14,6 +14,8 @@ const Navbar = ({
   const { cycleTheme } = useTheme();
   const location = useLocation();
   const isOnBlogPage = location.pathname === '/blog';
+  const isOnGalleryPage = location.pathname === '/gallery';
+  const isOnSubPage = isOnBlogPage || isOnGalleryPage;
 
   const handleResumeDownload = () => {
     const link = document.createElement('a');
@@ -24,20 +26,20 @@ const Navbar = ({
     document.body.removeChild(link);
   };
 
-  // Navigation items - Blog will use Link, others use scroll
+  // Navigation items - Blog and Gallery use Link, others use scroll
   const navItems = [
     { name: 'Home', type: 'scroll' },
     { name: 'About', type: 'scroll' },
     { name: 'Tech', type: 'scroll' },
     { name: 'Blog', type: 'link', to: '/blog' },
-    { name: 'Photography', type: 'scroll' },
+    { name: 'Gallery', type: 'link', to: '/gallery' },
     { name: 'Contact', type: 'scroll' },
   ];
 
   const handleNavClick = (item) => {
     if (item.type === 'scroll') {
-      // If on blog page, go back to home first
-      if (isOnBlogPage) {
+      // If on a sub page, go back to home first
+      if (isOnSubPage) {
         window.location.href = '/#' + item.name.toLowerCase();
       } else {
         scrollToSection(item.name.toLowerCase());
@@ -77,10 +79,11 @@ const Navbar = ({
             <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
               {navItems.map((item) => {
                 const isActive = item.type === 'link' 
-                  ? isOnBlogPage 
+                  ? location.pathname === item.to
                   : activeSection === item.name.toLowerCase();
 
                 if (item.type === 'link') {
+                  const isGallery = item.name === 'Gallery';
                   return (
                     <Link
                       key={item.name}
@@ -90,7 +93,7 @@ const Navbar = ({
                       }`}
                     >
                       {item.name}
-                      <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-700 ${
+                      <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${isGallery ? 'from-purple-400 to-pink-500' : 'from-amber-400 to-orange-500'} transition-all duration-700 ${
                         isActive ? 'w-full' : 'w-0 group-hover:w-full'
                       }`}></span>
                     </Link>
@@ -160,22 +163,26 @@ const Navbar = ({
             <div className="space-y-1 pb-3">
               {navItems.map((item, index) => {
                 const isActive = item.type === 'link' 
-                  ? isOnBlogPage 
+                  ? location.pathname === item.to
                   : activeSection === item.name.toLowerCase();
 
                 if (item.type === 'link') {
+                  const isGallery = item.name === 'Gallery';
+                  const activeColor = isGallery ? 'text-purple-400' : 'text-amber-400';
+                  const dotColor = isGallery ? 'bg-purple-400' : 'bg-amber-400';
+                  
                   return (
                     <Link
                       key={item.name}
                       to={item.to}
                       onClick={() => setIsMenuOpen(false)}
                       className={`block w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 transition-all duration-500 text-sm ${
-                        isActive ? 'bg-white/10 text-amber-400' : ''
+                        isActive ? `bg-white/10 ${activeColor}` : ''
                       }`}
                     >
                       <span className="flex items-center justify-between">
                         {item.name}
-                        {isActive && <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>}
+                        {isActive && <div className={`w-2 h-2 rounded-full ${dotColor} animate-pulse`}></div>}
                       </span>
                     </Link>
                   );

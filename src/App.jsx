@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+// Context
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 // Hooks
@@ -10,6 +11,7 @@ import {
   useVisibleSections 
 } from './hooks';
 
+// Components
 import { Preloader } from './components/preloader';
 import { CustomCursor, FloatingActionButtons, SectionDivider } from './components/common';
 import { Navbar, Footer } from './components/layout';
@@ -27,7 +29,7 @@ import {
 } from './components/sections';
 
 // Pages
-import { BlogPage } from './pages';
+import { BlogPage, GalleryPage } from './pages';
 
 // Styles
 import './styles/animations.css';
@@ -59,12 +61,12 @@ const PortfolioHome = () => {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setTimeout(() => setIsLoading(false), 500);
+          setTimeout(() => setIsLoading(false), 200);
           return 100;
         }
-        return prev + 1;
+        return prev + 4;  // Much faster increment
       });
-    }, 30);
+    }, 20);  // Faster interval
 
     return () => clearInterval(timer);
   }, []);
@@ -91,11 +93,7 @@ const PortfolioHome = () => {
       <Preloader progress={loadingProgress} isLoading={isLoading} />
 
       {/* Custom Cursor (Desktop Only) */}
-      <CustomCursor 
-        mousePosition={mousePosition} 
-        mouseVelocity={mouseVelocity}
-        isTouchDevice={isTouchDevice}
-      />
+      <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Scroll Progress Bar */}
       <div 
@@ -185,7 +183,7 @@ const PortfolioHome = () => {
   );
 };
 
-// Main App Component
+// Main App Component with Router and ThemeProvider
 const App = () => {
   return (
     <ThemeProvider>
@@ -193,6 +191,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<PortfolioHome />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

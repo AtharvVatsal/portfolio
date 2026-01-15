@@ -6,3 +6,4 @@ export { stats } from './stats';
 export { testimonials } from './testimonials';
 export { photoCategories } from './photoCategories';
 export { blogPosts, blogCategories } from './blog';
+export { galleryPhotos, galleryCategories } from './gallery';
