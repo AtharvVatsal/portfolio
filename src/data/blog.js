@@ -1,6 +1,170 @@
 export const blogPosts = [
 {
     id: 1,
+    title: "Accuracy Lied to Me: A Beginner's Guide to Model Evaluation",
+    excerpt: "Your model has shiny accuracy of 99%. It is also completely useless. Here is why accuracy is a liar and what metrics you should actually use.",
+    coverImage: "/blog/accuracy.png",
+    content: `
+      <p>Your model has shiny accuracy of 99%. Your model is also <strong>completely useless</strong>.</p>
+
+      <p>I have learned this the hard way. You may have as well. Let me save you some pain.</p>
+      
+      <br />
+
+      <h2><strong>The 99% Disaster</strong></h2>
+
+      <p><strong>Imagine this scenario:</strong> You are building a spam filter, and through tutorials, documentation, and "GPT-ing," your model achieves 99% accuracy. You are more than ready to use this as your new big thing, add it to your resume, and boast about your creation wherever you go – yes, even to your grandma who thinks computers are voodoo.</p>
+
+      <p>Then you deploy it. It detects zero fraud. Zero. Good old round ZERO!</p>
+      
+      <br />
+
+      <p>So here is what went down: Fact is, 1% of all transactions are fraudulent. And your excellent model, with your outstanding skills, learned it could predict <strong>all of them as legitimate</strong>. That is the simplest thing to learn and do. Therefore—boom—99% accuracy.</p>
+
+      <p>Your model is the metaphorical security guard who waves everyone through because "most people aren't criminals." Technically correct. Completely useless when actually needed.</p>
+      
+      <br /> 
+
+      <h2><strong>Why Accuracy is a Liar</strong></h2>
+
+      <p>Guessing accuracy simply lets you know that you get things right as frequently as you get them wrong. This does not, however, let you know the nature of the things you are getting wrong. This is similar to a parent who praises you, even if you do not deserve it 95% of the time.</p>
+      
+      <br />
+
+      <div style="background: #000000; color: #ffffff; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; margin: 20px 0; border: 1px solid #12337a;">
+        Accuracy = Correct Predictions / Total Predictions
+      </div>
+
+      <p>Once again, the reality is different in the real world. Not every mistake is the same. There are some mistakes that might drive you nuts, and some mistakes might be nuts themselves.</p>
+
+      <ul>
+        <li><strong>Missed a fraudulent transaction?</strong> The customer loses thousands.</li>
+        <li><strong>Flagged a legit transaction?</strong> The customer gets mildly annoyed.</li>
+      </ul>
+
+      <p>These are not equal, however, accuracy treats them as though they were twins.</p>
+      
+      <br />
+
+      <h2><strong>The Confusion Matrix: Your Truth Serum</strong></h2>
+      
+      
+
+      <p>Stop looking at accuracy. Start looking at this:</p>
+
+      <div style="overflow-x: auto;">
+        <table border="1" cellpadding="12" style="border-collapse: collapse; width: 100%; margin: 20px 0; text-align: center; border-color: #c7d2fe;">
+          <thead style="background-color: #000000; color: #ffffff;">
+            <tr>
+              <th style="border: 1px solid #c7d2fe;"></th>
+              <th style="border: 1px solid #c7d2fe;">Predicted: Safe</th>
+              <th style="border: 1px solid #c7d2fe;">Predicted: Fraud</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight: bold; background-color: #000000; color: #ffffff; border: 1px solid #c7d2fe;">Actually Safe</td>
+              <td style="border: 1px solid #c7d2fe;">985</td>
+              <td style="border: 1px solid #c7d2fe; color: red; font-weight: bold;">5</td>
+            </tr>
+            <tr>
+              <td style="font-weight: bold; background-color: #000000; color: #ffffff; border: 1px solid #c7d2fe;">Actually Fraud</td>
+              <td style="border: 1px solid #c7d2fe; color: red; font-weight: bold;">10</td>
+              <td style="border: 1px solid #c7d2fe; color: green; font-weight: bold;">0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>See the number down left there? That’s <strong>10 cases of fraud you didn’t even detect</strong>, thanks to your 99% accuracy rating. The confusion matrix does not lie. It tells you precisely where your model is failing.</p>
+      
+      <br />
+
+      <h2><strong>Metrics That Actually Matter</strong></h2>
+
+      <h3><strong>Recall: "Did I catch the bad stuff?"</strong></h3>
+      
+      <div style="background: #000000; color: #ffffff; padding: 10px; border-radius: 6px; font-family: monospace; margin-bottom: 10px; border: 1px solid #c7d2fe; text-align: center;">
+        Recall = Caught Frauds / Total Frauds
+      </div>
+      
+      <p>Use this when missing cases poses a costly problem and the potential consequences of missing negatives are critical. Cancer diagnosis? Terrorist threats? Fraudulent transactions? You want high recall.</p>
+      
+      <br />
+
+      <h3><strong>Precision: "When I yell fraud, am I right?"</strong></h3>
+      
+      <div style="background: #000000; color: #ffffff; padding: 10px; border-radius: 6px; font-family: monospace; margin-bottom: 10px; border: 1px solid #c7d2fe; text-align: center;">
+        Precision = Real Frauds / All Fraud Alerts
+      </div>
+      
+      <p>Use this if false alarms are frustrating. Think Email Spam Filters. If too many legit emails are marked as Spam, people get mad. They might even report your "next big thing".</p>
+      
+      <br />
+
+      <h3><strong>F1 Score: "Give me one number"</strong></h3>
+      <p>The Goldilocks metric. It balances both precision and recall.</p>
+      
+      <div style="background: #000000; color: #ffffff; padding: 15px; border-radius: 8px; font-family: monospace; text-align: center; margin: 20px 0; border: 1px solid #c7d2fe;">
+        F1 = 2 * (Precision * Recall) / (Precision + Recall)
+      </div>
+
+      <p>Use this when you can't decide or need to compare models quickly.</p>
+      
+      <br />
+
+      <h2><strong>The Tradeoff Nobody Tells You About</strong></h2>
+      
+      
+
+      <p>Precision and recall cannot be maximized at the same time. It is the same as wanting peace of mind and wanting to be an engineer today.</p>
+
+      <ul>
+        <li>Want to catch <strong>every single fraud case</strong>? Be ultra-cautious and flag everything you suspect. Your precision will tank.</li>
+        <li>Want <strong>legitimate-only</strong> fraud alerts? Be super strict. You WILL miss true fraud.</li>
+      </ul>
+
+      <p>Pick your poison based on which one costs the most to lose.</p>
+      
+      <br />
+
+      <h2><strong>Real Talk: When Accuracy is Fine</strong></h2>
+      <p>Don't overthink it for:</p>
+      <ul>
+        <li>Balanced Datasets (50-50 split, 60-40 split)</li>
+        <li>Equal error costs (cat vs. dog classification—who cares which way you mess up?)</li>
+        <li>Quick exploration (just checking if your model is completely broken)</li>
+      </ul>
+      <p>But for anything with imbalanced classes or unequal error costs? Accuracy is lying to you.</p>
+      
+      <br />
+
+      <h2><strong>The Checklist You Need</strong></h2>
+      <p>Before celebrating your next "high accuracy" model:</p>
+      <ul>
+        <li>✅ Class distribution? (Imbalanced = Accuracy is BS)</li>
+        <li>✅ What does the confusion matrix show?</li>
+        <li>✅ What's more expensive: false positives or false negatives?</li>
+        <li>✅ Choose metrics that fit your cost functions</li>
+      </ul>
+      
+      <br />
+
+      <h2><strong>The Bottom Line</strong></h2>
+      <p>The best model is not the one that is most accurate, but the one that is most expensive to fail. Relying on accuracy is like judging a goalkeeper solely on the number of times they touch the ball. Kind of cool, but tells you nothing about the score.</p>
+
+      <p>Stop chasing accuracy. Start asking: <em>"What mistakes is my model making, and can I live with them?"</em></p>
+
+      <p>Now go build something that actually works. 🚀</p>
+    `,
+    category: "Tech",
+    date: "06-02-2026",
+    readTime: "10 min read",
+    emoji: "🎯",
+    tags: ["Machine Learning", "Data Science", "Metrics", "Beginners"],
+},
+{
+    id: 2,
     title: "From a Hand-Me-Down Camera to Shooting the Stars",
     excerpt: "Growth through consistency, learning through real-world exposure, and validation through recognition.",
     coverImage: "/blog/photoStart.jpg",
@@ -30,7 +194,7 @@ export const blogPosts = [
     tags: ["Photography", "Nikon", "Beginnings"],
   },
     {
-    id: 2,
+    id: 3,
     title: "From Writing My First Java Program to Building for the Real World",
     excerpt: "The First Line of Code...",
     coverImage: "/blog/codingJourney.jpg",
@@ -60,7 +224,7 @@ export const blogPosts = [
     tags: ["Coding", "Java", "Journey", "Beginnings"],
   },
  {
-    id: 3,
+    id: 4,
     title: "Working with Himachal Police – Technology for Society",
     excerpt: "When software meets real-world responsibility...",
     coverImage: "/blog/police.webp",
