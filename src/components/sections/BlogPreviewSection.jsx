@@ -47,7 +47,7 @@ const BlogPreviewSection = () => {
             
             return (
               <Link
-                to="/blog"
+                to={`/blog/${post.slug}`}
                 key={post.id}
                 className="group rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-amber-400/30 cursor-pointer block overflow-hidden"
                 style={{ animationDelay: `${index * 0.1}s` }}
@@ -98,21 +98,16 @@ const BlogPreviewSection = () => {
           })}
         </div>
 
-        {/* CTA Button */}
+        {/* View All Button */}
         <div className="text-center">
           <Link
             to="/blog"
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-2xl hover:shadow-amber-500/30 transition-all duration-500 hover:scale-105 font-medium"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-2xl hover:shadow-amber-500/20 transition-all duration-500 hover:scale-105 font-medium group"
           >
             <BookOpen size={20} />
-            <span>Explore All Posts</span>
-            <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform duration-500" />
+            <span>View All Posts</span>
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
           </Link>
-        </div>
-
-        {/* Decorative element */}
-        <div className="flex justify-center mt-8">
-          <Sparkles size={20} className="text-amber-400/40 animate-pulse" />
         </div>
       </div>
     </section>

@@ -5,12 +5,11 @@ import {
   BookOpen, 
   Calendar, 
   Clock, 
-  Tag, 
   X,
   Search,
   PenLine,
   Sparkles,
-  Home,
+  Home
 } from 'lucide-react';
 import { blogPosts, blogCategories } from '../data';
 import { useTheme } from '../context/ThemeContext';
@@ -20,7 +19,6 @@ const BlogPage = () => {
   const { currentTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPost, setSelectedPost] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
@@ -30,12 +28,6 @@ const BlogPage = () => {
     window.scrollTo(0, 0);
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
-
-  useEffect(() => {
-    if (selectedPost) {
-      window.scrollTo(0, 0);
-    }
-  }, [selectedPost]);
 
   const handleImageError = (postId) => {
     setImageErrors(prev => ({ ...prev, [postId]: true }));
@@ -50,156 +42,6 @@ const BlogPage = () => {
     return matchesCategory && matchesSearch;
   });
 
-  // Single post view with cover image
-  if (selectedPost) {
-    const hasValidImage = selectedPost.coverImage && !imageErrors[selectedPost.id];
-    
-    return (
-      <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
-        <CustomCursor isTouchDevice={isTouchDevice} />
-
-        {/* Header */}
-        <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <button
-              onClick={() => setSelectedPost(null)}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300 group"
-            >
-              <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Blog</span>
-            </button>
-            
-            <Link 
-              to="/"
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300"
-            >
-              <Home size={18} />
-              <span className="hidden sm:inline">Portfolio</span>
-            </Link>
-          </div>
-        </header>
-
-        {/* Hero Cover Image */}
-        {hasValidImage ? (
-          <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
-            <img 
-              src={selectedPost.coverImage}
-              alt={selectedPost.title}
-              className="w-full h-full object-cover"
-              onError={() => handleImageError(selectedPost.id)}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-            
-            {/* Title overlay on image */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 md:p-16">
-              <div className="max-w-3xl mx-auto">
-                <div className="flex items-center gap-4 mb-4">
-                  <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-amber-500/20 text-amber-400 backdrop-blur-md">
-                    {selectedPost.category}
-                  </span>
-                  <span className="text-gray-300 text-sm flex items-center gap-2">
-                    <Calendar size={14} />
-                    {selectedPost.date}
-                  </span>
-                </div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-                  {selectedPost.title}
-                </h1>
-              </div>
-            </div>
-          </div>
-        ) : (
-          // Fallback header without image
-          <div className="pt-12 pb-8 px-4">
-            <div className="max-w-3xl mx-auto">
-              <div className="flex items-center gap-4 mb-4">
-                <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-amber-500/20 text-amber-400">
-                  {selectedPost.category}
-                </span>
-                <span className="text-gray-500 text-sm flex items-center gap-2">
-                  <Calendar size={14} />
-                  {selectedPost.date}
-                </span>
-                <span className="text-gray-500 text-sm flex items-center gap-2">
-                  <Clock size={14} />
-                  {selectedPost.readTime}
-                </span>
-              </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                {selectedPost.title}
-              </h1>
-              <div className="text-6xl mb-4">{selectedPost.emoji}</div>
-            </div>
-          </div>
-        )}
-
-        {/* Article Content */}
-        <article className="max-w-3xl mx-auto px-4 py-12">
-          {hasValidImage && (
-            <div className="flex items-center gap-4 mb-8 text-sm text-gray-400">
-              <span className="flex items-center gap-2">
-                <Clock size={14} />
-                {selectedPost.readTime}
-              </span>
-              <span className="text-2xl">{selectedPost.emoji}</span>
-            </div>
-          )}
-
-          {/* Content */}
-          <div 
-            className="prose prose-invert prose-lg max-w-none
-              prose-headings:text-white prose-headings:font-semibold
-              prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-              prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
-              prose-ul:text-gray-300 prose-li:mb-2
-              prose-strong:text-white
-              prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:underline"
-            dangerouslySetInnerHTML={{ __html: selectedPost.content }}
-          />
-
-          {/* Tags */}
-          <div className="mt-12 pt-8 border-t border-white/10">
-            <div className="flex items-center gap-2 flex-wrap">
-              <Tag size={16} className="text-gray-500" />
-              {selectedPost.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-3 py-1 rounded-full text-sm bg-white/5 border border-white/10 text-gray-400"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Navigation buttons */}
-          <div className="mt-12 flex gap-4 justify-center flex-wrap">
-            <button
-              onClick={() => setSelectedPost(null)}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300"
-            >
-              <ArrowLeft size={18} />
-              Back to all posts
-            </button>
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-lg transition-all duration-300"
-            >
-              <Home size={18} />
-              Back to Portfolio
-            </Link>
-          </div>
-        </article>
-
-        {/* Footer */}
-        <footer className="py-8 text-center border-t border-white/5">
-          <p className="text-gray-600 text-sm">© 2025 Atharv Vatsal</p>
-        </footer>
-      </div>
-    );
-  }
-
-  // Blog list view with image cards
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
       <CustomCursor isTouchDevice={isTouchDevice} />
@@ -218,6 +60,7 @@ const BlogPage = () => {
           <div className="flex items-center gap-2">
             <BookOpen size={20} className="text-amber-400" />
             <span className="font-medium">Blog</span>
+            <span className="text-gray-500 text-sm">({blogPosts.length} posts)</span>
           </div>
         </div>
       </header>
@@ -309,10 +152,10 @@ const BlogPage = () => {
                 const hasValidImage = post.coverImage && !imageErrors[post.id];
                 
                 return (
-                  <article
+                  <Link
                     key={post.id}
-                    onClick={() => setSelectedPost(post)}
-                    className={`group rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-amber-400/30 cursor-pointer overflow-hidden ${
+                    to={`/blog/${post.slug}`}
+                    className={`group rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-500 hover:scale-[1.02] hover:border-amber-400/30 cursor-pointer overflow-hidden block ${
                       isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                     }`}
                     style={{ transitionDelay: `${index * 100}ms` }}
@@ -379,7 +222,7 @@ const BlogPage = () => {
                         ))}
                       </div>
                     </div>
-                  </article>
+                  </Link>
                 );
               })}
             </div>

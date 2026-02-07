@@ -1,42 +1,75 @@
 import React from 'react';
-import { MessageCircle, ChevronDown } from 'lucide-react';
+import { ArrowUp, MessageCircle, Bot, Sparkles } from 'lucide-react';
+import AIChatbot from './AIChatbot';
 
-const FloatingActionButtons = ({ 
-  scrollY, 
-  showAIAssistant, 
-  setShowAIAssistant 
-}) => {
+const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  return (
-    <div className="fixed bottom-6 sm:bottom-8 right-4 sm:right-8 z-40 flex flex-col gap-3 sm:gap-4">
-      {/* AI Assistant Button */}
-      <button
-        onClick={() => setShowAIAssistant(!showAIAssistant)}
-        className="relative p-3 sm:p-4 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-2xl hover:shadow-cyan-500/50 transition-all duration-700 hover:scale-110 group"
-        aria-label="AI Assistant"
-      >
-        <MessageCircle size={20} className="sm:w-6 sm:h-6 group-hover:rotate-12 transition-transform duration-500" />
-        {showAIAssistant && (
-          <div className="absolute bottom-full right-0 mb-4 w-56 sm:w-64 p-4 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl animate-fade-in">
-            <p className="text-xs sm:text-sm text-gray-300">Ask me about my projects!</p>
-          </div>
-        )}
-      </button>
+  const showScrollTop = scrollY > 500;
 
-      {/* Scroll to Top Button */}
-      {scrollY > 500 && (
+  return (
+    <>
+      {/* Floating Buttons Container */}
+      <div className="fixed bottom-6 right-4 sm:right-6 z-40 flex flex-col gap-3">
+        
+        {/* Scroll to Top Button */}
         <button
           onClick={scrollToTop}
-          className="p-3 sm:p-4 rounded-full backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-700 hover:scale-110 group animate-fade-in"
+          className={`group p-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20 transition-all duration-500 hover:scale-110 shadow-lg ${
+            showScrollTop 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-10 pointer-events-none'
+          }`}
           aria-label="Scroll to top"
         >
-          <ChevronDown size={20} className="sm:w-6 sm:h-6 rotate-180 group-hover:-translate-y-1 transition-transform duration-500" />
+          <ArrowUp 
+            size={20} 
+            className="text-white group-hover:-translate-y-1 transition-transform duration-300" 
+          />
         </button>
-      )}
-    </div>
+
+        {/* AI Assistant Toggle Button */}
+        <button
+          onClick={() => setShowAIAssistant(!showAIAssistant)}
+          className={`group relative p-4 rounded-full transition-all duration-500 hover:scale-110 shadow-lg ${
+            showAIAssistant
+              ? 'bg-gradient-to-r from-purple-600 to-pink-600'
+              : 'bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20'
+          }`}
+          aria-label={showAIAssistant ? 'Close AI Assistant' : 'Open AI Assistant'}
+        >
+          {/* Animated ring when closed */}
+          {!showAIAssistant && (
+            <span className="absolute inset-0 rounded-full border-2 border-purple-400/50 animate-ping" />
+          )}
+          
+          <Bot 
+            size={22} 
+            className={`transition-all duration-300 ${
+              showAIAssistant 
+                ? 'text-white rotate-0' 
+                : 'text-purple-400 group-hover:text-white'
+            }`}
+          />
+          
+          {/* Sparkle decoration */}
+          {!showAIAssistant && (
+            <Sparkles 
+              size={10} 
+              className="absolute -top-1 -right-1 text-amber-400 animate-pulse" 
+            />
+          )}
+        </button>
+      </div>
+
+      {/* AI Chatbot */}
+      <AIChatbot 
+        isOpen={showAIAssistant} 
+        onClose={() => setShowAIAssistant(false)} 
+      />
+    </>
   );
 };
 

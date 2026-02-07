@@ -48,9 +48,14 @@ export const skillCategoryCards = [
       { name: 'Machine Learning', level: 80 },
       { name: 'XGBoost', level: 85 },
       { name: 'Random Forest', level: 88 },
-      { name: 'Scikit-learn', level: 90 },
+      { name: 'LangChain', level: 75 },
       { name: 'TensorFlow', level: 75 },
-      { name: 'PyTorch', level: 78 }
+      { name: 'RAG', level: 82 },
+      { name: 'Scikit-learn', level: 90 },
+      { name: 'Hugging Face', level: 80 },
+      { name: 'PyTorch', level: 78 },
+      { name: 'Matplotlib', level: 90 },
+      { name: 'Seaborn', level: 85 }
     ],
     stats: '8+ Models'
   },

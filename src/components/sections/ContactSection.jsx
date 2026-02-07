@@ -1,11 +1,14 @@
-import React from 'react';
-import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2 } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../config/links';
 
 const ContactSection = ({ isVisible, mousePosition }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     const formData = new FormData(e.target);
     const data = {
@@ -15,21 +18,38 @@ const ContactSection = ({ isVisible, mousePosition }) => {
     };
     
     try {
+      // 1. Send Notification Email to YOU (Admin)
       await emailjs.send(
-        'service_pzmc92r',
-        'template_1kiswqb',
+        'service_outlook',      // Your Service ID
+        'template_g9npx0s',     // Your Admin Template ID
         {
           from_name: data.name,
           from_email: data.email,
           message: data.message
         },
-        'g8-AVTdF_3Eg4Yr8FGl0x'
+        'zU0S_yyYuv721Cr0G' // Your Public Key
       );
+
+      // 2. Send Auto-Reply Email to THEM (User)
+      // REPLACE 'YOUR_AUTOREPLY_ID' with the new ID you created in EmailJS
+      await emailjs.send(
+        'service_outlook',      
+        'template_1kiswqb',    
+        {
+          to_name: data.name,   // This variable must match your EmailJS template (e.g. {{to_name}})
+          to_email: data.email, // This sends it to the user
+          message: data.message // (Optional) Include their message back to them
+        },
+        'zU0S_yyYuv721Cr0G'
+      );
+
       alert('Message sent successfully!');
       e.target.reset();
     } catch (error) {
       console.error('Error:', error);
       alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -79,7 +99,7 @@ const ContactSection = ({ isVisible, mousePosition }) => {
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
             Let's Connect
           </h2>
-          <p className="text-gray-400 text-base sm:text-lg">Have an oppurtunity or a project in mind? Let's talk!</p>
+          <p className="text-gray-400 text-base sm:text-lg">Have an opportunity or a project in mind? Let's talk!</p>
         </div>
 
         {/* Contact Grid */}
@@ -159,7 +179,8 @@ const ContactSection = ({ isVisible, mousePosition }) => {
                   type="text"
                   name="name"
                   required
-                  className="w-full px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all duration-300"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Your name"
                 />
               </div>
@@ -169,7 +190,8 @@ const ContactSection = ({ isVisible, mousePosition }) => {
                   type="email"
                   name="email"
                   required
-                  className="w-full px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all duration-300"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -179,17 +201,28 @@ const ContactSection = ({ isVisible, mousePosition }) => {
                   name="message"
                   rows="5"
                   required
-                  className="w-full px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all duration-300 resize-none"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 transition-all duration-300 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder="Tell me about your project..."
                 ></textarea>
               </div>
               <button
                 type="submit"
-                className="w-full px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-700 font-medium hover:scale-105 group"
+                disabled={isSubmitting}
+                className="w-full px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-700 font-medium hover:scale-105 group disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
               >
                 <span className="flex items-center justify-center gap-2">
-                  Send Message
-                  <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-500" />
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Message
+                      <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-500" />
+                    </>
+                  )}
                 </span>
               </button>
             </form>

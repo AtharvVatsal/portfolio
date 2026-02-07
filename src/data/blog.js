@@ -2,6 +2,7 @@ export const blogPosts = [
 {
     id: 1,
     title: "Accuracy Lied to Me: A Beginner's Guide to Model Evaluation",
+    slug: "accuracy-lied-to-me",
     excerpt: "Your model has shiny accuracy of 99%. It is also completely useless. Here is why accuracy is a liar and what metrics you should actually use.",
     coverImage: "/blog/accuracy.png",
     content: `
@@ -166,6 +167,7 @@ export const blogPosts = [
 {
     id: 2,
     title: "From a Hand-Me-Down Camera to Shooting the Stars",
+    slug: "from-hand-me-down-camera-to-shooting-stars",
     excerpt: "Growth through consistency, learning through real-world exposure, and validation through recognition.",
     coverImage: "/blog/photoStart.jpg",
     content: `
@@ -196,6 +198,7 @@ export const blogPosts = [
     {
     id: 3,
     title: "From Writing My First Java Program to Building for the Real World",
+    slug: "from-writing-my-first-java-program-to-building-for-the-real-world",
     excerpt: "The First Line of Code...",
     coverImage: "/blog/codingJourney.jpg",
     content: `
@@ -226,6 +229,7 @@ export const blogPosts = [
  {
     id: 4,
     title: "Working with Himachal Police – Technology for Society",
+    slug: "working-with-himachal-police-technology-for-society",
     excerpt: "When software meets real-world responsibility...",
     coverImage: "/blog/police.webp",
     content: `

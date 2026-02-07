@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BlogPage, BlogPostPage, GalleryPage } from './pages';  //pages
 
 // Context
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -28,8 +29,6 @@ import {
   BlogPreviewSection
 } from './components/sections';
 
-// Pages
-import { BlogPage, GalleryPage } from './pages';
 
 // Styles
 import './styles/animations.css';
@@ -192,6 +191,7 @@ const App = () => {
           <Route path="/" element={<PortfolioHome />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
         </Routes>
       </Router>
     </ThemeProvider>
