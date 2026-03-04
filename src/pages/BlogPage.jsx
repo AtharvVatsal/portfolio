@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { blogPosts, blogCategories } from '../data';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor } from '../components/common';
+import { CustomCursor, SEO } from '../components/common';
 
 const BlogPage = () => {
   const { currentTheme } = useTheme();
@@ -44,6 +44,12 @@ const BlogPage = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+      <SEO
+        title="Blog"
+        description="Thoughts, stories, and insights from Atharv Vatsal — covering tech, machine learning, photography, and life reflections."
+        url="/blog"
+        keywords={['blog', 'tech articles', 'machine learning blog', 'photography blog']}
+      />
       <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Header */}
@@ -188,17 +194,14 @@ const BlogPage = () => {
 
                     {/* Content */}
                     <div className="p-6">
-                      {/* Title */}
                       <h2 className="text-xl font-semibold text-white mb-3 line-clamp-2 group-hover:text-amber-400 transition-colors duration-300">
                         {post.title}
                       </h2>
 
-                      {/* Excerpt */}
                       <p className="text-gray-400 text-sm line-clamp-2 mb-4">
                         {post.excerpt}
                       </p>
 
-                      {/* Meta */}
                       <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-white/5">
                         <span className="flex items-center gap-1.5">
                           <Calendar size={12} />
@@ -210,7 +213,6 @@ const BlogPage = () => {
                         </span>
                       </div>
 
-                      {/* Tags */}
                       <div className="flex flex-wrap gap-2 mt-4">
                         {post.tags.slice(0, 2).map((tag) => (
                           <span

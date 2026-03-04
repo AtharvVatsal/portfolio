@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { galleryPhotos, galleryCategories } from '../data/gallery';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor } from '../components/common';
+import { CustomCursor, SEO } from '../components/common';
 
 const GalleryPage = () => {
   const { currentTheme } = useTheme();
@@ -67,34 +67,22 @@ const GalleryPage = () => {
     setSelectedPhoto(filteredPhotos[newIndex]);
   }, [currentIndex, filteredPhotos]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!selectedPhoto) return;
-      
       if (e.key === 'Escape') closeLightbox();
       if (e.key === 'ArrowLeft') goToPrevious();
       if (e.key === 'ArrowRight') goToNext();
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedPhoto, goToPrevious, goToNext]);
 
-  // Get aspect ratio class for masonry
   const getAspectClass = (aspectRatio, index) => {
-    // Create visual variety in the grid
     const patterns = [
-      'row-span-1', 
-      'row-span-2', 
-      'row-span-1',
-      'row-span-2',
-      'row-span-1',
-      'row-span-1',
-      'row-span-2',
-      'row-span-1',
+      'row-span-1', 'row-span-2', 'row-span-1', 'row-span-2',
+      'row-span-1', 'row-span-1', 'row-span-2', 'row-span-1',
     ];
-    
     if (aspectRatio === 'portrait') return 'row-span-2';
     if (aspectRatio === 'landscape') return 'row-span-1';
     return patterns[index % patterns.length];
@@ -102,6 +90,12 @@ const GalleryPage = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+      <SEO
+        title="Photography Gallery"
+        description="Photography portfolio by Atharv Vatsal — capturing portraits, landscapes, concerts, and nature through a creative lens."
+        url="/gallery"
+        keywords={['photography', 'gallery', 'portrait', 'landscape', 'concert photography', 'Nikon']}
+      />
       <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Header */}
@@ -189,42 +183,39 @@ const GalleryPage = () => {
                   className={`group relative rounded-2xl overflow-hidden cursor-pointer ${getAspectClass(photo.aspectRatio, index)} ${
                     isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
                   }`}
-                  style={{ transitionDelay: `${index * 50}ms`, transition: 'all 0.5s ease' }}
+                  style={{ 
+                    transitionDelay: `${index * 50}ms`,
+                    transition: 'opacity 0.5s ease, transform 0.5s ease'
+                  }}
                 >
                   {hasValidImage ? (
-                    <img
-                      src={photo.thumbnail || photo.src}
-                      alt={photo.title}
-                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
-                      onError={() => handleImageError(photo.id)}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-                      <ImageIcon size={48} className="text-white/30" />
-                    </div>
-                  )}
-                  
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
-                    <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      <h3 className="text-white font-semibold text-lg mb-1">{photo.title}</h3>
-                      <div className="flex items-center gap-2 text-gray-300 text-sm">
-                        <MapPin size={12} />
-                        <span>{photo.location}</span>
+                    <>
+                      <img
+                        src={photo.src}
+                        alt={photo.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        onError={() => handleImageError(photo.id)}
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      
+                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                        <h3 className="text-white font-semibold text-sm mb-1 line-clamp-1">{photo.title}</h3>
+                        <div className="flex items-center gap-2 text-gray-300 text-xs">
+                          <MapPin size={12} />
+                          <span className="line-clamp-1">{photo.location}</span>
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* Category Badge */}
-                  <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-medium bg-black/50 backdrop-blur-md text-white/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    {photo.category}
-                  </div>
-
-                  {/* Featured Badge */}
-                  {photo.featured && (
-                    <div className="absolute top-3 right-3">
-                      <Sparkles size={16} className="text-amber-400" />
+                      {photo.featured && (
+                        <div className="absolute top-3 right-3">
+                          <Sparkles size={16} className="text-amber-400 drop-shadow-lg" />
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl">
+                      <ImageIcon size={32} className="text-gray-600" />
                     </div>
                   )}
                 </div>
@@ -237,7 +228,7 @@ const GalleryPage = () => {
       {/* Footer */}
       <footer className="py-12 text-center border-t border-white/5">
         <Sparkles size={24} className="inline-block text-purple-400/40 animate-pulse mb-4" />
-        <p className="text-gray-600 text-sm mb-4">More photographs coming soon...</p>
+        <p className="text-gray-600 text-sm mb-4">Every frame tells a story...</p>
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-gray-500 hover:text-purple-400 transition-colors"
@@ -253,7 +244,6 @@ const GalleryPage = () => {
           className="fixed inset-0 z-[100] flex"
           onClick={closeLightbox}
         >
-          {/* Blurred Background */}
           <div 
             className="absolute inset-0 bg-black/90 backdrop-blur-xl"
             style={{
@@ -264,10 +254,7 @@ const GalleryPage = () => {
             }}
           />
           
-          {/* Content Container */}
           <div className="relative w-full h-full flex flex-col lg:flex-row" onClick={(e) => e.stopPropagation()}>
-            
-            {/* Close Button */}
             <button
               onClick={closeLightbox}
               className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
@@ -275,7 +262,6 @@ const GalleryPage = () => {
               <X size={24} />
             </button>
 
-            {/* Navigation - Previous */}
             <button
               onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
               className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-110"
@@ -283,7 +269,6 @@ const GalleryPage = () => {
               <ChevronLeft size={28} />
             </button>
 
-            {/* Navigation - Next */}
             <button
               onClick={(e) => { e.stopPropagation(); goToNext(); }}
               className="absolute right-4 lg:right-[340px] top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-110"
@@ -291,7 +276,6 @@ const GalleryPage = () => {
               <ChevronRight size={28} />
             </button>
 
-            {/* Main Image Area */}
             <div className="flex-1 flex items-center justify-center p-4 lg:p-8 lg:pr-[340px]">
               <img
                 src={selectedPhoto.src}
@@ -301,24 +285,19 @@ const GalleryPage = () => {
               />
             </div>
 
-            {/* Sidebar */}
             <div className="lg:absolute lg:right-0 lg:top-0 lg:bottom-0 lg:w-[320px] bg-black/50 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-white/10 overflow-y-auto">
               <div className="p-6 space-y-6">
-                
-                {/* Title & Description */}
                 <div>
                   <h2 className="text-2xl font-bold text-white mb-2">{selectedPhoto.title}</h2>
                   <p className="text-gray-400 text-sm leading-relaxed">{selectedPhoto.description}</p>
                 </div>
 
-                {/* Category */}
                 <div>
                   <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-purple-500/20 text-purple-400">
                     {selectedPhoto.category}
                   </span>
                 </div>
 
-                {/* Location & Date */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-gray-300">
                     <MapPin size={18} className="text-purple-400" />
@@ -330,10 +309,8 @@ const GalleryPage = () => {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="h-px bg-white/10"></div>
 
-                {/* Camera Info */}
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Equipment</h3>
                   <div className="space-y-2">
@@ -348,10 +325,8 @@ const GalleryPage = () => {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="h-px bg-white/10"></div>
 
-                {/* EXIF Data */}
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Settings</h3>
                   <div className="grid grid-cols-2 gap-3">
@@ -386,10 +361,8 @@ const GalleryPage = () => {
                   </div>
                 </div>
 
-                {/* Divider */}
                 <div className="h-px bg-white/10"></div>
 
-                {/* Tags */}
                 <div>
                   <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Tags</h3>
                   <div className="flex flex-wrap gap-2">
@@ -404,14 +377,12 @@ const GalleryPage = () => {
                   </div>
                 </div>
 
-                {/* Photo Counter */}
                 <div className="text-center pt-4 border-t border-white/10">
                   <span className="text-gray-500 text-sm">
                     {currentIndex + 1} / {filteredPhotos.length}
                   </span>
                 </div>
 
-                {/* Keyboard Hint */}
                 <div className="flex items-center justify-center gap-4 text-gray-600 text-xs">
                   <span className="flex items-center gap-1">
                     <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">←</kbd>

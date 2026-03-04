@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Code, ExternalLink, ArrowRight, Github } from 'lucide-react';
 import { projects } from '../../data';
 import { PROJECT_LINKS } from '../../config/links';
+import { MouseGlow } from '../common';
 
 const TechProjectsSection = ({ isVisible, mousePosition }) => {
   // Show only top 4 projects on main page
@@ -34,15 +35,13 @@ const TechProjectsSection = ({ isVisible, mousePosition }) => {
     >
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden">
-        <div 
-          className="absolute w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full pointer-events-none transition-all duration-700 ease-out"
-          style={{
-            background: `radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, rgba(59, 130, 246, 0.2) 40%, transparent 70%)`,
-            left: `${(mousePosition?.x || 0) - 400}px`,
-            top: `${(mousePosition?.y || 0) - 400}px`,
-            filter: 'blur(100px)',
-          }}
-        ></div>
+        <MouseGlow
+          mousePosition={mousePosition}
+          size={800}
+          blur={100}
+          smoothing={0.08}
+          gradient="radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, rgba(59, 130, 246, 0.2) 40%, transparent 70%)"
+        />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 w-full">

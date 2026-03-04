@@ -8,11 +8,19 @@ import {
   Home,
   ChevronLeft,
   ChevronRight,
-  BookOpen
+  BookOpen,
+  Loader2
 } from 'lucide-react';
 import { blogPosts } from '../data';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor } from '../components/common';
+import { CustomCursor, SEO } from '../components/common';
+import { MarkdownRenderer, extractHeadings, TableOfContents, ReadingProgress } from '../components/blog';
+
+// Helper to convert "06-02-2026" → "2026-02-06"
+const parseDate = (dateStr) => {
+  const [day, month, year] = dateStr.split('-');
+  return `${year}-${month}-${day}`;
+};
 
 const BlogPostPage = () => {
   const { slug } = useParams();
@@ -20,41 +28,65 @@ const BlogPostPage = () => {
   const { currentTheme } = useTheme();
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [markdownContent, setMarkdownContent] = useState('');
+  const [isLoadingContent, setIsLoadingContent] = useState(true);
+  const [contentError, setContentError] = useState(false);
 
-  // Find current post by slug
   const currentIndex = blogPosts.findIndex(post => post.slug === slug);
   const post = blogPosts[currentIndex];
-  
-  // Get previous and next posts
   const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
-    setImageError(false); // Reset image error when post changes
+    setImageError(false);
   }, [slug]);
+
+  // Fetch markdown content
+  useEffect(() => {
+    if (!post?.markdownFile) {
+      setIsLoadingContent(false);
+      setContentError(true);
+      return;
+    }
+
+    setIsLoadingContent(true);
+    setContentError(false);
+    setMarkdownContent('');
+
+    fetch(post.markdownFile)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load post');
+        return res.text();
+      })
+      .then(text => {
+        setMarkdownContent(text);
+        setIsLoadingContent(false);
+      })
+      .catch(err => {
+        console.error('Error loading markdown:', err);
+        setContentError(true);
+        setIsLoadingContent(false);
+      });
+  }, [post]);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft' && prevPost) {
-        navigate(`/blog/${prevPost.slug}`);
-      } else if (e.key === 'ArrowRight' && nextPost) {
-        navigate(`/blog/${nextPost.slug}`);
-      } else if (e.key === 'Escape') {
-        navigate('/blog');
-      }
+      if (e.key === 'ArrowLeft' && prevPost) navigate(`/blog/${prevPost.slug}`);
+      else if (e.key === 'ArrowRight' && nextPost) navigate(`/blog/${nextPost.slug}`);
+      else if (e.key === 'Escape') navigate('/blog');
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [prevPost, nextPost, navigate]);
 
-  // Handle 404
+  // 404
   if (!post) {
     return (
       <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white flex items-center justify-center`}>
+        <SEO title="Post Not Found" description="The blog post you're looking for doesn't exist." noIndex />
         <div className="text-center">
           <div className="text-6xl mb-4">📝</div>
           <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
@@ -72,10 +104,27 @@ const BlogPostPage = () => {
   }
 
   const hasValidImage = post.coverImage && !imageError;
+  const headings = markdownContent ? extractHeadings(markdownContent) : [];
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+      {/* SEO with article structured data */}
+      <SEO
+        title={post.title}
+        description={post.excerpt}
+        image={post.coverImage}
+        url={`/blog/${post.slug}`}
+        type="article"
+        keywords={post.tags}
+        article={{
+          publishedTime: parseDate(post.date),
+          tags: post.tags,
+          author: 'Atharv Vatsal',
+        }}
+      />
+
       <CustomCursor isTouchDevice={isTouchDevice} />
+      <ReadingProgress />
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">
@@ -89,7 +138,6 @@ const BlogPostPage = () => {
           </Link>
           
           <div className="flex items-center gap-4">
-            {/* Post navigation in header */}
             <div className="hidden sm:flex items-center gap-2">
               <button
                 onClick={() => prevPost && navigate(`/blog/${prevPost.slug}`)}
@@ -142,7 +190,6 @@ const BlogPostPage = () => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
           
-          {/* Title overlay on image */}
           <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 md:p-16">
             <div className="max-w-3xl mx-auto">
               <div className="flex items-center gap-4 mb-4 flex-wrap">
@@ -165,7 +212,6 @@ const BlogPostPage = () => {
           </div>
         </div>
       ) : (
-        // Fallback header without image
         <div className="pt-12 pb-8 px-4">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center gap-4 mb-4 flex-wrap">
@@ -197,19 +243,34 @@ const BlogPostPage = () => {
           </div>
         )}
 
-        {/* Content */}
-        <div 
-          className="prose prose-invert prose-lg max-w-none
-            prose-headings:text-white prose-headings:font-semibold
-            prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-            prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
-            prose-ul:text-gray-300 prose-li:mb-2
-            prose-strong:text-white
-            prose-a:text-cyan-400 prose-a:no-underline hover:prose-a:underline
-            prose-code:text-amber-400 prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
-            prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        {!isLoadingContent && headings.length > 0 && (
+          <TableOfContents headings={headings} />
+        )}
+
+        {isLoadingContent ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 size={32} className="animate-spin text-amber-400" />
+              <span className="text-gray-500">Loading article...</span>
+            </div>
+          </div>
+        ) : contentError ? (
+          <div className="text-center py-20">
+            <div className="text-5xl mb-4">😵</div>
+            <h3 className="text-xl font-medium text-gray-400 mb-2">Failed to load article</h3>
+            <p className="text-gray-500 mb-6">Something went wrong while loading this post.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        ) : (
+          <div className="markdown-content">
+            <MarkdownRenderer content={markdownContent} />
+          </div>
+        )}
 
         {/* Tags */}
         <div className="mt-12 pt-8 border-t border-white/10">
@@ -229,7 +290,6 @@ const BlogPostPage = () => {
         {/* Post Navigation */}
         <div className="mt-12 pt-8 border-t border-white/10">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Previous Post */}
             {prevPost ? (
               <Link
                 to={`/blog/${prevPost.slug}`}
@@ -243,11 +303,8 @@ const BlogPostPage = () => {
                   {prevPost.title}
                 </h3>
               </Link>
-            ) : (
-              <div></div>
-            )}
+            ) : <div></div>}
 
-            {/* Next Post */}
             {nextPost ? (
               <Link
                 to={`/blog/${nextPost.slug}`}
@@ -261,9 +318,7 @@ const BlogPostPage = () => {
                   {nextPost.title}
                 </h3>
               </Link>
-            ) : (
-              <div></div>
-            )}
+            ) : <div></div>}
           </div>
         </div>
 
@@ -299,7 +354,6 @@ const BlogPostPage = () => {
         </div>
       </article>
 
-      {/* Footer */}
       <footer className="py-8 text-center border-t border-white/5">
         <p className="text-gray-600 text-sm">© 2025 Atharv Vatsal</p>
       </footer>

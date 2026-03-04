@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { BlogPage, BlogPostPage, GalleryPage, ProjectsPage } from './pages';  //pages
 
 // Context
@@ -14,7 +15,7 @@ import {
 
 // Components
 import { Preloader } from './components/preloader';
-import { CustomCursor, FloatingActionButtons, SectionDivider } from './components/common';
+import { CustomCursor, FloatingActionButtons, SectionDivider, SEO } from './components/common';
 import { Navbar, Footer } from './components/layout';
 import {
   HeroSection,
@@ -88,6 +89,9 @@ const PortfolioHome = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white overflow-x-hidden ${!isTouchDevice ? 'cursor-none' : ''}`}>
+      {/* SEO */}
+      <SEO url="/" keywords={['portfolio', 'AI engineer', 'photographer', 'VIT Vellore']} />
+
       {/* Preloader */}
       <Preloader progress={loadingProgress} isLoading={isLoading} />
 
@@ -182,20 +186,22 @@ const PortfolioHome = () => {
   );
 };
 
-// Main App Component with Router and ThemeProvider
+// Main App Component with Router, ThemeProvider, and HelmetProvider
 const App = () => {
   return (
-    <ThemeProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<PortfolioHome />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<PortfolioHome />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 };
 

@@ -5,6 +5,7 @@ import { useTypingEffect } from '../../hooks';
 import { useGreeting } from '../../hooks';
 import { roles, taglines } from '../../data';
 import { SOCIAL_LINKS } from '../../config/links';
+import { MouseGlow } from '../common';
 
 const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
   const { theme } = useTheme();
@@ -25,7 +26,7 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20 px-4"
+      className="min-h-screen flex items-center justify-center relative overflow-hidden pt-16 sm:pt-20 lg:pt-24 px-4"
       style={{
         transform: parallaxOffset ? `translate(${parallaxOffset.x}px, ${parallaxOffset.y}px)` : 'none',
         transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -34,16 +35,22 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
       {/* Enhanced Background */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Mouse spotlight */}
-        <div 
-          className="absolute w-[600px] h-[600px] md:w-[800px] md:h-[800px] rounded-full pointer-events-none transition-all duration-700 ease-out"
-          style={{
-            background: `radial-gradient(circle, rgba(34, 211, 238, ${0.4 - (scrollY || 0) * 0.0003}) 0%, rgba(168, 85, 247, ${0.3 - (scrollY || 0) * 0.0002}) 40%, transparent 70%)`,
-            left: `${mousePosition.x - 300}px`,
-            top: `${mousePosition.y - 300}px`,
-            filter: 'blur(80px)',
-            transform: `scale(${1 + (scrollY || 0) * 0.0005})`,
-          }}
-        ></div>
+        <MouseGlow
+          mousePosition={mousePosition}
+          size={800}
+          blur={80}
+          smoothing={0.08}
+          className="hidden md:block"
+          gradient={`radial-gradient(circle, rgba(34, 211, 238, ${0.4 - (scrollY || 0) * 0.0003}) 0%, rgba(168, 85, 247, ${0.3 - (scrollY || 0) * 0.0002}) 40%, transparent 70%)`}
+        />
+        <MouseGlow
+          mousePosition={mousePosition}
+          size={600}
+          blur={80}
+          smoothing={0.08}
+          className="md:hidden"
+          gradient={`radial-gradient(circle, rgba(34, 211, 238, ${0.4 - (scrollY || 0) * 0.0003}) 0%, rgba(168, 85, 247, ${0.3 - (scrollY || 0) * 0.0002}) 40%, transparent 70%)`}
+        />
 
         {/* Animated grid */}
         <div className="absolute inset-0 opacity-20">
@@ -71,9 +78,9 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
       <div className="relative z-10 text-center max-w-5xl mx-auto">
         {/* Greeting */}
         <div className="mb-4 animate-fade-in">
-          <span className="px-4 py-2 rounded-full backdrop-blur-xl bg-white/5 border border-white/10 text-sm text-gray-300">
-            <Sparkles className="inline w-4 h-4 mr-2 text-cyan-400" />
-            {greeting}, Welcome to my Portfolio
+          <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-full backdrop-blur-xl bg-white/5 border border-white/10 text-xs sm:text-sm text-gray-300 max-w-full">
+            <Sparkles className="inline w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2 text-cyan-400 flex-shrink-0" />
+            <span className="truncate">{greeting}, Welcome to my Portfolio</span>
           </span>
         </div>
 

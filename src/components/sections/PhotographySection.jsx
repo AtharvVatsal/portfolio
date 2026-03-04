@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Camera, ArrowRight, Sparkles } from 'lucide-react';
 import { photoCategories } from '../../data';
 import { galleryPhotos } from '../../data/gallery';
+import { MouseGlow } from '../common';
 
 const PhotographySection = ({ isVisible, mousePosition }) => {
   const [imageErrors, setImageErrors] = useState({});
@@ -143,14 +144,13 @@ const PhotographySection = ({ isVisible, mousePosition }) => {
 
       {/* Mouse follow gradient */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-        <div 
-          className="absolute w-[500px] h-[500px] rounded-full transition-all duration-1000 ease-out opacity-60"
-          style={{
-            background: `radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.2) 40%, transparent 70%)`,
-            left: `${(mousePosition?.x || 0) - 250}px`,
-            top: `${(mousePosition?.y || 0) - 250}px`,
-            filter: 'blur(60px)',
-          }}
+        <MouseGlow
+          mousePosition={mousePosition}
+          size={500}
+          blur={60}
+          smoothing={0.08}
+          className="opacity-60"
+          gradient="radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.2) 40%, transparent 70%)"
         />
       </div>
 
