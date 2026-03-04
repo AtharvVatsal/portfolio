@@ -57,72 +57,122 @@ const AIChatbot = ({ isOpen, onClose }) => {
     setError(null);
 
     try {
-      // Build conversation history for context
-      const conversationHistory = messages.map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      }));
+      // Check if API key exists
+      if (!GEMINI_CONFIG.apiKey) {
+        throw new Error('AI assistant is not configured. API key missing.');
+      }
 
-      // Add user's new message
-      conversationHistory.push({
-        role: 'user',
-        parts: [{ text: input.trim() }]
+      // Build conversation history for context
+      // Gemini requires first message to be 'user' role, so skip
+      // any assistant messages before the first user message
+      const allMessages = [...messages, { role: 'user', content: input.trim() }];
+      
+      const firstUserIndex = allMessages.findIndex(msg => msg.role === 'user');
+      const relevantMessages = allMessages
+        .slice(firstUserIndex)
+        .filter(msg => !msg.isError) // skip error bubbles
+        .map(msg => ({
+          role: msg.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: msg.content }]
+        }));
+
+      // Gemini requires alternating roles — merge consecutive same-role messages
+      const conversationHistory = relevantMessages.reduce((acc, msg) => {
+        if (acc.length > 0 && acc[acc.length - 1].role === msg.role) {
+          acc[acc.length - 1].parts[0].text += '\n' + msg.parts[0].text;
+        } else {
+          acc.push(msg);
+        }
+        return acc;
+      }, []);
+
+      const requestBody = JSON.stringify({
+        contents: conversationHistory,
+        systemInstruction: {
+          parts: [{ text: PORTFOLIO_CONTEXT }]
+        },
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+        safetySettings: [
+          { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+          { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
+        ],
       });
 
-      const response = await fetch(
-        `${GEMINI_CONFIG.apiUrl}/${GEMINI_CONFIG.model}:generateContent?key=${GEMINI_CONFIG.apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            contents: conversationHistory,
-            systemInstruction: {
-              parts: [{ text: PORTFOLIO_CONTEXT }]
-            },
-            generationConfig: {
-              temperature: 0.7,
-              topK: 40,
-              topP: 0.95,
-              maxOutputTokens: 1024,
-            },
-            safetySettings: [
-              { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-              { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-              { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-              { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_MEDIUM_AND_ABOVE" },
-            ],
-          }),
+      // Try with primary model, retry with backoff, then fallback model
+      const models = [GEMINI_CONFIG.model, 'gemini-2.5-flash-lite'];
+      let lastError = null;
+
+      for (const model of models) {
+        for (let attempt = 0; attempt < 3; attempt++) {
+          if (attempt > 0) {
+            // Exponential backoff: 1s, 2s
+            await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt - 1)));
+          }
+
+          const response = await fetch(
+            `${GEMINI_CONFIG.apiUrl}/${model}:generateContent?key=${GEMINI_CONFIG.apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: requestBody,
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+              const assistantMessage = {
+                id: Date.now() + 1,
+                role: 'assistant',
+                content: data.candidates[0].content.parts[0].text,
+                timestamp: new Date(),
+              };
+              setMessages(prev => [...prev, assistantMessage]);
+              return; // Success — exit entirely
+            } else {
+              lastError = new Error('Invalid response format');
+              break; // Don't retry format errors
+            }
+          }
+
+          const errorData = await response.json().catch(() => ({}));
+          console.error(`Gemini API error (${model}, attempt ${attempt + 1}):`, response.status, errorData);
+
+          if (response.status === 429) {
+            lastError = new Error('Rate limit hit — retrying...');
+            continue; // Retry this model
+          } else if (response.status === 400) {
+            lastError = new Error('Bad request — check API key and model name.');
+            break; // Try next model
+          } else if (response.status === 403 || response.status === 401) {
+            throw new Error('API key is invalid or expired.');
+          } else if (response.status === 404) {
+            lastError = new Error(`Model "${model}" not found.`);
+            break; // Try next model
+          } else {
+            lastError = new Error(`API error: ${response.status}`);
+            break;
+          }
         }
-      );
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
       }
 
-      const data = await response.json();
-      
-      if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-        const assistantMessage = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          content: data.candidates[0].content.parts[0].text,
-          timestamp: new Date(),
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-      } else {
-        throw new Error('Invalid response format');
-      }
+      // If we exhausted all retries and models
+      throw lastError || new Error('Failed to get a response. Please try again.');
     } catch (err) {
       console.error('Chat error:', err);
-      setError('Sorry, I encountered an error. Please try again.');
+      setError(err.message);
       
-      // Add error message to chat
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'assistant',
-        content: "I'm having trouble connecting right now. Please try again in a moment, or feel free to use the Contact section to reach Atharv directly!",
+        content: `⚠️ ${err.message}\n\nFeel free to use the Contact section to reach Atharv directly!`,
         timestamp: new Date(),
         isError: true,
       }]);
@@ -277,7 +327,7 @@ const AIChatbot = ({ isOpen, onClose }) => {
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyPress}
                   placeholder="Ask me anything..."
                   disabled={isLoading}
                   className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors disabled:opacity-50"

@@ -6,9 +6,9 @@ export const projects = [
     title: 'DriveSense: Autonomous Driving Perception with YOLOv8 & U-Net',
     description: 'A dual-pipeline computer vision system combining YOLOv8 object detection and U-Net semantic segmentation for real-time road scene understanding, trained on BDD100K and Cityscapes datasets.',
     tech: ['PyTorch', 'YOLOv8', 'U-Net', 'OpenCV', 'Albumentations', 'NumPy', 'Matplotlib', 'Seaborn', 'Pandas', 'CUDA'],
-    color: 'from-teal-400 to-indigo-500',
+    color: 'from-violet-400 to-teal-500',
     icon: ScanEye,
-    gradient: 'from-teal-500/20 to-indigo-500/20',
+    gradient: 'from-violet-400/20 to-indigo-700/20',
     projectKey: 'drivesense'
   },
   {
