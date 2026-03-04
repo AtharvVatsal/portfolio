@@ -1,19 +1,28 @@
 import React from 'react';
-import { Code, ExternalLink, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Code, ExternalLink, ArrowRight, Github } from 'lucide-react';
 import { projects } from '../../data';
-import { PROJECT_LINKS, SOCIAL_LINKS } from '../../config/links';
+import { PROJECT_LINKS } from '../../config/links';
 
 const TechProjectsSection = ({ isVisible, mousePosition }) => {
-  const handleProjectClick = (projectKey) => {
+  // Show only top 4 projects on main page
+  const displayedProjects = projects.slice(0, 4);
+
+  const handleDemoClick = (e, projectKey) => {
+    e.stopPropagation();
     const project = PROJECT_LINKS[projectKey];
     if (project) {
       const url = project.demo || project.github;
-      window.open(url, '_blank', 'noopener,noreferrer');
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
-  const handleViewAllClick = () => {
-    window.open(SOCIAL_LINKS.github, '_blank', 'noopener,noreferrer');
+  const handleGithubClick = (e, projectKey) => {
+    e.stopPropagation();
+    const project = PROJECT_LINKS[projectKey];
+    if (project?.github) {
+      window.open(project.github, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -52,14 +61,17 @@ const TechProjectsSection = ({ isVisible, mousePosition }) => {
 
         {/* Projects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-          {projects.map((project, index) => {
+          {displayedProjects.map((project, index) => {
             const Icon = project.icon;
+            const projectLinks = PROJECT_LINKS[project.projectKey];
+            const hasGithub = projectLinks?.github;
+            const hasDemo = projectLinks?.demo || projectLinks?.github;
+
             return (
               <div
                 key={project.id}
-                className="group relative p-6 sm:p-8 rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-700 hover:scale-[1.02] hover:border-cyan-400/50 cursor-pointer animate-fade-in-up"
+                className="group relative p-6 sm:p-8 rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-700 hover:scale-[1.02] hover:border-cyan-400/50 animate-fade-in-up"
                 style={{ animationDelay: `${index * 0.15}s` }}
-                onClick={() => handleProjectClick(project.projectKey)}
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${project.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
@@ -97,30 +109,45 @@ const TechProjectsSection = ({ isVisible, mousePosition }) => {
                     )}
                   </div>
                   
-                  {/* View Project Button */}
-                  <button
-                    className={`flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-to-r ${project.color} text-white font-medium text-sm sm:text-base hover:shadow-lg transition-all duration-500 group`}
-                  >
-                    <span>View Project</span>
-                    <ExternalLink size={16} className="sm:w-5 sm:h-5 group-hover:rotate-45 transition-transform duration-500" />
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* View Project / Demo Button */}
+                    {hasDemo && (
+                      <button
+                        onClick={(e) => handleDemoClick(e, project.projectKey)}
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl bg-gradient-to-r ${project.color} text-white font-medium text-sm sm:text-base hover:shadow-lg transition-all duration-500 group/btn`}
+                      >
+                        <span>View Project</span>
+                        <ExternalLink size={16} className="sm:w-5 sm:h-5 group-hover/btn:rotate-45 transition-transform duration-500" />
+                      </button>
+                    )}
+
+                    {/* GitHub Button */}
+                    {hasGithub && (
+                      <button
+                        onClick={(e) => handleGithubClick(e, project.projectKey)}
+                        className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-medium text-sm sm:text-base transition-all duration-500 group/git"
+                      >
+                        <Github size={16} className="sm:w-5 sm:h-5" />
+                        <span>Source Code</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* View All Button */}
+        {/* View All Projects Button - Links to /projects page */}
         <div className="text-center mt-12">
-          <button 
-            onClick={handleViewAllClick}
-            className="px-8 py-4 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-700 hover:scale-105 font-medium group"
+          <Link 
+            to="/projects"
+            className="px-8 py-4 rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-700 hover:scale-105 font-medium group inline-flex items-center gap-2"
           >
-            <span className="flex items-center gap-2">
-              View All Projects
-              <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-500" />
-            </span>
-          </button>
+            View All Projects
+            <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-500" />
+          </Link>
         </div>
       </div>
     </section>

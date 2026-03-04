@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { BlogPage, BlogPostPage, GalleryPage } from './pages';  //pages
+import { BlogPage, BlogPostPage, GalleryPage, ProjectsPage } from './pages';  //pages
 
 // Context
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -191,6 +191,7 @@ const App = () => {
           <Route path="/" element={<PortfolioHome />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
         </Routes>
       </Router>
