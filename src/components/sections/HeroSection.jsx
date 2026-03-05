@@ -1,5 +1,6 @@
 import React from 'react';
-import { Github, Linkedin, Instagram, ChevronDown, Sparkles } from 'lucide-react';
+import { Github, Linkedin, Instagram, ChevronDown, Sparkles, FileText } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
 import { useTypingEffect } from '../../hooks';
 import { useGreeting } from '../../hooks';
@@ -122,6 +123,17 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
               <social.icon size={24} />
             </button>
           ))}
+        </div>
+
+        {/* Resume CTA */}
+        <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.8s' }}>
+          <Link
+            to="/resume"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full backdrop-blur-xl bg-white/5 border border-white/10 text-sm text-gray-300 hover:text-white hover:bg-white/10 hover:border-cyan-400/30 transition-all duration-500 hover:scale-105"
+          >
+            <FileText size={16} className="text-cyan-400" />
+            View Interactive Resume
+          </Link>
         </div>
 
         {/* Scroll indicator */}

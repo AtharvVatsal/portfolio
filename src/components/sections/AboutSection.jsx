@@ -1,5 +1,6 @@
 import React from 'react';
-import { Code, Camera, Film, Award, Download } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Code, Camera, Film, Award, Download, FileText } from 'lucide-react';
 import { RESUME_LINK } from '../../config/links';
 
 const AboutSection = ({ isVisible }) => {
@@ -185,15 +186,15 @@ const AboutSection = ({ isVisible }) => {
                 <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></span>
               </button>
 
-              <button
-                onClick={handleResumeDownload}
+              <Link
+                to="/resume"
                 className="group px-6 py-3 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-700 hover:scale-105 font-medium"
               >
                 <span className="flex items-center gap-2">
-                  <Download size={18} />
-                  Download Resume
+                  <FileText size={18} className="text-cyan-400" />
+                  View My Resume
                 </span>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

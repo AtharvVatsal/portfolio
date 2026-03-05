@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2, CheckCircle2, XCircle, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2, CheckCircle2, XCircle, X, FileText } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../config/links';
 import { MouseGlow } from '../common';
@@ -93,6 +94,13 @@ const ContactSection = ({ isVisible, mousePosition }) => {
             Let's Connect
           </h2>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-md mx-auto">Have an opportunity or a project in mind? Let's talk!</p>
+          <Link
+            to="/resume"
+            className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm text-gray-400 hover:text-white hover:border-cyan-400/30 hover:bg-white/10 transition-all duration-300"
+          >
+            <FileText size={14} className="text-cyan-400" />
+            View my resume first?
+          </Link>
         </div>
 
         {/* Contact Grid */}

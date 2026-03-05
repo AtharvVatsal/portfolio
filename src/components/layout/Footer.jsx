@@ -1,5 +1,6 @@
 import React from 'react';
-import { Github, Linkedin, Instagram, Camera, Code, Rocket } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Github, Linkedin, Instagram, Camera, Code, Rocket, FileText } from 'lucide-react';
 import { SOCIAL_LINKS } from '../../config/links';
 
 const Footer = () => {
@@ -48,6 +49,24 @@ const Footer = () => {
             <Rocket size={18} className="sm:w-5 sm:h-5 group-hover:rotate-12 group-hover:-translate-y-1 transition-all duration-700" />
             <span className="text-sm sm:text-base">Back to Top</span>
           </button>
+        </div>
+
+        {/* Page Links */}
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-white/5">
+          {[
+            { name: 'Blog', to: '/blog' },
+            { name: 'Projects', to: '/projects' },
+            { name: 'Gallery', to: '/gallery' },
+            { name: 'Resume', to: '/resume' },
+          ].map((page) => (
+            <Link
+              key={page.name}
+              to={page.to}
+              className="text-xs sm:text-sm text-gray-500 hover:text-white transition-colors duration-300"
+            >
+              {page.name}
+            </Link>
+          ))}
         </div>
 
         {/* Copyright */}

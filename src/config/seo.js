@@ -1,8 +1,8 @@
 // Default SEO configuration
 export const SEO_CONFIG = {
   siteName: 'Atharv Vatsal',
-  siteUrl: 'https://atharvvatsal.com', // Update with your actual domain
-  defaultTitle: 'Atharv Vatsal | Engineer • Photographer • Creator',
+  siteUrl: 'https://atharvvatsal.com',
+  defaultTitle: 'Atharv Vatsal',
   titleTemplate: '%s | Atharv Vatsal',
   defaultDescription:
     'Portfolio of Atharv Vatsal — CS student at VIT specializing in AI/ML, Computer Vision, and Photography. Explore projects, blog posts, and a photography gallery.',
