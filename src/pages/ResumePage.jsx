@@ -50,7 +50,7 @@ const ResumePage = () => {
   // ─── DATA ─────────────────────────────────────────────
 
   const highlights = [
-    { value: '6+', label: 'Projects Built', color: 'from-cyan-400 to-blue-500' },
+    { value: '10+', label: 'Projects Built', color: 'from-cyan-400 to-blue-500' },
     { value: '98%', label: 'NLP Accuracy', color: 'from-green-400 to-emerald-500' },
     { value: '7.8M+', label: 'Records Processed', color: 'from-purple-400 to-pink-500' },
     { value: '87.4%', label: 'Prediction Accuracy', color: 'from-amber-400 to-orange-500' },
