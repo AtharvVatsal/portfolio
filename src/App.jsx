@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { BlogPage, BlogPostPage, GalleryPage, ProjectsPage } from './pages';  //pages
 
 // Context
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -13,7 +12,7 @@ import {
   useVisibleSections 
 } from './hooks';
 
-// Components
+// Components (always loaded — needed on home page)
 import { Preloader } from './components/preloader';
 import { CustomCursor, FloatingActionButtons, SectionDivider, SEO } from './components/common';
 import { Navbar, Footer } from './components/layout';
@@ -30,9 +29,26 @@ import {
   BlogPreviewSection
 } from './components/sections';
 
+// Page transition & loading
+import PageTransition from './components/common/PageTransition';
+import PageLoader from './components/common/PageLoader';
+
+// Analytics
+import useAnalytics from './hooks/useAnalytics';
 
 // Styles
 import './styles/animations.css';
+
+// Lazy-loaded pages (code-split into separate chunks)
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
+const GalleryPage = lazy(() => import('./pages/GalleryPage'));
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const ResumePage = lazy(() => import('./pages/ResumePage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+// Module-level flag (survives remounts, resets on full page reload)
+let hasLoadedOnce = false;
 
 // Portfolio Home Page
 const PortfolioHome = () => {
@@ -43,35 +59,61 @@ const PortfolioHome = () => {
     'home', 'about', 'skills', 'tech', 'blog', 'photography', 'contact'
   ]);
 
-  // State
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const isReturnVisit = hasLoadedOnce;
+  const [isLoading, setIsLoading] = useState(!isReturnVisit);
+  const [loadingProgress, setLoadingProgress] = useState(isReturnVisit ? 100 : 0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
-  // Detect touch device
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
-  // Loading animation
+  // Preloader — only on first visit
   useEffect(() => {
+    if (isReturnVisit) return;
+
     const timer = setInterval(() => {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setTimeout(() => setIsLoading(false), 200);
+          setTimeout(() => {
+            setIsLoading(false);
+            hasLoadedOnce = true;
+          }, 200);
           return 100;
         }
-        return prev + 4;  // Much faster increment
+        return prev + 4;
       });
-    }, 20);  // Faster interval
-
+    }, 20);
     return () => clearInterval(timer);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Save scroll position continuously while on home page
+  useEffect(() => {
+    const handleScroll = () => {
+      sessionStorage.setItem('homeScrollY', String(window.scrollY));
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Scroll to section function
+  // Restore scroll position on return visit
+  useEffect(() => {
+    if (!isReturnVisit) return;
+
+    const saved = sessionStorage.getItem('homeScrollY');
+    if (saved && Number(saved) > 0) {
+      // Multiple rAF to ensure DOM is fully painted
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, Number(saved));
+        });
+      });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -81,7 +123,6 @@ const PortfolioHome = () => {
     }
   };
 
-  // Calculate parallax offset for hero
   const parallaxOffset = {
     x: (mousePosition.x - window.innerWidth / 2) * 0.02,
     y: (mousePosition.y - window.innerHeight / 2) * 0.02,
@@ -89,22 +130,17 @@ const PortfolioHome = () => {
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white overflow-x-hidden ${!isTouchDevice ? 'cursor-none' : ''}`}>
-      {/* SEO */}
       <SEO url="/" keywords={['portfolio', 'AI engineer', 'photographer', 'VIT Vellore']} />
 
-      {/* Preloader */}
-      <Preloader progress={loadingProgress} isLoading={isLoading} />
-
-      {/* Custom Cursor (Desktop Only) */}
+      {/* Preloader — only on first visit */}
+      {!isReturnVisit && <Preloader progress={loadingProgress} isLoading={isLoading} />}
       <CustomCursor isTouchDevice={isTouchDevice} />
 
-      {/* Scroll Progress Bar */}
       <div 
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 z-[60] transition-all duration-300"
         style={{ width: `${scrollProgress}%` }}
       />
 
-      {/* Navigation */}
       <Navbar
         isMenuOpen={isMenuOpen}
         setIsMenuOpen={setIsMenuOpen}
@@ -113,92 +149,61 @@ const PortfolioHome = () => {
         scrollToSection={scrollToSection}
       />
 
-      {/* Main Content */}
       <main>
-        {/* Hero Section */}
-        <HeroSection 
-          mousePosition={mousePosition}
-          scrollY={scrollY}
-          parallaxOffset={parallaxOffset}
-        />
-
+        <HeroSection mousePosition={mousePosition} scrollY={scrollY} parallaxOffset={parallaxOffset} />
         <SectionDivider color="cyan" />
-
-        {/* About Section */}
         <AboutSection isVisible={visibleSections.has('about')} />
-
-        {/* Stats Section */}
         <StatsSection />
-
         <SectionDivider color="purple" />
-
-        {/* Skills Section */}
         <SkillsSection isVisible={visibleSections.has('skills')} />
-
-        {/* Quote Section */}
         <QuoteSection isVisible={visibleSections.has('skills')} />
-
         <SectionDivider color="blue" />
-
-        {/* Tech Projects Section */}
-        <TechProjectsSection 
-          isVisible={visibleSections.has('tech')}
-          mousePosition={mousePosition}
-        />
-
+        <TechProjectsSection isVisible={visibleSections.has('tech')} mousePosition={mousePosition} />
         <SectionDivider color="purple" />
-
-        {/* Photography Section */}
-        <PhotographySection 
-          isVisible={visibleSections.has('photography')}
-          mousePosition={mousePosition}
-        />
-
+        <PhotographySection isVisible={visibleSections.has('photography')} mousePosition={mousePosition} />
         <SectionDivider color="cyan" />
-
-        {/* Blog Preview Section */}
         <BlogPreviewSection />
-
         <SectionDivider color="pink" />
-
-        {/* Testimonials Section */}
         <TestimonialsSection />
-
         <SectionDivider color="cyan" />
-
-        {/* Contact Section */}
-        <ContactSection 
-          isVisible={visibleSections.has('contact')}
-          mousePosition={mousePosition}
-        />
+        <ContactSection isVisible={visibleSections.has('contact')} mousePosition={mousePosition} />
       </main>
 
-      {/* Footer */}
       <Footer />
-
-      {/* Floating Action Buttons */}
-      <FloatingActionButtons
-        scrollY={scrollY}
-        showAIAssistant={showAIAssistant}
-        setShowAIAssistant={setShowAIAssistant}
-      />
+      <FloatingActionButtons scrollY={scrollY} showAIAssistant={showAIAssistant} setShowAIAssistant={setShowAIAssistant} />
     </div>
   );
 };
 
-// Main App Component with Router, ThemeProvider, and HelmetProvider
+// Animated routes wrapper
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  useAnalytics(); // Track page views on route change
+
+  return (
+    <PageTransition>
+      <Suspense fallback={<PageLoader />}>
+        <Routes location={location}>
+          <Route path="/" element={<PortfolioHome />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/resume" element={<ResumePage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
+    </PageTransition>
+  );
+};
+
+// Main App Component
 const App = () => {
   return (
     <HelmetProvider>
       <ThemeProvider>
         <Router>
-          <Routes>
-            <Route path="/" element={<PortfolioHome />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/gallery" element={<GalleryPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-          </Routes>
+          <AnimatedRoutes />
         </Router>
       </ThemeProvider>
     </HelmetProvider>

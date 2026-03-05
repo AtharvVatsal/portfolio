@@ -16,7 +16,8 @@ const Navbar = ({
   const isOnBlogPage = location.pathname === '/blog';
   const isOnGalleryPage = location.pathname === '/gallery';
   const isOnProjectsPage = location.pathname === '/projects';
-  const isOnSubPage = isOnBlogPage || isOnGalleryPage || isOnProjectsPage;
+  const isOnResumePage = location.pathname === '/resume';
+  const isOnSubPage = isOnBlogPage || isOnGalleryPage || isOnProjectsPage || isOnResumePage;
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -48,6 +49,7 @@ const Navbar = ({
     { name: 'Tech', type: 'scroll' },
     { name: 'Blog', type: 'link', to: '/blog' },
     { name: 'Gallery', type: 'link', to: '/gallery' },
+    { name: 'Resume', type: 'link', to: '/resume' },
     { name: 'Contact', type: 'scroll' },
   ];
 
@@ -98,7 +100,11 @@ const Navbar = ({
                     : activeSection === item.name.toLowerCase();
 
                   if (item.type === 'link') {
-                    const isGallery = item.name === 'Gallery';
+                    const linkColor = item.name === 'Gallery' 
+                      ? 'from-purple-400 to-pink-500' 
+                      : item.name === 'Resume'
+                        ? 'from-cyan-400 to-blue-500'
+                        : 'from-amber-400 to-orange-500';
                     return (
                       <Link
                         key={item.name}
@@ -108,7 +114,7 @@ const Navbar = ({
                         }`}
                       >
                         {item.name}
-                        <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${isGallery ? 'from-purple-400 to-pink-500' : 'from-amber-400 to-orange-500'} transition-all duration-700 ${
+                        <span className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${linkColor} transition-all duration-700 ${
                           isActive ? 'w-full' : 'w-0 group-hover:w-full'
                         }`}></span>
                       </Link>

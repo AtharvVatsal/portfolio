@@ -4,3 +4,5 @@ export { default as SectionDivider } from './SectionDivider';
 export { default as AIChatbot } from './AIChatbot';
 export { default as SEO } from './SEO';
 export { default as MouseGlow } from './MouseGlow';
+export { default as PageTransition } from './PageTransition';
+export { default as PageLoader } from './PageLoader';

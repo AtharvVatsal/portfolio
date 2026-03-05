@@ -222,7 +222,7 @@ const AIChatbot = ({ isOpen, onClose }) => {
               <Bot size={20} className="text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">AI Assistant</h3>
+              <h3 className="font-semibold text-white">AI Chatbot</h3>
               <p className="text-xs text-white/70">
                 {isLoading ? 'Typing...' : 'Online'}
               </p>
