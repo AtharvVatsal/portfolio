@@ -1,11 +1,19 @@
-import React, { useState } from 'react';
-import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2, CheckCircle2, XCircle, X } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../config/links';
 import { MouseGlow } from '../common';
 
 const ContactSection = ({ isVisible, mousePosition }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Auto-dismiss toast after 5 seconds
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 5000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,25 +27,24 @@ const ContactSection = ({ isVisible, mousePosition }) => {
     };
     
     try {
+      // Just ONE call! EmailJS will automatically send the notification to you,
+      // AND send the auto-reply to the visitor based on your dashboard settings.
       await emailjs.send(
-        'service_outlook',
-        'template_g9npx0s',
-        { from_name: data.name, from_email: data.email, message: data.message },
-        'zU0S_yyYuv721Cr0G'
+        'service_wvm84yn', // Verify this is your exact Service ID from the dashboard
+        'template_cr2o9gp',
+        { 
+          from_name: data.name, 
+          reply_to: data.email, // Updated to match your {{reply_to}} template variable
+          message: data.message 
+        },
+        '28jLJQbxea4uQvb0o' // Your Public Key
       );
 
-      await emailjs.send(
-        'service_outlook',
-        'template_1kiswqb',
-        { to_name: data.name, to_email: data.email, message: data.message },
-        'zU0S_yyYuv721Cr0G'
-      );
-
-      alert('Message sent successfully!');
+      setToast({ type: 'success', message: `Thanks ${data.name}! Your message has been sent. I'll get back to you soon!` });
       e.target.reset();
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to send message. Please try again.');
+      setToast({ type: 'error', message: 'Failed to send message. Please try again or email me directly!' });
     } finally {
       setIsSubmitting(false);
     }
@@ -214,6 +221,45 @@ const ContactSection = ({ isVisible, mousePosition }) => {
             </form>
           </div>
         </div>
+      </div>
+
+      {/* Toast Notification */}
+      <div
+        className={`fixed top-6 left-1/2 z-[100] transition-all duration-500 ease-out ${
+          toast
+            ? 'opacity-100 translate-y-0 -translate-x-1/2'
+            : 'opacity-0 -translate-y-6 -translate-x-1/2 pointer-events-none'
+        }`}
+      >
+        {toast && (
+          <div
+            className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl backdrop-blur-xl border shadow-2xl max-w-md ${
+              toast.type === 'success'
+                ? 'bg-emerald-500/15 border-emerald-400/30 shadow-emerald-500/10'
+                : 'bg-red-500/15 border-red-400/30 shadow-red-500/10'
+            }`}
+          >
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+              toast.type === 'success' ? 'bg-emerald-400/20' : 'bg-red-400/20'
+            }`}>
+              {toast.type === 'success'
+                ? <CheckCircle2 size={18} className="text-emerald-400" />
+                : <XCircle size={18} className="text-red-400" />
+              }
+            </div>
+            <p className={`text-sm font-medium ${
+              toast.type === 'success' ? 'text-emerald-200' : 'text-red-200'
+            }`}>
+              {toast.message}
+            </p>
+            <button
+              onClick={() => setToast(null)}
+              className="flex-shrink-0 p-1 rounded-lg hover:bg-white/10 transition-colors ml-1"
+            >
+              <X size={14} className="text-gray-400" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

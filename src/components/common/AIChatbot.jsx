@@ -198,6 +198,7 @@ const AIChatbot = ({ isOpen, onClose }) => {
 
   // Quick suggestions
   const suggestions = [
+    "Who Is Atharv?",
     "What are Atharv's skills?",
     "Tell me about his projects",
     "How can I contact him?",
