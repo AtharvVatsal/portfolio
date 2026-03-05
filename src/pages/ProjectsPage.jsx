@@ -1,364 +1,224 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
-  Calendar, 
-  Clock, 
-  Tag, 
+  Code, 
+  ExternalLink, 
+  Github, 
   Home,
-  ChevronLeft,
-  ChevronRight,
-  BookOpen,
-  Loader2
+  Sparkles,
+  Rocket
 } from 'lucide-react';
-import { blogPosts } from '../data';
+import { projects } from '../data';
+import { PROJECT_LINKS, SOCIAL_LINKS } from '../config/links';
 import { useTheme } from '../context/ThemeContext';
 import { CustomCursor, SEO } from '../components/common';
-import { MarkdownRenderer, extractHeadings, TableOfContents, ReadingProgress } from '../components/blog';
 
-// Helper to convert "06-02-2026" → "2026-02-06"
-const parseDate = (dateStr) => {
-  const [day, month, year] = dateStr.split('-');
-  return `${year}-${month}-${day}`;
-};
-
-const BlogPostPage = () => {
-  const { slug } = useParams();
-  const navigate = useNavigate();
+const ProjectsPage = () => {
   const { currentTheme } = useTheme();
+  const [isLoaded, setIsLoaded] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const [markdownContent, setMarkdownContent] = useState('');
-  const [isLoadingContent, setIsLoadingContent] = useState(true);
-  const [contentError, setContentError] = useState(false);
-
-  const currentIndex = blogPosts.findIndex(post => post.slug === slug);
-  const post = blogPosts[currentIndex];
-  const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
-  const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
-    setImageError(false);
-  }, [slug]);
-
-  // Fetch markdown content
-  useEffect(() => {
-    if (!post?.markdownFile) {
-      setIsLoadingContent(false);
-      setContentError(true);
-      return;
-    }
-
-    setIsLoadingContent(true);
-    setContentError(false);
-    setMarkdownContent('');
-
-    fetch(post.markdownFile)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to load post');
-        return res.text();
-      })
-      .then(text => {
-        setMarkdownContent(text);
-        setIsLoadingContent(false);
-      })
-      .catch(err => {
-        console.error('Error loading markdown:', err);
-        setContentError(true);
-        setIsLoadingContent(false);
-      });
-  }, [post]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft' && prevPost) navigate(`/blog/${prevPost.slug}`);
-      else if (e.key === 'ArrowRight' && nextPost) navigate(`/blog/${nextPost.slug}`);
-      else if (e.key === 'Escape') navigate('/blog');
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [prevPost, nextPost, navigate]);
-
-  // 404
-  if (!post) {
-    return (
-      <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white flex items-center justify-center`}>
-        <SEO title="Post Not Found" description="The blog post you're looking for doesn't exist." noIndex />
-        <div className="text-center">
-          <div className="text-6xl mb-4">📝</div>
-          <h1 className="text-2xl font-bold mb-4">Post Not Found</h1>
-          <p className="text-gray-400 mb-6">The blog post you're looking for doesn't exist.</p>
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg transition-all duration-300"
-          >
-            <ArrowLeft size={18} />
-            Back to Blog
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const hasValidImage = post.coverImage && !imageError;
-  const headings = markdownContent ? extractHeadings(markdownContent) : [];
+    setTimeout(() => setIsLoaded(true), 100);
+  }, []);
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
-      {/* SEO with article structured data */}
       <SEO
-        title={post.title}
-        description={post.excerpt}
-        image={post.coverImage}
-        url={`/blog/${post.slug}`}
-        type="article"
-        keywords={post.tags}
-        article={{
-          publishedTime: parseDate(post.date),
-          tags: post.tags,
-          author: 'Atharv Vatsal',
-        }}
+        title="Projects"
+        description="Technical projects by Atharv Vatsal — from autonomous driving perception with YOLOv8 & U-Net to predictive policing and NLP-powered report processing."
+        url="/projects"
+        keywords={['projects', 'YOLOv8', 'U-Net', 'machine learning projects', 'computer vision', 'NLP']}
       />
-
       <CustomCursor isTouchDevice={isTouchDevice} />
-      <ReadingProgress />
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link
-            to="/blog"
+            to="/"
             className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300 group"
           >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span>All Posts</span>
+            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform duration-300" />
+            <span>Back to Portfolio</span>
           </Link>
           
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2">
-              <button
-                onClick={() => prevPost && navigate(`/blog/${prevPost.slug}`)}
-                disabled={!prevPost}
-                className={`p-2 rounded-lg transition-all duration-300 ${
-                  prevPost 
-                    ? 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white' 
-                    : 'text-gray-700 cursor-not-allowed'
-                }`}
-                title={prevPost ? `Previous: ${prevPost.title}` : 'No previous post'}
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <span className="text-xs text-gray-500">
-                {currentIndex + 1} / {blogPosts.length}
-              </span>
-              <button
-                onClick={() => nextPost && navigate(`/blog/${nextPost.slug}`)}
-                disabled={!nextPost}
-                className={`p-2 rounded-lg transition-all duration-300 ${
-                  nextPost 
-                    ? 'bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white' 
-                    : 'text-gray-700 cursor-not-allowed'
-                }`}
-                title={nextPost ? `Next: ${nextPost.title}` : 'No next post'}
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-
-            <Link 
-              to="/"
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300"
-            >
-              <Home size={18} />
-              <span className="hidden sm:inline">Portfolio</span>
-            </Link>
+          <div className="flex items-center gap-2">
+            <Code size={20} className="text-cyan-400" />
+            <span className="font-medium">Projects</span>
+            <span className="text-gray-500 text-sm">({projects.length})</span>
           </div>
         </div>
       </header>
 
-      {/* Hero Cover Image */}
-      {hasValidImage ? (
-        <div className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
-          <img 
-            src={post.coverImage}
-            alt={post.title}
-            className="w-full h-full object-cover"
-            onError={() => setImageError(true)}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-          
-          <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 md:p-16">
-            <div className="max-w-3xl mx-auto">
-              <div className="flex items-center gap-4 mb-4 flex-wrap">
-                <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-amber-500/20 text-amber-400 backdrop-blur-md">
-                  {post.category}
-                </span>
-                <span className="text-gray-300 text-sm flex items-center gap-2">
-                  <Calendar size={14} />
-                  {post.date}
-                </span>
-                <span className="text-gray-300 text-sm flex items-center gap-2">
-                  <Clock size={14} />
-                  {post.readTime}
-                </span>
+      {/* Hero */}
+      <section className="py-16 sm:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+          <div 
+            className={`transition-all duration-700 ${
+              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+            }`}
+          >
+            <div className="flex justify-center mb-6">
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-xl">
+                <Rocket size={40} className="text-cyan-400" />
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-                {post.title}
-              </h1>
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className="pt-12 pb-8 px-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-4 mb-4 flex-wrap">
-              <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-amber-500/20 text-amber-400">
-                {post.category}
-              </span>
-              <span className="text-gray-500 text-sm flex items-center gap-2">
-                <Calendar size={14} />
-                {post.date}
-              </span>
-              <span className="text-gray-500 text-sm flex items-center gap-2">
-                <Clock size={14} />
-                {post.readTime}
-              </span>
-            </div>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              {post.title}
+
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+              All Projects
             </h1>
-            <div className="text-6xl mb-4">{post.emoji}</div>
+            
+            <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
+              A collection of my technical projects — from machine learning systems 
+              and computer vision pipelines to data analytics and NLP tools.
+            </p>
           </div>
         </div>
-      )}
+      </section>
 
-      {/* Article Content */}
-      <article className="max-w-3xl mx-auto px-4 py-12">
-        {hasValidImage && (
-          <div className="flex items-center gap-4 mb-8 text-sm text-gray-400">
-            <span className="text-2xl">{post.emoji}</span>
+      {/* Projects Grid */}
+      <section className="py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            {projects.map((project, index) => {
+              const Icon = project.icon;
+              const projectLinks = PROJECT_LINKS[project.projectKey];
+              const hasGithub = projectLinks?.github;
+              const hasDemo = projectLinks?.demo;
+
+              return (
+                <div
+                  key={project.id}
+                  className={`group relative p-6 sm:p-8 rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-700 hover:scale-[1.02] hover:border-cyan-400/50 overflow-hidden ${
+                    isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+                  }`}
+                  style={{ transitionDelay: `${index * 100}ms` }}
+                >
+                  <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${project.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
+                  
+                  <div className="relative z-10">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className={`flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${project.color} flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                        <Icon size={28} className="sm:w-8 sm:h-8 text-white" />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className={`text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r ${project.color} bg-clip-text text-transparent`}>
+                          {project.title}
+                        </h3>
+                      </div>
+                    </div>
+                    
+                    <p className="text-gray-400 text-sm sm:text-base mb-5 group-hover:text-gray-300 transition-colors duration-500 leading-relaxed">
+                      {project.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {project.tech.map((tech) => (
+                        <span 
+                          key={tech}
+                          className="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10 text-gray-400 group-hover:border-cyan-400/30 group-hover:text-gray-300 transition-all duration-500"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+                      {hasDemo && (
+                        <a
+                          href={projectLinks.demo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r ${project.color} text-white font-medium text-sm hover:shadow-lg transition-all duration-500 group/btn`}
+                        >
+                          <ExternalLink size={16} className="group-hover/btn:rotate-45 transition-transform duration-500" />
+                          <span>Live Demo</span>
+                        </a>
+                      )}
+
+                      {hasGithub && (
+                        <a
+                          href={projectLinks.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-5 py-2.5 rounded-xl backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/20 text-white font-medium text-sm transition-all duration-500 group/git"
+                        >
+                          <Github size={16} />
+                          <span>View Code</span>
+                        </a>
+                      )}
+
+                      {!hasDemo && !hasGithub && (
+                        <span className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-500 text-sm">
+                          <Code size={16} />
+                          <span>Private / Coming Soon</span>
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        )}
+        </div>
+      </section>
 
-        {!isLoadingContent && headings.length > 0 && (
-          <TableOfContents headings={headings} />
-        )}
-
-        {isLoadingContent ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 size={32} className="animate-spin text-amber-400" />
-              <span className="text-gray-500">Loading article...</span>
+      {/* Check My GitHub CTA */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <div className="p-8 sm:p-12 rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 relative overflow-hidden group hover:bg-white/10 transition-all duration-700">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            
+            <div className="relative z-10">
+              <Github size={48} className="mx-auto mb-6 text-gray-400 group-hover:text-white group-hover:scale-110 transition-all duration-500" />
+              
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">
+                Want to see more?
+              </h2>
+              
+              <p className="text-gray-400 mb-8 max-w-lg mx-auto">
+                Check out my GitHub for more projects, contributions, and experiments 
+                across machine learning, computer vision, and web development.
+              </p>
+              
+              <a
+                href={SOCIAL_LINKS.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-500 hover:scale-105 font-semibold text-lg group/ghbtn"
+              >
+                <Github size={22} />
+                <span>Check My GitHub</span>
+                <ExternalLink size={18} className="group-hover/ghbtn:rotate-45 transition-transform duration-500" />
+              </a>
             </div>
           </div>
-        ) : contentError ? (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">😵</div>
-            <h3 className="text-xl font-medium text-gray-400 mb-2">Failed to load article</h3>
-            <p className="text-gray-500 mb-6">Something went wrong while loading this post.</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-3 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 transition-colors"
-            >
-              Try Again
-            </button>
-          </div>
-        ) : (
-          <div className="markdown-content">
-            <MarkdownRenderer content={markdownContent} />
-          </div>
-        )}
-
-        {/* Tags */}
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Tag size={16} className="text-gray-500" />
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-3 py-1 rounded-full text-sm bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-colors cursor-default"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
         </div>
+      </section>
 
-        {/* Post Navigation */}
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {prevPost ? (
-              <Link
-                to={`/blog/${prevPost.slug}`}
-                className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-400/30 transition-all duration-300"
-              >
-                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2">
-                  <ChevronLeft size={16} />
-                  <span>Previous</span>
-                </div>
-                <h3 className="text-white font-medium group-hover:text-amber-400 transition-colors line-clamp-2">
-                  {prevPost.title}
-                </h3>
-              </Link>
-            ) : <div></div>}
-
-            {nextPost ? (
-              <Link
-                to={`/blog/${nextPost.slug}`}
-                className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-400/30 transition-all duration-300 text-right"
-              >
-                <div className="flex items-center justify-end gap-2 text-gray-500 text-sm mb-2">
-                  <span>Next</span>
-                  <ChevronRight size={16} />
-                </div>
-                <h3 className="text-white font-medium group-hover:text-amber-400 transition-colors line-clamp-2">
-                  {nextPost.title}
-                </h3>
-              </Link>
-            ) : <div></div>}
-          </div>
-        </div>
-
-        {/* Back buttons */}
-        <div className="mt-12 flex gap-4 justify-center flex-wrap">
-          <Link
-            to="/blog"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300"
-          >
-            <BookOpen size={18} />
-            All Posts
-          </Link>
-          <Link
-            to="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:shadow-lg hover:shadow-amber-500/20 transition-all duration-300"
-          >
-            <Home size={18} />
-            Portfolio
-          </Link>
-        </div>
-
-        {/* Keyboard hint */}
-        <div className="mt-8 flex items-center justify-center gap-6 text-gray-600 text-xs">
-          <span className="flex items-center gap-2">
-            <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">←</kbd>
-            <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">→</kbd>
-            <span className="ml-1">Navigate</span>
-          </span>
-          <span className="flex items-center gap-2">
-            <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">Esc</kbd>
-            <span className="ml-1">All posts</span>
-          </span>
-        </div>
-      </article>
-
-      <footer className="py-8 text-center border-t border-white/5">
-        <p className="text-gray-600 text-sm">© 2025 Atharv Vatsal</p>
+      {/* Footer */}
+      <footer className="py-12 text-center border-t border-white/5">
+        <Sparkles size={24} className="inline-block text-cyan-400/40 animate-pulse mb-4" />
+        <p className="text-gray-600 text-sm mb-4">More projects in the pipeline...</p>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-cyan-400 transition-colors"
+        >
+          <Home size={16} />
+          Back to Portfolio
+        </Link>
       </footer>
     </div>
   );
 };
 
-export default BlogPostPage;
+export default ProjectsPage;
