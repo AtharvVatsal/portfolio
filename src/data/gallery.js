@@ -205,7 +205,7 @@ const photoData = [
     id: 11,
     publicId: "AAA_2275_oofrbp",
     title: "Rhythm Ascendant",
-    description: "Shreya Ghoshal captivates the stage with effortless grace, her The Mohan Sisters rise at center stage as movement, symmetry, and light converge into a powerful visual crescendo. flowing as vividly as the lights around her.",
+    description: "The Mohan Sisters rise at center stage as movement, symmetry, and light converge into a powerful visual crescendo. flowing as vividly as the lights around her.",
     category: "Dance Performance",
     location: "VIT Vellore, India",
     date: "22-02-2025",
