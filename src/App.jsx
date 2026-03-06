@@ -32,6 +32,8 @@ import {
 // Page transition & loading
 import PageTransition from './components/common/PageTransition';
 import PageLoader from './components/common/PageLoader';
+import ScrollReveal, { ScrollRevealGroup } from './components/common/ScrollReveal';
+import { MatrixRain, useKonamiCode } from './components/common/EasterEgg';
 
 // Analytics
 import useAnalytics from './hooks/useAnalytics';
@@ -65,6 +67,10 @@ const PortfolioHome = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  // Easter egg
+  const [matrixActive, setMatrixActive] = useState(false);
+  useKonamiCode(() => setMatrixActive(true));
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -165,7 +171,9 @@ const PortfolioHome = () => {
         <HeroSection mousePosition={mousePosition} scrollY={scrollY} parallaxOffset={parallaxOffset} />
         <SectionDivider color="cyan" />
         <AboutSection isVisible={visibleSections.has('about')} />
-        <StatsSection />
+        <ScrollReveal variant="fade-up" duration={800}>
+          <StatsSection />
+        </ScrollReveal>
         <SectionDivider color="purple" />
         <SkillsSection isVisible={visibleSections.has('skills')} />
         <QuoteSection isVisible={visibleSections.has('skills')} />
@@ -174,15 +182,22 @@ const PortfolioHome = () => {
         <SectionDivider color="purple" />
         <PhotographySection isVisible={visibleSections.has('photography')} mousePosition={mousePosition} />
         <SectionDivider color="cyan" />
-        <BlogPreviewSection />
+        <ScrollReveal variant="fade-up" duration={800}>
+          <BlogPreviewSection />
+        </ScrollReveal>
         <SectionDivider color="pink" />
-        <TestimonialsSection />
+        <ScrollReveal variant="fade-up" duration={800}>
+          <TestimonialsSection />
+        </ScrollReveal>
         <SectionDivider color="cyan" />
         <ContactSection isVisible={visibleSections.has('contact')} mousePosition={mousePosition} />
       </main>
 
       <Footer />
       <FloatingActionButtons scrollY={scrollY} showAIAssistant={showAIAssistant} setShowAIAssistant={setShowAIAssistant} />
+
+      {/* Easter Egg */}
+      <MatrixRain isActive={matrixActive} onComplete={() => setMatrixActive(false)} />
     </div>
   );
 };
