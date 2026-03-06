@@ -7,8 +7,8 @@ export const useVisibleSections = (sectionIds = []) => {
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: '-10% 0px -10% 0px',
-      threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+      rootMargin: '0px 0px -15% 0px',
+      threshold: [0, 0.1, 0.2, 0.3, 0.5]
     };
 
     const observerCallback = (entries) => {
@@ -18,17 +18,22 @@ export const useVisibleSections = (sectionIds = []) => {
         if (entry.isIntersecting) {
           setVisibleSections((prev) => new Set([...prev, sectionId]));
           
-          // Update active section based on intersection ratio
           if (entry.intersectionRatio > 0.3) {
             setActiveSection(sectionId);
           }
+        } else {
+          // Remove when leaving viewport — enables reverse animation
+          setVisibleSections((prev) => {
+            const next = new Set(prev);
+            next.delete(sectionId);
+            return next;
+          });
         }
       });
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
 
-    // Observe all sections
     const sections = sectionIds.length > 0 
       ? sectionIds.map(id => document.getElementById(id)).filter(Boolean)
       : document.querySelectorAll('section[id]');

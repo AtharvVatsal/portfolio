@@ -32,7 +32,7 @@ import {
 // Page transition & loading
 import PageTransition from './components/common/PageTransition';
 import PageLoader from './components/common/PageLoader';
-import ScrollReveal, { ScrollRevealGroup } from './components/common/ScrollReveal';
+import ScrollReveal from './components/common/ScrollReveal';
 import { MatrixRain, useKonamiCode } from './components/common/EasterEgg';
 
 // Analytics
@@ -55,7 +55,7 @@ let hasLoadedOnce = false;
 // Portfolio Home Page
 const PortfolioHome = () => {
   const { currentTheme } = useTheme();
-  const { mousePosition, mouseVelocity } = useMousePosition();
+  const { mousePosition } = useMousePosition();
   const { scrollY, scrollProgress, showNavbar } = useScrollProgress();
   const { visibleSections, activeSection, setActiveSection } = useVisibleSections([
     'home', 'about', 'skills', 'tech', 'blog', 'photography', 'contact'
@@ -169,28 +169,56 @@ const PortfolioHome = () => {
 
       <main>
         <HeroSection mousePosition={mousePosition} scrollY={scrollY} parallaxOffset={parallaxOffset} />
+
         <SectionDivider color="cyan" />
-        <AboutSection isVisible={visibleSections.has('about')} />
-        <ScrollReveal variant="fade-up" duration={800}>
+
+        <ScrollReveal variant="fade-up" duration={1000}>
+          <AboutSection isVisible={visibleSections.has('about')} />
+        </ScrollReveal>
+
+        <ScrollReveal variant="fade-up" duration={900}>
           <StatsSection />
         </ScrollReveal>
+
         <SectionDivider color="purple" />
-        <SkillsSection isVisible={visibleSections.has('skills')} />
-        <QuoteSection isVisible={visibleSections.has('skills')} />
+
+        <ScrollReveal variant="fade-up" duration={1000}>
+          <SkillsSection isVisible={visibleSections.has('skills')} />
+        </ScrollReveal>
+
+        <ScrollReveal variant="scale" duration={1000}>
+          <QuoteSection isVisible={visibleSections.has('skills')} />
+        </ScrollReveal>
+
         <SectionDivider color="blue" />
-        <TechProjectsSection isVisible={visibleSections.has('tech')} mousePosition={mousePosition} />
+
+        <ScrollReveal variant="fade-up" duration={1000}>
+          <TechProjectsSection isVisible={visibleSections.has('tech')} mousePosition={mousePosition} />
+        </ScrollReveal>
+
         <SectionDivider color="purple" />
-        <PhotographySection isVisible={visibleSections.has('photography')} mousePosition={mousePosition} />
+
+        <ScrollReveal variant="fade-up" duration={1000}>
+          <PhotographySection isVisible={visibleSections.has('photography')} mousePosition={mousePosition} />
+        </ScrollReveal>
+
         <SectionDivider color="cyan" />
-        <ScrollReveal variant="fade-up" duration={800}>
+
+        <ScrollReveal variant="fade-up" duration={900}>
           <BlogPreviewSection />
         </ScrollReveal>
+
         <SectionDivider color="pink" />
-        <ScrollReveal variant="fade-up" duration={800}>
+
+        <ScrollReveal variant="fade-up" duration={900}>
           <TestimonialsSection />
         </ScrollReveal>
+
         <SectionDivider color="cyan" />
-        <ContactSection isVisible={visibleSections.has('contact')} mousePosition={mousePosition} />
+
+        <ScrollReveal variant="fade-up" duration={1000}>
+          <ContactSection isVisible={visibleSections.has('contact')} mousePosition={mousePosition} />
+        </ScrollReveal>
       </main>
 
       <Footer />
