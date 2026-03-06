@@ -9,12 +9,13 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  Loader2
+  Sparkles
 } from 'lucide-react';
 import { blogPosts } from '../data';
 import { useTheme } from '../context/ThemeContext';
 import { CustomCursor, SEO } from '../components/common';
 import { MarkdownRenderer, extractHeadings, TableOfContents, ReadingProgress } from '../components/blog';
+import { ArticleSkeleton } from '../components/common/Skeleton';
 
 // Helper to convert "06-02-2026" → "2026-02-06"
 const parseDate = (dateStr) => {
@@ -36,6 +37,19 @@ const BlogPostPage = () => {
   const post = blogPosts[currentIndex];
   const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
+
+  // Compute related posts based on shared tags
+  const relatedPosts = post
+    ? blogPosts
+        .filter((p) => p.id !== post.id)
+        .map((p) => ({
+          ...p,
+          relevance: p.tags.filter((tag) => post.tags.includes(tag)).length,
+        }))
+        .filter((p) => p.relevance > 0)
+        .sort((a, b) => b.relevance - a.relevance)
+        .slice(0, 2)
+    : [];
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -248,12 +262,7 @@ const BlogPostPage = () => {
         )}
 
         {isLoadingContent ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-4">
-              <Loader2 size={32} className="animate-spin text-amber-400" />
-              <span className="text-gray-500">Loading article...</span>
-            </div>
-          </div>
+          <ArticleSkeleton />
         ) : contentError ? (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">😵</div>
@@ -286,6 +295,61 @@ const BlogPostPage = () => {
             ))}
           </div>
         </div>
+
+        {/* Related Posts */}
+        {relatedPosts.length > 0 && (
+          <div className="mt-12 pt-8 border-t border-white/10">
+            <h3 className="flex items-center gap-2 text-lg font-semibold text-white mb-5">
+              <Sparkles size={18} className="text-amber-400" />
+              You might also enjoy
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {relatedPosts.map((related) => (
+                <Link
+                  key={related.id}
+                  to={`/blog/${related.slug}`}
+                  className="group p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-amber-400/20 transition-all duration-500 hover:scale-[1.02] overflow-hidden"
+                >
+                  {/* Cover image thumbnail */}
+                  {related.coverImage && (
+                    <div className="relative h-28 sm:h-32 rounded-lg overflow-hidden mb-3 -mx-1 -mt-1">
+                      <img
+                        src={related.coverImage}
+                        alt={related.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        onError={(e) => { e.target.parentElement.style.display = 'none'; }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <span className="absolute bottom-2 left-2 text-lg">{related.emoji}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/15 text-amber-400">
+                      {related.category}
+                    </span>
+                    <span className="text-[11px] text-gray-500 flex items-center gap-1">
+                      <Clock size={10} />
+                      {related.readTime}
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-semibold text-white group-hover:text-amber-400 transition-colors duration-300 line-clamp-2 leading-snug">
+                    {related.title}
+                  </h4>
+                  {/* Shared tags */}
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {related.tags
+                      .filter((t) => post.tags.includes(t))
+                      .map((tag) => (
+                        <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
+                          #{tag}
+                        </span>
+                      ))}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Post Navigation */}
         <div className="mt-12 pt-8 border-t border-white/10">

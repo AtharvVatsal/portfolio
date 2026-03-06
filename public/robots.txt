@@ -1,0 +1,9 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://atharvvatsal.com/sitemap.xml
+
+# Disallow admin/internal paths
+Disallow: /static/

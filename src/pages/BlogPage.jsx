@@ -9,7 +9,8 @@ import {
   Search,
   PenLine,
   Sparkles,
-  Home
+  Home,
+  FileText
 } from 'lucide-react';
 import { blogPosts, blogCategories } from '../data';
 import { useTheme } from '../context/ThemeContext';
@@ -22,6 +23,7 @@ const BlogPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
+  const [loadedImages, setLoadedImages] = useState({});
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -31,6 +33,10 @@ const BlogPage = () => {
 
   const handleImageError = (postId) => {
     setImageErrors(prev => ({ ...prev, [postId]: true }));
+  };
+
+  const handleImageLoad = (postId) => {
+    setLoadedImages(prev => ({ ...prev, [postId]: true }));
   };
 
   const filteredPosts = blogPosts.filter((post) => {
@@ -170,10 +176,17 @@ const BlogPage = () => {
                     <div className="relative h-48 overflow-hidden bg-white/5">
                       {hasValidImage ? (
                         <>
+                          {/* Skeleton shimmer while image loads */}
+                          {!loadedImages[post.id] && (
+                            <div className="absolute inset-0 animate-pulse bg-white/5" />
+                          )}
                           <img 
                             src={post.coverImage}
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ${
+                              loadedImages[post.id] ? 'opacity-100' : 'opacity-0'
+                            }`}
+                            onLoad={() => handleImageLoad(post.id)}
                             onError={() => handleImageError(post.id)}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -236,13 +249,23 @@ const BlogPage = () => {
       <footer className="py-12 text-center border-t border-white/5">
         <Sparkles size={24} className="inline-block text-amber-400/40 animate-pulse mb-4" />
         <p className="text-gray-600 text-sm mb-4">More posts coming soon...</p>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-amber-400 transition-colors"
-        >
-          <Home size={16} />
-          Back to Portfolio
-        </Link>
+        <div className="flex items-center justify-center gap-4 sm:gap-6">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-amber-400 transition-colors text-sm"
+          >
+            <Home size={16} />
+            Portfolio
+          </Link>
+          <span className="text-gray-700">·</span>
+          <Link
+            to="/resume"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-cyan-400 transition-colors text-sm"
+          >
+            <FileText size={16} />
+            Resume
+          </Link>
+        </div>
       </footer>
     </div>
   );

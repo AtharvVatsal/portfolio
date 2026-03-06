@@ -6,3 +6,4 @@ export { default as SEO } from './SEO';
 export { default as MouseGlow } from './MouseGlow';
 export { default as PageTransition } from './PageTransition';
 export { default as PageLoader } from './PageLoader';
+export { default as ArticleSkeleton } from './Skeleton';
