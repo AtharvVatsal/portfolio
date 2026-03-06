@@ -103,9 +103,21 @@ const PortfolioHome = () => {
   useEffect(() => {
     if (!isReturnVisit) return;
 
+    // Check if we need to scroll to a specific section (e.g. from Resume "Get in Touch")
+    const targetSection = sessionStorage.getItem('scrollToSection');
+    if (targetSection) {
+      sessionStorage.removeItem('scrollToSection');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(targetSection);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+      return;
+    }
+
     const saved = sessionStorage.getItem('homeScrollY');
     if (saved && Number(saved) > 0) {
-      // Multiple rAF to ensure DOM is fully painted
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           window.scrollTo(0, Number(saved));

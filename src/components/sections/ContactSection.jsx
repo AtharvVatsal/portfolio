@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2, CheckCircle2, XCircle, X, FileText } from 'lucide-react';
+import { Mail, MapPin, Phone, ArrowRight, Github, Linkedin, Instagram, Loader2, FileText, Check, RotateCcw } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../config/links';
 import { MouseGlow } from '../common';
 
 const ContactSection = ({ isVisible, mousePosition }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState(null);
+  const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'success' | 'error'
+  const [senderName, setSenderName] = useState('');
+  const formRef = useRef(null);
 
-  // Auto-dismiss toast after 5 seconds
+  // Auto-reset form after success/error
   useEffect(() => {
-    if (!toast) return;
-    const timer = setTimeout(() => setToast(null), 5000);
+    if (formStatus === 'idle') return;
+    const timer = setTimeout(() => setFormStatus('idle'), 6000);
     return () => clearTimeout(timer);
-  }, [toast]);
+  }, [formStatus]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,11 +43,12 @@ const ContactSection = ({ isVisible, mousePosition }) => {
         '28jLJQbxea4uQvb0o' // Your Public Key
       );
 
-      setToast({ type: 'success', message: `Thanks ${data.name}! Your message has been sent. I'll get back to you soon!` });
+      setSenderName(data.name);
+      setFormStatus('success');
       e.target.reset();
     } catch (error) {
       console.error('Error:', error);
-      setToast({ type: 'error', message: 'Failed to send message. Please try again or email me directly!' });
+      setFormStatus('error');
     } finally {
       setIsSubmitting(false);
     }
@@ -171,103 +174,143 @@ const ContactSection = ({ isVisible, mousePosition }) => {
             </div>
           </div>
 
-          {/* Contact Form */}
-          <div className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  disabled={isSubmitting}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder="Your name"
-                />
+          {/* Contact Form — morphs into success/error card */}
+          <div className="relative p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-xl bg-white/5 border border-white/10 overflow-hidden"
+            style={{ minHeight: '380px' }}
+          >
+            {/* Success State */}
+            <div
+              className={`absolute inset-0 flex flex-col items-center justify-center p-6 sm:p-8 transition-all duration-700 ease-out ${
+                formStatus === 'success'
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-95 pointer-events-none'
+              }`}
+            >
+              {/* Animated check circle */}
+              <div className="relative mb-6">
+                <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-400/30 flex items-center justify-center">
+                  <div className={`transition-all duration-500 delay-300 ${formStatus === 'success' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                    <Check size={36} className="text-emerald-400" strokeWidth={3} />
+                  </div>
+                </div>
+                {/* Pulse rings */}
+                <div className={`absolute inset-0 rounded-full border-2 border-emerald-400/20 transition-all duration-1000 ${formStatus === 'success' ? 'scale-150 opacity-0' : 'scale-100 opacity-0'}`}></div>
+                <div className={`absolute inset-0 rounded-full border-2 border-emerald-400/10 transition-all duration-1000 delay-200 ${formStatus === 'success' ? 'scale-[2] opacity-0' : 'scale-100 opacity-0'}`}></div>
               </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  disabled={isSubmitting}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder="your.email@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Message</label>
-                <textarea
-                  name="message"
-                  rows="4"
-                  required
-                  disabled={isSubmitting}
-                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/25 transition-all duration-300 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder="Tell me about your project..."
-                ></textarea>
-              </div>
+
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Message Sent!</h3>
+              <p className="text-gray-400 text-sm sm:text-base text-center max-w-xs mb-6">
+                Thanks {senderName || 'there'}! I'll get back to you soon.
+              </p>
               <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 font-medium text-sm sm:text-base sm:hover:scale-[1.03] active:scale-[0.98] group disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                onClick={() => setFormStatus('idle')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300"
               >
-                <span className="flex items-center justify-center gap-2">
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 size={18} className="sm:w-5 sm:h-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      Send Message
-                      <ArrowRight size={18} className="sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-500" />
-                    </>
-                  )}
-                </span>
+                <RotateCcw size={14} />
+                Send another
               </button>
-            </form>
+            </div>
+
+            {/* Error State */}
+            <div
+              className={`absolute inset-0 flex flex-col items-center justify-center p-6 sm:p-8 transition-all duration-700 ease-out ${
+                formStatus === 'error'
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-95 pointer-events-none'
+              }`}
+            >
+              <div className="w-20 h-20 rounded-full bg-red-500/10 border-2 border-red-400/30 flex items-center justify-center mb-6">
+                <span className={`text-3xl transition-all duration-500 delay-300 ${formStatus === 'error' ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`}>
+                  ✕
+                </span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Couldn't Send</h3>
+              <p className="text-gray-400 text-sm sm:text-base text-center max-w-xs mb-6">
+                Something went wrong. Try again or email me directly.
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setFormStatus('idle')}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-gray-400 hover:text-white hover:bg-white/10 transition-all duration-300"
+                >
+                  <RotateCcw size={14} />
+                  Try again
+                </button>
+                <a
+                  href={`mailto:${CONTACT_INFO.email}`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-sm font-medium transition-all duration-300 hover:shadow-lg"
+                >
+                  <Mail size={14} />
+                  Email directly
+                </a>
+              </div>
+            </div>
+
+            {/* Form (default state) */}
+            <div
+              className={`transition-all duration-500 ease-out ${
+                formStatus === 'idle'
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-95 pointer-events-none'
+              }`}
+            >
+              <form ref={formRef} onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 sm:mb-2">Message</label>
+                  <textarea
+                    name="message"
+                    rows="4"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl backdrop-blur-md bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/25 transition-all duration-300 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    placeholder="Tell me about your project..."
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-cyan-500 to-purple-500 hover:shadow-2xl hover:shadow-purple-500/50 transition-all duration-500 font-medium text-sm sm:text-base sm:hover:scale-[1.03] active:scale-[0.98] group disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={18} className="sm:w-5 sm:h-5 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        Send Message
+                        <ArrowRight size={18} className="sm:w-5 sm:h-5 group-hover:translate-x-2 transition-transform duration-500" />
+                      </>
+                    )}
+                  </span>
+                </button>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Toast Notification */}
-      <div
-        className={`fixed top-6 left-1/2 z-[100] transition-all duration-500 ease-out ${
-          toast
-            ? 'opacity-100 translate-y-0 -translate-x-1/2'
-            : 'opacity-0 -translate-y-6 -translate-x-1/2 pointer-events-none'
-        }`}
-      >
-        {toast && (
-          <div
-            className={`flex items-center gap-3 px-5 py-3.5 rounded-2xl backdrop-blur-xl border shadow-2xl max-w-md ${
-              toast.type === 'success'
-                ? 'bg-emerald-500/15 border-emerald-400/30 shadow-emerald-500/10'
-                : 'bg-red-500/15 border-red-400/30 shadow-red-500/10'
-            }`}
-          >
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-              toast.type === 'success' ? 'bg-emerald-400/20' : 'bg-red-400/20'
-            }`}>
-              {toast.type === 'success'
-                ? <CheckCircle2 size={18} className="text-emerald-400" />
-                : <XCircle size={18} className="text-red-400" />
-              }
-            </div>
-            <p className={`text-sm font-medium ${
-              toast.type === 'success' ? 'text-emerald-200' : 'text-red-200'
-            }`}>
-              {toast.message}
-            </p>
-            <button
-              onClick={() => setToast(null)}
-              className="flex-shrink-0 p-1 rounded-lg hover:bg-white/10 transition-colors ml-1"
-            >
-              <X size={14} className="text-gray-400" />
-            </button>
-          </div>
-        )}
       </div>
     </section>
   );
