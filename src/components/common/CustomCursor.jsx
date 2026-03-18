@@ -39,8 +39,8 @@ const CustomCursor = ({ isTouchDevice }) => {
 
     const animate = () => {
       // Smooth cursor movement
-      cursorPos.current.x = lerp(cursorPos.current.x, mousePos.current.x, 0.15);
-      cursorPos.current.y = lerp(cursorPos.current.y, mousePos.current.y, 0.15);
+      cursorPos.current.x = lerp(cursorPos.current.x, mousePos.current.x, 0.4);
+      cursorPos.current.y = lerp(cursorPos.current.y, mousePos.current.y, 0.4);
 
       // Add point to trail
       trailPoints.current.push({

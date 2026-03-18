@@ -12,6 +12,14 @@ export const PROJECT_LINKS = {
     github: 'https://github.com/AtharvVatsal/DriveSense',
     demo: 'https://www.linkedin.com/feed/update/urn:li:activity:7434483913151983616/',
   },
+  lzquant: {
+    github: null,
+    demo: null,
+  },
+  newtonsnightmare: {
+    github: null,
+    demo: null,
+  },
   riskgrid: {
     github: 'https://github.com/AtharvVatsal/RiskGrid',
     demo: 'https://www.linkedin.com/feed/update/urn:li:activity:7386068813575995392/',

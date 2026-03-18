@@ -75,6 +75,13 @@ const TechProjectsSection = ({ isVisible, mousePosition }) => {
                 {/* Background gradient */}
                 <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${project.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
                 
+                {/* Ongoing badge */}
+                {project.ongoing && (
+                  <span className="absolute top-4 right-4 sm:top-5 sm:right-5 z-20 px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] font-medium tracking-wide bg-cyan-400/10 text-cyan-300 border border-cyan-400/20 backdrop-blur-sm">
+                    Ongoing
+                  </span>
+                )}
+                
                 <div className="relative z-10">
                   {/* Icon */}
                   <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${project.color} flex items-center justify-center mb-4 sm:mb-6 shadow-lg group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
