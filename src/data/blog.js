@@ -1,6 +1,19 @@
 export const blogPosts = [
   {
     id: 1,
+    title: "The Auto-Fill of Human Memory",
+    slug: "autoFill",
+    excerpt: "We think memories are recordings of the past. Neuroscience suggests something stranger: every time we remember, our brain quietly edits the story.",
+    coverImage: "/blog/autoFill.jpg",
+    markdownFile: "/blog/posts/autoFill.md",
+    category: "Thoughts",
+    date: "18-03-2026",
+    readTime: "15 min read",
+    emoji: "🧩",
+    tags: ["Neuroscience", "Cognitive Science", "Memory", "Artificial Intelligence", "Psychology", "Philosophy", "Self-Improvement"]
+  },
+  {
+    id: 2,
     title: "Why Your Brain is an Overfit Model",
     slug: "why-your-brain-is-an-overfit-model",
     excerpt: "The human brain is an incredible organ, but it has its quirks....",
@@ -13,7 +26,7 @@ export const blogPosts = [
     tags: ["Machine Learning", "Psychology", "Self-Improvement"],
   },
   {
-    id: 2,
+    id: 3,
     title: "Accuracy Lied to Me: A Beginner's Guide to Model Evaluation",
     slug: "accuracy-lied-to-me",
     excerpt: "Your model has shiny accuracy of 99%. It is also completely useless. Here is why accuracy is a liar and what metrics you should actually use.",
@@ -26,7 +39,7 @@ export const blogPosts = [
     tags: ["Machine Learning", "Data Science", "Metrics", "Beginners"],
   },
   {
-    id: 3,
+    id: 4,
     title: "From a Hand-Me-Down Camera to Shooting the Stars",
     slug: "from-hand-me-down-camera-to-shooting-stars",
     excerpt: "Growth through consistency, learning through real-world exposure, and validation through recognition.",
@@ -39,7 +52,7 @@ export const blogPosts = [
     tags: ["Photography", "Nikon", "Beginnings"],
   },
   {
-    id: 4,
+    id: 5,
     title: "From Writing My First Java Program to Building for the Real World",
     slug: "from-writing-my-first-java-program-to-building-for-the-real-world",
     excerpt: "The First Line of Code...",
@@ -52,7 +65,7 @@ export const blogPosts = [
     tags: ["Coding", "Java", "Journey", "Beginnings"],
   },
   {
-    id: 5,
+    id: 6,
     title: "Working with Himachal Police – Technology for Society",
     slug: "working-with-himachal-police-technology-for-society",
     excerpt: "When software meets real-world responsibility...",
