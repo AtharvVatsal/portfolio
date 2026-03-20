@@ -208,11 +208,11 @@ const PortfolioHome = () => {
           <BlogPreviewSection />
         </ScrollReveal>
 
-        <SectionDivider color="pink" />
+        {/* <SectionDivider color="pink" /> */}
 
-        <ScrollReveal variant="fade-up" duration={1000}>
+        {/* <ScrollReveal variant="fade-up" duration={1000}>
           <TestimonialsSection />
-        </ScrollReveal>
+        </ScrollReveal> */}
 
         <SectionDivider color="cyan" />
 
