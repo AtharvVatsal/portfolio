@@ -153,13 +153,15 @@
   }
 }
 
-/* Glow Animation */
+/* Glow Animation - GPU accelerated */
 @keyframes glow {
   0%, 100% {
     box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+    opacity: 0.8;
   }
   50% {
     box-shadow: 0 0 40px rgba(34, 211, 238, 0.6);
+    opacity: 1;
   }
 }
 

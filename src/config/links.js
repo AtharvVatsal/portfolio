@@ -13,8 +13,8 @@ export const PROJECT_LINKS = {
     demo: 'https://www.linkedin.com/feed/update/urn:li:activity:7434483913151983616/',
   },
   lzquant: {
-    github: null,
-    demo: null,
+    github: 'https://github.com/AtharvVatsal/lz-quant',
+    demo: 'https://lz-quant.vercel.app/',
   },
   newtonsnightmare: {
     github: null,

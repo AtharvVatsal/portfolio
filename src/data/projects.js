@@ -20,7 +20,6 @@ export const projects = [
     icon: TrendingUp,
     gradient: 'from-amber-500/20 to-yellow-500/20',
     projectKey: 'lzquant',
-    ongoing: true
   },
   {
     id: 3,

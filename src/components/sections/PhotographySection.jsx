@@ -262,10 +262,12 @@ const PhotographySection = ({ isVisible, mousePosition }) => {
         
         .animate-marquee-left {
           animation: marquee-left 60s linear infinite;
+          will-change: transform;
         }
         
         .animate-marquee-right {
           animation: marquee-right 45s linear infinite;
+          will-change: transform;
         }
         
         .animate-gradient {
@@ -274,6 +276,21 @@ const PhotographySection = ({ isVisible, mousePosition }) => {
         
         .animate-pulse-slow {
           animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* Disable heavy animations on mobile */
+        @media (max-width: 639px) {
+          .animate-marquee-left,
+          .animate-marquee-right {
+            animation: none;
+          }
+          .animate-pulse-slow {
+            animation: none;
+            opacity: 0.5;
+          }
+          .animate-gradient {
+            animation: none;
+          }
         }
       `}</style>
     </section>
