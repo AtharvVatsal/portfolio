@@ -2,10 +2,10 @@ import React from 'react';
 
 const SectionDivider = ({ color = 'cyan', animated = true }) => {
   const colorClasses = {
-    cyan: 'via-cyan-500/5',
-    purple: 'via-purple-500/5',
-    blue: 'via-blue-500/5',
-    pink: 'via-pink-500/5'
+    cyan: 'via-cyan-500/3',
+    purple: 'via-purple-500/3',
+    blue: 'via-blue-500/3',
+    pink: 'via-pink-500/3'
   };
 
   return (

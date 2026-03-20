@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
-// Apple-style easing
 const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
 
 const variantConfig = {
@@ -26,44 +25,72 @@ const ScrollReveal = ({
   const [progress, setProgress] = useState(0);
   const rafRef = useRef(null);
   const [delayDone, setDelayDone] = useState(delay === 0);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (delay > 0) {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // On mobile, track visibility for fade in/out
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const calculate = () => {
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      
+      // Fade in when top of element enters viewport
+      // Fade out when bottom of element leaves viewport
+      const isVisible = rect.top < vh * 0.9 && rect.bottom > vh * 0.1;
+      setProgress(isVisible ? 1 : 0);
+      setDelayDone(true);
+    };
+
+    calculate();
+    window.addEventListener('scroll', calculate, { passive: true });
+    window.addEventListener('resize', calculate);
+
+    return () => {
+      window.removeEventListener('scroll', calculate);
+      window.removeEventListener('resize', calculate);
+    };
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (delay > 0 && !isMobile) {
       const t = setTimeout(() => setDelayDone(true), delay);
       return () => clearTimeout(t);
+    } else {
+      setDelayDone(true);
     }
-  }, [delay]);
+  }, [delay, isMobile]);
 
   const calculate = useCallback(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || isMobile) return;
 
     const rect = el.getBoundingClientRect();
     const vh = window.innerHeight;
 
-    // Element center position
     const elCenter = rect.top + rect.height / 2;
-
-    // Define the "fully visible" zone in the middle of the viewport
-    const visibleTop = vh * (exitZone / 100);      // e.g. 10% from top
-    const visibleBottom = vh * (1 - entryZone / 100); // e.g. 85% from top
-
-    // Entry from bottom: element center moves from below visibleBottom into zone
-    // Exit from top: element center moves from above visibleTop out of zone
+    const visibleTop = vh * (exitZone / 100);
+    const visibleBottom = vh * (1 - entryZone / 100);
 
     let p;
 
     if (elCenter >= visibleTop && elCenter <= visibleBottom) {
-      // Element center is in the fully visible zone
       p = 1;
     } else if (elCenter > visibleBottom) {
-      // Below the visible zone — entering from bottom
-      const transitionRange = vh * 0.45; // 45% of viewport to complete entry
+      const transitionRange = vh * 0.45;
       const distance = elCenter - visibleBottom;
       p = 1 - Math.min(1, distance / transitionRange);
     } else if (elCenter < visibleTop) {
-      // Above the visible zone — exiting from top
-      const transitionRange = vh * 0.35; // 35% of viewport for top exit
+      const transitionRange = vh * 0.35;
       const distance = visibleTop - elCenter;
       p = 1 - Math.min(1, distance / transitionRange);
     } else {
@@ -71,7 +98,7 @@ const ScrollReveal = ({
     }
 
     setProgress(easeOutQuint(Math.max(0, Math.min(1, p))));
-  }, [entryZone, exitZone]);
+  }, [entryZone, exitZone, isMobile]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -79,7 +106,6 @@ const ScrollReveal = ({
       rafRef.current = requestAnimationFrame(calculate);
     };
 
-    // Initial + resize
     calculate();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', calculate, { passive: true });
@@ -96,9 +122,13 @@ const ScrollReveal = ({
 
   const style = {
     opacity: p,
-    transform: `translate3d(${config.x * (1 - p)}px, ${config.y * (1 - p)}px, 0) scale(${config.scale + (1 - config.scale) * p})`,
-    filter: config.blur > 0 ? `blur(${config.blur * (1 - p)}px)` : undefined,
-    transition: `opacity ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), filter ${duration}ms cubic-bezier(0.22, 1, 0.36, 1)`,
+    transform: isMobile
+      ? undefined
+      : `translate3d(${config.x * (1 - p)}px, ${config.y * (1 - p)}px, 0) scale(${config.scale + (1 - config.scale) * p})`,
+    filter: !isMobile && config.blur > 0 ? `blur(${config.blur * (1 - p)}px)` : undefined,
+    transition: isMobile
+      ? `opacity 300ms ease-out`
+      : `opacity ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1), filter ${duration}ms cubic-bezier(0.22, 1, 0.36, 1)`,
     willChange: 'opacity, transform',
   };
 
@@ -109,7 +139,6 @@ const ScrollReveal = ({
   );
 };
 
-// Staggered group
 export const ScrollRevealGroup = ({
   children,
   variant = 'fade-up',

@@ -176,7 +176,7 @@ const PortfolioHome = () => {
           <AboutSection isVisible={visibleSections.has('about')} />
         </ScrollReveal>
 
-        <ScrollReveal variant="fade-up" duration={900}>
+        <ScrollReveal variant="fade-up" duration={1000}>
           <StatsSection />
         </ScrollReveal>
 
@@ -204,13 +204,13 @@ const PortfolioHome = () => {
 
         <SectionDivider color="cyan" />
 
-        <ScrollReveal variant="fade-up" duration={900}>
+        <ScrollReveal variant="fade-up" duration={1000}>
           <BlogPreviewSection />
         </ScrollReveal>
 
         <SectionDivider color="pink" />
 
-        <ScrollReveal variant="fade-up" duration={900}>
+        <ScrollReveal variant="fade-up" duration={1000}>
           <TestimonialsSection />
         </ScrollReveal>
 
