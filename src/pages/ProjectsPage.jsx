@@ -13,28 +13,25 @@ import {
 import { projects } from '../data';
 import { PROJECT_LINKS, SOCIAL_LINKS } from '../config/links';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor, SEO } from '../components/common';
+import { SEO } from '../components/common';
 
 const ProjectsPage = () => {
   const { currentTheme } = useTheme();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>
       <SEO
         title="Projects"
         description="Technical projects by Atharv Vatsal — from autonomous driving perception with YOLOv8 & U-Net to predictive policing and NLP-powered report processing."
         url="/projects"
         keywords={['projects', 'YOLOv8', 'U-Net', 'machine learning projects', 'computer vision', 'NLP']}
       />
-      <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">

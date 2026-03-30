@@ -66,15 +66,10 @@ const PortfolioHome = () => {
   const [loadingProgress, setLoadingProgress] = useState(isReturnVisit ? 100 : 0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   // Easter egg
   const [matrixActive, setMatrixActive] = useState(false);
   useKonamiCode(() => setMatrixActive(true));
-
-  useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  }, []);
 
   // Preloader — only on first visit
   useEffect(() => {
@@ -147,12 +142,11 @@ const PortfolioHome = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white overflow-x-hidden ${!isTouchDevice ? 'cursor-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white overflow-x-hidden`}>
       <SEO url="/" keywords={['portfolio', 'AI engineer', 'photographer', 'VIT Vellore']} />
 
       {/* Preloader — only on first visit */}
       {!isReturnVisit && <Preloader progress={loadingProgress} isLoading={isLoading} />}
-      <CustomCursor isTouchDevice={isTouchDevice} />
 
       <div 
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 z-[60] transition-all duration-300"
@@ -236,19 +230,23 @@ const AnimatedRoutes = () => {
   useAnalytics(); // Track page views on route change
 
   return (
-    <PageTransition>
-      <Suspense fallback={<PageLoader />}>
-        <Routes location={location}>
-          <Route path="/" element={<PortfolioHome />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/resume" element={<ResumePage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
-    </PageTransition>
+    <>
+      {/* Single global cursor — persists across all routes */}
+      <CustomCursor />
+      <PageTransition>
+        <Suspense fallback={<PageLoader />}>
+          <Routes location={location}>
+            <Route path="/" element={<PortfolioHome />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/resume" element={<ResumePage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </PageTransition>
+    </>
   );
 };
 

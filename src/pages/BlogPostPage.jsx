@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { blogPosts } from '../data';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor, SEO } from '../components/common';
+import { SEO } from '../components/common';
 import { MarkdownRenderer, extractHeadings, TableOfContents, ReadingProgress } from '../components/blog';
 import { ArticleSkeleton } from '../components/common/Skeleton';
 
@@ -27,7 +27,7 @@ const BlogPostPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { currentTheme } = useTheme();
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
   const [imageError, setImageError] = useState(false);
   const [markdownContent, setMarkdownContent] = useState('');
   const [isLoadingContent, setIsLoadingContent] = useState(true);
@@ -52,7 +52,6 @@ const BlogPostPage = () => {
     : [];
 
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
     setImageError(false);
   }, [slug]);
@@ -121,7 +120,7 @@ const BlogPostPage = () => {
   const headings = markdownContent ? extractHeadings(markdownContent) : [];
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>
       {/* SEO with article structured data */}
       <SEO
         title={post.title}
@@ -137,7 +136,7 @@ const BlogPostPage = () => {
         }}
       />
 
-      <CustomCursor isTouchDevice={isTouchDevice} />
+
       <ReadingProgress />
 
       {/* Header */}

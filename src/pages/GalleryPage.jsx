@@ -19,19 +19,17 @@ import {
 } from 'lucide-react';
 import { galleryPhotos, galleryCategories } from '../data/gallery';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor, SEO } from '../components/common';
+import { SEO } from '../components/common';
 
 const GalleryPage = () => {
   const { currentTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
@@ -89,14 +87,13 @@ const GalleryPage = () => {
   };
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>
       <SEO
         title="Photography Gallery"
         description="Photography portfolio by Atharv Vatsal — capturing portraits, landscapes, concerts, and nature through a creative lens."
         url="/gallery"
         keywords={['photography', 'gallery', 'portrait', 'landscape', 'concert photography', 'Nikon']}
       />
-      <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">

@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Home, ArrowLeft, Search, Ghost } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { SEO } from '../components/common';
-import {CustomCursor} from '../components/common';
 
 const NotFoundPage = () => {
   const { currentTheme } = useTheme();
@@ -25,7 +24,7 @@ const NotFoundPage = () => {
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white flex items-center justify-center relative overflow-hidden`}>
       <SEO title="404 — Page Not Found" description="The page you're looking for doesn't exist." noIndex />
-        <CustomCursor />
+
       {/* Ambient background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>

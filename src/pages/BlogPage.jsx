@@ -14,19 +14,17 @@ import {
 } from 'lucide-react';
 import { blogPosts, blogCategories } from '../data';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor, SEO } from '../components/common';
+import { SEO } from '../components/common';
 
 const BlogPage = () => {
   const { currentTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [imageErrors, setImageErrors] = useState({});
   const [loadedImages, setLoadedImages] = useState({});
 
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
@@ -49,14 +47,13 @@ const BlogPage = () => {
   });
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>
       <SEO
         title="Blog"
         description="Thoughts, stories, and insights from Atharv Vatsal — covering tech, machine learning, photography, and life reflections."
         url="/blog"
         keywords={['blog', 'tech articles', 'machine learning blog', 'photography blog']}
       />
-      <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">

@@ -21,7 +21,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { CustomCursor, SEO, MouseGlow } from '../components/common';
+import { SEO, MouseGlow } from '../components/common';
 import { useMousePosition } from '../hooks';
 import { SOCIAL_LINKS, CONTACT_INFO, RESUME_LINK } from '../config/links';
 
@@ -29,11 +29,9 @@ const ResumePage = () => {
   const { currentTheme } = useTheme();
   const { mousePosition } = useMousePosition();
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [activeTab, setActiveTab] = useState('experience');
 
   useEffect(() => {
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
     window.scrollTo(0, 0);
     setTimeout(() => setIsLoaded(true), 100);
   }, []);
@@ -262,14 +260,13 @@ const ResumePage = () => {
   // ─── RENDER ───────────────────────────────────────────
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white ${!isTouchDevice ? 'cursor-none' : ''}`}>
+    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>
       <SEO
         title="Resume"
         description="Interactive resume of Atharv Vatsal — CS student at VIT specializing in AI/ML, with experience at the Government of Himachal Pradesh."
         url="/resume"
         keywords={['resume', 'CV', 'Atharv Vatsal', 'machine learning', 'VIT']}
       />
-      <CustomCursor isTouchDevice={isTouchDevice} />
 
       {/* Ambient Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
