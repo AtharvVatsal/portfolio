@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { ArrowUp, Bot, Sparkles } from 'lucide-react';
-import AIChatbot from './AIChatbot';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { ArrowUp, Bot, Sparkles, Loader2 } from 'lucide-react';
+
+const AIChatbotLazy = lazy(() => import('./AIChatbot'));
 
 const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isOnHero, setIsOnHero] = useState(true);
+  const [chatbotLoading, setChatbotLoading] = useState(false);
+  const [chatbotReady, setChatbotReady] = useState(false);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -19,6 +22,20 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
 
   // Only pulse on hero section or when hovering near the button
   const shouldPulse = !showAIAssistant && (isOnHero || isHovering);
+
+  // Handle chatbot open - start loading when opened for first time
+  const handleChatbotToggle = () => {
+    if (!showAIAssistant && !chatbotReady) {
+      setChatbotLoading(true);
+    }
+    setShowAIAssistant(!showAIAssistant);
+  };
+
+  // Mark chatbot as ready once loaded
+  const handleChatbotReady = () => {
+    setChatbotLoading(false);
+    setChatbotReady(true);
+  };
 
   return (
     <>
@@ -43,7 +60,7 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
 
         {/* AI Assistant Toggle Button */}
         <button
-          onClick={() => setShowAIAssistant(!showAIAssistant)}
+          onClick={handleChatbotToggle}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
           className={`group relative w-12 h-12 flex items-center justify-center rounded-full transition-all duration-500 hover:scale-110 shadow-lg ${
@@ -53,35 +70,54 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
           }`}
           aria-label={showAIAssistant ? 'Close AI Assistant' : 'Open AI Assistant'}
         >
-          {/* Animated ring — only on hero section or hover */}
-          {shouldPulse && (
-            <span className="absolute inset-0 rounded-full border-2 border-purple-400/50 animate-ping" />
-          )}
-          
-          <Bot 
-            size={22} 
-            className={`transition-all duration-300 ${
-              showAIAssistant 
-                ? 'text-white rotate-0' 
-                : 'text-purple-400 group-hover:text-white'
-            }`}
-          />
-          
-          {/* Sparkle decoration — same condition */}
-          {shouldPulse && (
-            <Sparkles 
-              size={10} 
-              className="absolute -top-1 -right-1 text-amber-400 animate-pulse" 
-            />
+          {/* Loading spinner when chatbot is loading */}
+          {chatbotLoading ? (
+            <Loader2 size={22} className="text-white animate-spin" />
+          ) : (
+            <>
+              {/* Animated ring — only on hero section or hover */}
+              {shouldPulse && (
+                <span className="absolute inset-0 rounded-full border-2 border-purple-400/50 animate-ping" />
+              )}
+              
+              <Bot 
+                size={22} 
+                className={`transition-all duration-300 ${
+                  showAIAssistant 
+                    ? 'text-white rotate-0' 
+                    : 'text-purple-400 group-hover:text-white'
+                }`}
+              />
+              
+              {/* Sparkle decoration — same condition */}
+              {shouldPulse && (
+                <Sparkles 
+                  size={10} 
+                  className="absolute -top-1 -right-1 text-amber-400 animate-pulse" 
+                />
+              )}
+            </>
           )}
         </button>
       </div>
 
-      {/* AI Chatbot */}
-      <AIChatbot 
-        isOpen={showAIAssistant} 
-        onClose={() => setShowAIAssistant(false)} 
-      />
+      {/* AI Chatbot - Lazy loaded */}
+      {showAIAssistant && (
+        <Suspense fallback={
+          <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[90vw] sm:w-96 h-[400px] bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3">
+              <Loader2 size={32} className="text-purple-400 animate-spin" />
+              <p className="text-gray-400 text-sm">Loading AI Assistant...</p>
+            </div>
+          </div>
+        }>
+          <AIChatbotLazy 
+            isOpen={showAIAssistant} 
+            onClose={() => setShowAIAssistant(false)}
+            onReady={handleChatbotReady}
+          />
+        </Suspense>
+      )}
     </>
   );
 };

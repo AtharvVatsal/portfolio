@@ -317,7 +317,7 @@ const ResumePage = () => {
               <div className="relative group">
                 <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/30 to-purple-500/30 blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700 scale-110"></div>
                 <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl overflow-hidden border-2 border-white/15 shadow-2xl group-hover:border-cyan-400/30 transition-all duration-500">
-                  <img src="/avPhoto.JPG" alt="Atharv Vatsal" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onError={(e) => { e.target.style.display = 'none'; }} />
+                  <img src="/avPhoto.webp" alt="Atharv Vatsal" width="128" height="128" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" onError={(e) => { e.target.style.display = 'none'; }} />
                 </div>
               </div>
 

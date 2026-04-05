@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { GEMINI_CONFIG, PORTFOLIO_CONTEXT } from '../../config/gemini';
 
-const AIChatbot = ({ isOpen, onClose }) => {
+const AIChatbot = ({ isOpen, onClose, onReady }) => {
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -28,6 +28,13 @@ const AIChatbot = ({ isOpen, onClose }) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Notify parent when chatbot is ready
+  useEffect(() => {
+    if (onReady) {
+      onReady();
+    }
+  }, [onReady]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {

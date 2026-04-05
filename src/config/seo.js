@@ -6,7 +6,7 @@ export const SEO_CONFIG = {
   titleTemplate: '%s | Atharv Vatsal',
   defaultDescription:
     'Portfolio of Atharv Vatsal — CS student at VIT specializing in AI/ML, Computer Vision, and Photography. Explore projects, blog posts, and a photography gallery.',
-  defaultImage: '/avPhoto.JPG',
+  defaultImage: '/avPhoto.webp',
   twitterHandle: '@atharvvatsal',
   locale: 'en_US',
   themeColor: '#0a0a1a',
