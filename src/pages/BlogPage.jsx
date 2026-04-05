@@ -180,6 +180,8 @@ const BlogPage = () => {
                           <img 
                             src={post.coverImage}
                             alt={post.title}
+                            width="400"
+                            height="225"
                             className={`w-full h-full object-cover group-hover:scale-110 transition-all duration-700 ${
                               loadedImages[post.id] ? 'opacity-100' : 'opacity-0'
                             }`}

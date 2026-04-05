@@ -198,6 +198,8 @@ const BlogPostPage = () => {
           <img 
             src={post.coverImage}
             alt={post.title}
+            width="1200"
+            height="675"
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
           />
@@ -315,6 +317,8 @@ const BlogPostPage = () => {
                       <img
                         src={related.coverImage}
                         alt={related.title}
+                        width="200"
+                        height="112"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         onError={(e) => { e.target.parentElement.style.display = 'none'; }}
                       />

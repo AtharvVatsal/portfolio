@@ -190,6 +190,8 @@ const GalleryPage = () => {
                       <img
                         src={photo.src}
                         alt={photo.title}
+                        width="400"
+                        height="300"
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         onError={() => handleImageError(photo.id)}
                         loading="lazy"
@@ -277,6 +279,8 @@ const GalleryPage = () => {
               <img
                 src={selectedPhoto.src}
                 alt={selectedPhoto.title}
+                width="800"
+                height="600"
                 className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
                 onError={() => handleImageError(selectedPhoto.id)}
               />
