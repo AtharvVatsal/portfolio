@@ -23,6 +23,27 @@ body {
   overflow-x: hidden;
 }
 
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0a0a1a;
+  color: #22d3ee;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  z-index: 9999;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 16px;
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
+
 /* Hide default cursor on desktop */
 @media (hover: hover) and (pointer: fine) {
   * {

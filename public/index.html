@@ -9,11 +9,20 @@
     <meta name="keywords" content="Atharv Vatsal, Portfolio, Computer Science, AI, ML, Machine Learning, Computer Vision, Photography, Web Developer" />
     <meta name="author" content="Atharv Vatsal" />
     
+    <!-- Security Headers -->
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()" />
+    
+    <!-- Content Security Policy - relaxed for Create React App -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https://res.cloudinary.com https://*.cloudinary.com https://images.unsplash.com; connect-src 'self' https://generativelanguage.googleapis.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:;" />
+    
     <!-- Social Media -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Atharv Vatsal" />
     <meta property="og:description" content="Computer Science Engineer, Photographer & Creative Designer" />
-    <meta property="og:image" content="%PUBLIC_URL%/og-image.jpg" />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.webp" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Atharv Vatsal Portfolio" />
@@ -24,7 +33,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Atharv Vatsal" />
     <meta name="twitter:description" content="Computer Science Engineer, Photographer & Creative Designer" />
-    <meta name="twitter:image" content="%PUBLIC_URL%/og-image.jpg" />
+    <meta name="twitter:image" content="%PUBLIC_URL%/og-image.webp" />
     
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
@@ -39,6 +48,7 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
   </body>
 </html>

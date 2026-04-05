@@ -9,37 +9,32 @@ import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { 
   useMousePosition, 
   useScrollProgress, 
-  useVisibleSections 
+  useVisibleSections,
+  useAnalytics 
 } from './hooks';
-
-// Components (always loaded — needed on home page)
-import { Preloader } from './components/preloader';
-import { CustomCursor, FloatingActionButtons, SectionDivider, SEO } from './components/common';
-import { Navbar, Footer } from './components/layout';
-import {
-  HeroSection,
-  AboutSection,
-  StatsSection,
-  SkillsSection,
-  QuoteSection,
-  TechProjectsSection,
-  PhotographySection,
-  TestimonialsSection,
-  ContactSection,
-  BlogPreviewSection
-} from './components/sections';
-
-// Page transition & loading
-import PageTransition from './components/common/PageTransition';
-import PageLoader from './components/common/PageLoader';
-import ScrollReveal from './components/common/ScrollReveal';
-import { MatrixRain, useKonamiCode } from './components/common/EasterEgg';
-
-// Analytics
-import useAnalytics from './hooks/useAnalytics';
 
 // Styles
 import './styles/animations.css';
+
+// Always-loaded components (needed on home page)
+import { Preloader } from './components/preloader';
+import { CustomCursor, FloatingActionButtons, SectionDivider, SEO, ScrollReveal } from './components/common';
+import { Navbar, Footer } from './components/layout';
+import PageTransition from './components/common/PageTransition';
+import PageLoader from './components/common/PageLoader';
+import { MatrixRain, useKonamiCode } from './components/common/EasterEgg';
+
+// Lazy-loaded sections (code split for performance)
+const HeroSection = lazy(() => import('./components/sections/HeroSection'));
+const AboutSection = lazy(() => import('./components/sections/AboutSection'));
+const StatsSection = lazy(() => import('./components/sections/StatsSection'));
+const SkillsSection = lazy(() => import('./components/sections/SkillsSection'));
+const QuoteSection = lazy(() => import('./components/sections/QuoteSection'));
+const TechProjectsSection = lazy(() => import('./components/sections/TechProjectsSection'));
+const PhotographySection = lazy(() => import('./components/sections/PhotographySection'));
+const TestimonialsSection = lazy(() => import('./components/sections/TestimonialsSection'));
+const ContactSection = lazy(() => import('./components/sections/ContactSection'));
+const BlogPreviewSection = lazy(() => import('./components/sections/BlogPreviewSection'));
 
 // Lazy-loaded pages (code-split into separate chunks)
 const BlogPage = lazy(() => import('./pages/BlogPage'));
@@ -161,59 +156,55 @@ const PortfolioHome = () => {
         scrollToSection={scrollToSection}
       />
 
-      <main>
-        <HeroSection mousePosition={mousePosition} scrollY={scrollY} parallaxOffset={parallaxOffset} />
+      <div id="main-content">
+        <Suspense fallback={null}>
+          <HeroSection mousePosition={mousePosition} scrollY={scrollY} parallaxOffset={parallaxOffset} />
 
-        <SectionDivider color="cyan" />
+          <SectionDivider color="cyan" />
 
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <AboutSection isVisible={visibleSections.has('about')} />
-        </ScrollReveal>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <AboutSection isVisible={visibleSections.has('about')} />
+          </ScrollReveal>
 
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <StatsSection />
-        </ScrollReveal>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <StatsSection />
+          </ScrollReveal>
 
-        <SectionDivider color="purple" />
+          <SectionDivider color="purple" />
 
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <SkillsSection isVisible={visibleSections.has('skills')} />
-        </ScrollReveal>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <SkillsSection isVisible={visibleSections.has('skills')} />
+          </ScrollReveal>
 
-        <ScrollReveal variant="scale" duration={1000}>
-          <QuoteSection isVisible={visibleSections.has('skills')} />
-        </ScrollReveal>
+          <ScrollReveal variant="scale" duration={1000}>
+            <QuoteSection isVisible={visibleSections.has('skills')} />
+          </ScrollReveal>
 
-        <SectionDivider color="blue" />
+          <SectionDivider color="blue" />
 
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <TechProjectsSection isVisible={visibleSections.has('tech')} mousePosition={mousePosition} />
-        </ScrollReveal>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <TechProjectsSection isVisible={visibleSections.has('tech')} mousePosition={mousePosition} />
+          </ScrollReveal>
 
-        <SectionDivider color="purple" />
+          <SectionDivider color="purple" />
 
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <PhotographySection isVisible={visibleSections.has('photography')} mousePosition={mousePosition} />
-        </ScrollReveal>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <PhotographySection isVisible={visibleSections.has('photography')} mousePosition={mousePosition} />
+          </ScrollReveal>
 
-        <SectionDivider color="cyan" />
+          <SectionDivider color="cyan" />
 
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <BlogPreviewSection />
-        </ScrollReveal>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <BlogPreviewSection />
+          </ScrollReveal>
 
-        {/* <SectionDivider color="pink" /> */}
+          <SectionDivider color="cyan" />
 
-        {/* <ScrollReveal variant="fade-up" duration={1000}>
-          <TestimonialsSection />
-        </ScrollReveal> */}
-
-        <SectionDivider color="cyan" />
-
-        <ScrollReveal variant="fade-up" duration={1000}>
-          <ContactSection isVisible={visibleSections.has('contact')} mousePosition={mousePosition} />
-        </ScrollReveal>
-      </main>
+          <ScrollReveal variant="fade-up" duration={1000}>
+            <ContactSection isVisible={visibleSections.has('contact')} mousePosition={mousePosition} />
+          </ScrollReveal>
+        </Suspense>
+      </div>
 
       <Footer />
       <FloatingActionButtons scrollY={scrollY} showAIAssistant={showAIAssistant} setShowAIAssistant={setShowAIAssistant} />
@@ -235,15 +226,17 @@ const AnimatedRoutes = () => {
       <CustomCursor />
       <PageTransition>
         <Suspense fallback={<PageLoader />}>
-          <Routes location={location}>
-            <Route path="/" element={<PortfolioHome />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
-            <Route path="/gallery" element={<GalleryPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/resume" element={<ResumePage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <main id="main-content">
+            <Routes location={location}>
+              <Route path="/" element={<PortfolioHome />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
+              <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/resume" element={<ResumePage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </main>
         </Suspense>
       </PageTransition>
     </>

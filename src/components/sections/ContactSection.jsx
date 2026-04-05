@@ -5,6 +5,10 @@ import emailjs from '@emailjs/browser';
 import { CONTACT_INFO, SOCIAL_LINKS } from '../../config/links';
 import { MouseGlow } from '../common';
 
+const EMAILJS_SERVICE_ID = process.env.REACT_APP_EMAILJS_SERVICE_ID || '';
+const EMAILJS_TEMPLATE_ID = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || '';
+const EMAILJS_PUBLIC_KEY = process.env.REACT_APP_EMAILJS_PUBLIC_KEY || '';
+
 const ContactSection = ({ isVisible, mousePosition }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState('idle'); // 'idle' | 'success' | 'error'
@@ -30,17 +34,19 @@ const ContactSection = ({ isVisible, mousePosition }) => {
     };
     
     try {
-      // Just ONE call! EmailJS will automatically send the notification to you,
-      // AND send the auto-reply to the visitor based on your dashboard settings.
+      if (!EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID || !EMAILJS_PUBLIC_KEY) {
+        throw new Error('Email service not configured. Please contact directly.');
+      }
+
       await emailjs.send(
-        'service_wvm84yn', // Verify this is your exact Service ID from the dashboard
-        'template_cr2o9gp',
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
         { 
           from_name: data.name, 
-          reply_to: data.email, // Updated to match your {{reply_to}} template variable
+          reply_to: data.email,
           message: data.message 
         },
-        '28jLJQbxea4uQvb0o' // Your Public Key
+        EMAILJS_PUBLIC_KEY
       );
 
       setSenderName(data.name);

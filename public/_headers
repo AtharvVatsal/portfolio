@@ -1,0 +1,48 @@
+# Netlify Edge Headers - Caching Configuration
+# Copy to netlify.toml or use _headers file in public folder
+
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.ico
+  Cache-Control: public, max-age=31536000, immutable
+  X-Frame-Options: DENY
+
+/*.pdf
+  Cache-Control: public, max-age=86400
+  X-Frame-Options: DENY

@@ -52,9 +52,12 @@ const PhotographySection = ({ isVisible, mousePosition }) => {
           <img
             src={photo.thumbnail || photo.src}
             alt={photo.title}
+            width={row === 1 ? 280 : 240}
+            height={row === 1 ? 180 : 160}
             className="w-full h-full object-cover"
             onError={() => handleImageError(photo.id)}
             loading="lazy"
+            decoding="async"
           />
           
           {/* Gradient overlay */}
@@ -81,7 +84,11 @@ const PhotographySection = ({ isVisible, mousePosition }) => {
           <img
             src={photo.thumbnail || photo.src}
             alt=""
+            width={row === 1 ? 280 : 240}
+            height={row === 1 ? 180 : 160}
             className="w-full h-full object-cover object-bottom"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>

@@ -15,12 +15,15 @@ const CustomCursor = () => {
   const idleTimer = useRef(null);
   const startLoopRef = useRef(null);
 
-  // Self-contained touch detection
+  // Self-contained touch detection + reduced motion preference
   const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     setIsTouchDevice(
-      'ontouchstart' in window || navigator.maxTouchPoints > 0
+      'ontouchstart' in window || 
+      navigator.maxTouchPoints > 0 ||
+      prefersReducedMotion.matches
     );
   }, []);
 
