@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Github, Linkedin, Instagram, Camera, Code, Rocket, FileText } from 'lucide-react';
+import { Github, Linkedin, Instagram, Camera, Code, Rocket } from 'lucide-react';
 import { SOCIAL_LINKS } from '../../config/links';
 
 const Footer = () => {

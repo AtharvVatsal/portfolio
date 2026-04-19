@@ -33,7 +33,6 @@ const SkillsSection = lazy(() => import('./components/sections/SkillsSection'));
 const QuoteSection = lazy(() => import('./components/sections/QuoteSection'));
 const TechProjectsSection = lazy(() => import('./components/sections/TechProjectsSection'));
 const PhotographySection = lazy(() => import('./components/sections/PhotographySection'));
-const TestimonialsSection = lazy(() => import('./components/sections/TestimonialsSection'));
 const ContactSection = lazy(() => import('./components/sections/ContactSection'));
 const BlogPreviewSection = lazy(() => import('./components/sections/BlogPreviewSection'));
 

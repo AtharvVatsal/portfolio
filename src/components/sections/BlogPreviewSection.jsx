@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ArrowRight, PenLine, Sparkles } from 'lucide-react';
+import { BookOpen, ArrowRight, PenLine } from 'lucide-react';
 import { blogPosts } from '../../data';
 
 const BlogPreviewSection = () => {

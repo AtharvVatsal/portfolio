@@ -114,16 +114,18 @@ const HeroSection = memo(({ mousePosition, scrollY, parallaxOffset }) => {
         {/* Social Links */}
         <div className="flex justify-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
           {[
-            { icon: Github, platform: 'github', color: 'hover:text-cyan-400 hover:border-cyan-400' },
-            { icon: Linkedin, platform: 'linkedin', color: 'hover:text-blue-400 hover:border-blue-400' },
-            { icon: Instagram, platform: 'instagram', color: 'hover:text-pink-400 hover:border-pink-400' },
+            { icon: Github, platform: 'github', color: 'hover:text-cyan-400 hover:border-cyan-400', label: 'GitHub profile' },
+            { icon: Linkedin, platform: 'linkedin', color: 'hover:text-blue-400 hover:border-blue-400', label: 'LinkedIn profile' },
+            { icon: Instagram, platform: 'instagram', color: 'hover:text-pink-400 hover:border-pink-400', label: 'Instagram profile' },
           ].map((social) => (
             <button
               key={social.platform}
               onClick={() => handleSocialClick(social.platform)}
+              aria-label={social.label}
               className={`p-3 rounded-full backdrop-blur-xl bg-white/5 border border-white/10 transition-all duration-500 hover:scale-110 hover:bg-white/10 ${social.color}`}
             >
               <social.icon size={24} />
+              <span className="sr-only">{social.label}</span>
             </button>
           ))}
         </div>

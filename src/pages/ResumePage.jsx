@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Download, 
-  Home, 
   GraduationCap, 
   Briefcase, 
   Code, 

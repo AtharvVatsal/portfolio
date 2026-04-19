@@ -1,20 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Code, Camera, Film, Award, Download, FileText } from 'lucide-react';
-import { RESUME_LINK } from '../../config/links';
+import { Code, Camera, Film, Award, FileText } from 'lucide-react';
 
 const AboutSection = ({ isVisible }) => {
   const scrollToSection = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const handleResumeDownload = () => {
-    const link = document.createElement('a');
-    link.href = RESUME_LINK;
-    link.download = 'Atharv_Vatsal_Resume.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   const identityCards = [

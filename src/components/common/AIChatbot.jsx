@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  MessageCircle, 
   X, 
   Send, 
   Bot, 
   User, 
-  Sparkles,
   Loader2,
-  AlertCircle,
   Minimize2,
   Maximize2
 } from 'lucide-react';
