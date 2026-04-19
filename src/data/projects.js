@@ -1,6 +1,18 @@
-import { Siren, ScanEye, MessageCircleWarning, FileChartColumn, Brain, TrendingUp } from 'lucide-react';
+import { Siren, ScanEye, MessageCircleWarning, FileChartColumn, Brain, TrendingUp, Camera, FolderOpen, Layers, Sparkles } from 'lucide-react';
 
 export const projects = [
+  {
+    id: 8,
+    title: 'keeper-raw: AI-Powered Photo Culling Desktop App',
+    description: 'A Tauri-based desktop application for professional photographers that automates the photo culling process using AI (YOLOv8-face, FaceMesh, Laplacian). Groups RAW files into scenes, detects faces/blinks/sharpness, and exports XMP sidecars for Lightroom. Reduces 8+ hours of manual culling to ~30 minutes.',
+    tech: ['Rust', 'Tauri 2.x', 'React 19', 'TypeScript', 'ONNX Runtime', 'YOLOv8-face', 'FaceMesh', 'ExifTool', 'Rayon', 'Vite', 'Python'],
+    color: 'from-violet-400 to-purple-500',
+    icon: Camera,
+    gradient: 'from-violet-500/20 to-purple-500/20',
+    projectKey: 'keeperraw',
+    liveUrl: 'https://github.com/AtharvVatsal/keeper-raw',
+    ongoing: true
+  },
   {
     id: 1,
     title: 'DriveSense: Autonomous Driving Perception with YOLOv8 & U-Net',
