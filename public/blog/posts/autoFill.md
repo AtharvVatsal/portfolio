@@ -77,6 +77,7 @@ Your brain does not store a full recording of events. Instead, it stores fragmen
 When you recall the event later, your brain **reconstructs the scene** from those fragments.
 
 Think of it like this:
+
 ```
 experience → fragments stored → reconstruction during recall
 ```
@@ -138,11 +139,9 @@ Your brain quietly fills the gaps with **emotional smoothing**.
 
 It's running a process that looks suspiciously like this:
 
-
 ```
 memory = fragments + emotional bias + reconstruction
 ```
-
 
 The rough edges get blurred.
 

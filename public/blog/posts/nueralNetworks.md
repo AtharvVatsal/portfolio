@@ -8,7 +8,7 @@
 
 Imagine a vast city.
 
-Not a quiet one—but a restless, ever-active, constantly evolving city.
+Not a quiet one but a restless, ever-active, constantly evolving city.
 
 Millions of individuals live here. Each one has a job. Each one makes tiny decisions. Most of them don’t even understand the bigger picture.
 
@@ -46,7 +46,7 @@ Let’s say a neuron receives signals:
 
 But not all voices are equal.
 
-Each signal has a **weight**—a measure of importance.
+Each signal has a **weight** a measure of importance.
 
 So the neuron does something quietly powerful:
 
@@ -101,7 +101,7 @@ Now imagine thousands of these neurons.
 
 They don’t all connect randomly.
 
-They form **layers**—like districts in a city.
+They form **layers** like districts in a city.
 
 ### Input Layer
 
@@ -166,7 +166,7 @@ Information flows forward.
 
 This process is called **forward propagation**.
 
-It’s like a rumor traveling across the city—getting refined, verified, and distilled at every step until it reaches the mayor's office.
+It’s like a rumor traveling across the city getting refined, verified, and distilled at every step until it reaches the mayor's office.
 
 ---
 
@@ -250,7 +250,7 @@ Once neurons know their mistakes, they adjust their weights.
 
 But carefully.
 
-Not drastic changes—tiny, measured steps.
+Not drastic changes, tiny, measured steps.
 
 $$w = w - \eta \frac{\partial L}{\partial w}$$
 
@@ -272,7 +272,7 @@ Who sets the learning rate, or chooses the activation functions?
 
 Not the neurons.
 
-That is the job of the Architect—the engineer.
+That is the job of the Architect, the engineer.
 
 These overarching rules are called **hyperparameters**. They are the blueprint of the pipeline. A poorly planned city will cause traffic jams (vanishing gradients) or chaotic noise (exploding gradients). A well-planned city learns beautifully.
 
