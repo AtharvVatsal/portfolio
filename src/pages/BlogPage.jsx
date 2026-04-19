@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -37,14 +37,14 @@ const BlogPage = () => {
     setLoadedImages(prev => ({ ...prev, [postId]: true }));
   };
 
-  const filteredPosts = blogPosts.filter((post) => {
+  const filteredPosts = useMemo(() => blogPosts.filter((post) => {
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
     const matchesSearch = 
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
-  });
+  }), [selectedCategory, searchQuery]);
 
   return (
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>

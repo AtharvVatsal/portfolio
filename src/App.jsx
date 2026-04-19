@@ -23,6 +23,7 @@ import { Navbar, Footer } from './components/layout';
 import PageTransition from './components/common/PageTransition';
 import PageLoader from './components/common/PageLoader';
 import { MatrixRain, useKonamiCode } from './components/common/EasterEgg';
+import ErrorBoundary from './components/common/ErrorBoundary';
 
 // Lazy-loaded sections (code split for performance)
 const HeroSection = lazy(() => import('./components/sections/HeroSection'));
@@ -249,7 +250,9 @@ const App = () => {
     <HelmetProvider>
       <ThemeProvider>
         <Router>
-          <AnimatedRoutes />
+          <ErrorBoundary>
+            <AnimatedRoutes />
+          </ErrorBoundary>
         </Router>
       </ThemeProvider>
     </HelmetProvider>

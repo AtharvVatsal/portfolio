@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -38,8 +38,11 @@ const GalleryPage = () => {
     setImageErrors(prev => ({ ...prev, [photoId]: true }));
   };
 
-  const filteredPhotos = galleryPhotos.filter(
-    photo => selectedCategory === 'All' || photo.category === selectedCategory
+  const filteredPhotos = useMemo(() => 
+    galleryPhotos.filter(
+      photo => selectedCategory === 'All' || photo.category === selectedCategory
+    ),
+    [selectedCategory]
   );
 
   const openLightbox = (photo, index) => {

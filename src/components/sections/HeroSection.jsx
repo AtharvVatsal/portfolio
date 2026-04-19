@@ -1,15 +1,13 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Github, Linkedin, Instagram, ChevronDown, Sparkles, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useTheme } from '../../context/ThemeContext';
 import { useTypingEffect } from '../../hooks';
 import { useGreeting } from '../../hooks';
 import { roles, taglines } from '../../data';
 import { SOCIAL_LINKS } from '../../config/links';
 import { MouseGlow } from '../common';
 
-const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
-  const { theme } = useTheme();
+const HeroSection = memo(({ mousePosition, scrollY, parallaxOffset }) => {
   const { displayText, currentIndex, cursorBlink } = useTypingEffect(roles);
   const greeting = useGreeting();
 
@@ -22,6 +20,11 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer');
     }
+  };
+
+  const gradientOpacity = {
+    cyan: 0.4 - (scrollY || 0) * 0.0003,
+    purple: 0.3 - (scrollY || 0) * 0.0002,
   };
 
   return (
@@ -42,7 +45,7 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
           blur={80}
           smoothing={0.08}
           className="hidden md:block"
-          gradient={`radial-gradient(circle, rgba(34, 211, 238, ${0.4 - (scrollY || 0) * 0.0003}) 0%, rgba(168, 85, 247, ${0.3 - (scrollY || 0) * 0.0002}) 40%, transparent 70%)`}
+          gradient={`radial-gradient(circle, rgba(34, 211, 238, ${gradientOpacity.cyan}) 0%, rgba(168, 85, 247, ${gradientOpacity.purple}) 40%, transparent 70%)`}
         />
         <MouseGlow
           mousePosition={mousePosition}
@@ -50,7 +53,7 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
           blur={80}
           smoothing={0.08}
           className="md:hidden"
-          gradient={`radial-gradient(circle, rgba(34, 211, 238, ${0.4 - (scrollY || 0) * 0.0003}) 0%, rgba(168, 85, 247, ${0.3 - (scrollY || 0) * 0.0002}) 40%, transparent 70%)`}
+          gradient={`radial-gradient(circle, rgba(34, 211, 238, ${gradientOpacity.cyan}) 0%, rgba(168, 85, 247, ${gradientOpacity.purple}) 40%, transparent 70%)`}
         />
 
         {/* Animated grid */}
@@ -147,6 +150,6 @@ const HeroSection = ({ mousePosition, scrollY, parallaxOffset }) => {
       </div>
     </section>
   );
-};
+});
 
 export default HeroSection;
