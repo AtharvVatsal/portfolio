@@ -43,11 +43,11 @@ export const PROJECT_LINKS = {
 };
 // Contact Information
 export const CONTACT_INFO = {
-  email: 'atharvvatsal@outlook.com',
-  emailAlt: 'atharv.vatsal2023@vitstudent.ac.in',
-  phone: '+91 9736340828',
+  email: 'atharv.vatsal2023@vitstudent.ac.in',
+  emailAlt: 'atharvvatsal@outlook.com',
+  phone: '+91 9726240828',
   phoneAlt: '+91 86268796190',
-  location: 'Himachal Pradesh, India',
+  location: 'Dharamshala, Himachal Pradesh',
 };
 // Resume Link
 export const RESUME_LINK = '/AtharvVatsalResume.pdf';
