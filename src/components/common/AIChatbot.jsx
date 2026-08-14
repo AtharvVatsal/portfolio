@@ -15,7 +15,7 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
     {
       id: 1,
       role: 'assistant',
-      content: "Hi! 👋 I'm Atharv's AI assistant. Feel free to ask me anything about his skills, projects, or experience!",
+      content: "Hi! I'm Atharv's AI assistant. Feel free to ask me anything about his skills, projects, or experience!",
       timestamp: new Date(),
     }
   ]);
@@ -26,19 +26,16 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Notify parent when chatbot is ready
   useEffect(() => {
     if (onReady) {
       onReady();
     }
   }, [onReady]);
 
-  // Scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Focus input when chat opens
   useEffect(() => {
     if (isOpen && !isMinimized) {
       setTimeout(() => inputRef.current?.focus(), 100);
@@ -61,26 +58,21 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
     setError(null);
 
     try {
-      // Check if API key exists
       if (!GEMINI_CONFIG.apiKey) {
         throw new Error('AI assistant is not configured. API key missing.');
       }
 
-      // Build conversation history for context
-      // Gemini requires first message to be 'user' role, so skip
-      // any assistant messages before the first user message
       const allMessages = [...messages, { role: 'user', content: input.trim() }];
       
       const firstUserIndex = allMessages.findIndex(msg => msg.role === 'user');
       const relevantMessages = allMessages
         .slice(firstUserIndex)
-        .filter(msg => !msg.isError) // skip error bubbles
+        .filter(msg => !msg.isError)
         .map(msg => ({
           role: msg.role === 'assistant' ? 'model' : 'user',
           parts: [{ text: msg.content }]
         }));
 
-      // Gemini requires alternating roles — merge consecutive same-role messages
       const conversationHistory = relevantMessages.reduce((acc, msg) => {
         if (acc.length > 0 && acc[acc.length - 1].role === msg.role) {
           acc[acc.length - 1].parts[0].text += '\n' + msg.parts[0].text;
@@ -109,14 +101,12 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
         ],
       });
 
-      // Try with primary model, retry with backoff, then fallback model
       const models = [GEMINI_CONFIG.model, 'gemini-2.5-flash-lite'];
       let lastError = null;
 
       for (const model of models) {
         for (let attempt = 0; attempt < 3; attempt++) {
           if (attempt > 0) {
-            // Exponential backoff: 1s, 2s
             await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt - 1)));
           }
 
@@ -139,10 +129,10 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
                 timestamp: new Date(),
               };
               setMessages(prev => [...prev, assistantMessage]);
-              return; // Success — exit entirely
+              return;
             } else {
               lastError = new Error('Invalid response format');
-              break; // Don't retry format errors
+              break;
             }
           }
 
@@ -151,15 +141,15 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
 
           if (response.status === 429) {
             lastError = new Error('Rate limit hit — retrying...');
-            continue; // Retry this model
+            continue;
           } else if (response.status === 400) {
             lastError = new Error('Bad request — check API key and model name.');
-            break; // Try next model
+            break;
           } else if (response.status === 403 || response.status === 401) {
             throw new Error('API key is invalid or expired.');
           } else if (response.status === 404) {
             lastError = new Error(`Model "${model}" not found.`);
-            break; // Try next model
+            break;
           } else {
             lastError = new Error(`API error: ${response.status}`);
             break;
@@ -167,7 +157,6 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
         }
       }
 
-      // If we exhausted all retries and models
       throw lastError || new Error('Failed to get a response. Please try again.');
     } catch (err) {
       console.error('Chat error:', err);
@@ -176,7 +165,7 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         role: 'assistant',
-        content: `⚠️ ${err.message}\n\nFeel free to use the Contact section to reach Atharv directly!`,
+        content: `${err.message}\n\nFeel free to use the Contact section to reach Atharv directly!`,
         timestamp: new Date(),
         isError: true,
       }]);
@@ -200,7 +189,6 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
     });
   };
 
-  // Quick suggestions
   const suggestions = [
     "Who Is Atharv?",
     "What are Atharv's skills?",
@@ -217,33 +205,33 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
       }`}
     >
       {/* Chat Container */}
-      <div className="bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl shadow-purple-500/10 overflow-hidden flex flex-col">
+      <div className="bg-notebook-bg border border-notebook-border shadow-2xl overflow-hidden flex flex-col">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-4 flex items-center justify-between">
+        <div className="bg-notebook-bg border-b border-notebook-border p-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-              <Bot size={20} className="text-white" />
+            <div className="w-9 h-9 border border-blueprint/30 flex items-center justify-center">
+              <Bot size={18} className="text-blueprint" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">AI Chatbot</h3>
-              <p className="text-xs text-white/70">
-                {isLoading ? 'Typing...' : 'Online'}
+              <h3 className="font-mono text-sm text-ink-primary">AI Terminal</h3>
+              <p className="text-[10px] font-mono text-ink-faint">
+                {isLoading ? 'Processing...' : 'Online'}
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <button
               onClick={() => setIsMinimized(!isMinimized)}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-1.5 text-ink-faint hover:text-ink-primary transition-colors"
             >
-              {isMinimized ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
+              {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              className="p-1.5 text-ink-faint hover:text-ink-primary transition-colors"
             >
-              <X size={18} />
+              <X size={16} />
             </button>
           </div>
         </div>
@@ -259,25 +247,25 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
                 >
                   <div className={`flex gap-2 max-w-[85%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
                     {/* Avatar */}
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                    <div className={`flex-shrink-0 w-7 h-7 flex items-center justify-center text-xs font-mono ${
                       message.role === 'user' 
-                        ? 'bg-cyan-500/20 text-cyan-400' 
-                        : 'bg-purple-500/20 text-purple-400'
+                        ? 'border border-blueprint/30 text-blueprint' 
+                        : 'border border-notebook-border text-ink-faint'
                     }`}>
-                      {message.role === 'user' ? <User size={16} /> : <Bot size={16} />}
+                      {message.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                     </div>
                     
                     {/* Message Bubble */}
-                    <div className={`rounded-2xl px-4 py-2.5 ${
+                    <div className={`px-3 py-2 ${
                       message.role === 'user'
-                        ? 'bg-cyan-600 text-white rounded-tr-none'
+                        ? 'bg-blueprint/10 border border-blueprint/20 text-ink-primary'
                         : message.isError
-                          ? 'bg-red-500/20 text-red-200 rounded-tl-none'
-                          : 'bg-white/10 text-gray-200 rounded-tl-none'
+                          ? 'bg-red-500/10 border border-red-500/20 text-red-300'
+                          : 'bg-surface border border-notebook-border text-ink-secondary'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.role === 'user' ? 'text-cyan-200' : 'text-gray-500'
+                      <p className={`text-[10px] mt-1 font-mono ${
+                        message.role === 'user' ? 'text-blueprint/60' : 'text-ink-faint'
                       }`}>
                         {formatTime(message.timestamp)}
                       </p>
@@ -290,13 +278,13 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
               {isLoading && (
                 <div className="flex justify-start">
                   <div className="flex gap-2 max-w-[85%]">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center">
-                      <Bot size={16} />
+                    <div className="flex-shrink-0 w-7 h-7 border border-notebook-border flex items-center justify-center text-ink-faint">
+                      <Bot size={14} />
                     </div>
-                    <div className="bg-white/10 rounded-2xl rounded-tl-none px-4 py-3">
+                    <div className="border border-notebook-border px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Loader2 size={16} className="animate-spin text-purple-400" />
-                        <span className="text-sm text-gray-400">Thinking...</span>
+                        <Loader2 size={14} className="animate-spin text-blueprint" />
+                        <span className="text-sm text-ink-muted font-mono">Thinking...</span>
                       </div>
                     </div>
                   </div>
@@ -309,13 +297,13 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
             {/* Quick Suggestions */}
             {messages.length <= 2 && !isLoading && (
               <div className="px-4 pb-2">
-                <p className="text-xs text-gray-500 mb-2">Quick questions:</p>
-                <div className="flex flex-wrap gap-2">
+                <p className="text-[10px] text-ink-faint font-mono mb-2">Quick queries:</p>
+                <div className="flex flex-wrap gap-1.5">
                   {suggestions.map((suggestion, index) => (
                     <button
                       key={index}
                       onClick={() => setInput(suggestion)}
-                      className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-all"
+                      className="text-[11px] px-2.5 py-1 font-mono text-ink-muted border border-notebook-border hover:border-blueprint/30 hover:text-ink-primary transition-all"
                     >
                       {suggestion}
                     </button>
@@ -325,8 +313,9 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
             )}
 
             {/* Input Area */}
-            <div className="p-4 border-t border-white/10">
+            <div className="p-3 border-t border-notebook-border">
               <div className="flex items-center gap-2">
+                <span className="text-ink-faint font-mono text-xs hidden sm:inline">{'>'}</span>
                 <input
                   ref={inputRef}
                   type="text"
@@ -335,19 +324,19 @@ const AIChatbot = ({ isOpen, onClose, onReady }) => {
                   onKeyDown={handleKeyPress}
                   placeholder="Ask me anything..."
                   disabled={isLoading}
-                  className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors disabled:opacity-50"
+                  className="flex-1 bg-transparent border border-notebook-border px-3 py-2 text-sm font-mono text-ink-primary placeholder-ink-faint focus:outline-none focus:border-blueprint/40 transition-colors disabled:opacity-50"
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!input.trim() || isLoading}
-                  className="p-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:shadow-lg hover:shadow-purple-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 bg-blueprint text-white hover:bg-blueprint/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  <Send size={18} />
+                  <Send size={16} />
                 </button>
               </div>
               
-              <p className="text-xs text-gray-600 mt-2 text-center">
-                Powered by Google Gemini ✨
+              <p className="text-[10px] text-ink-faint font-mono mt-2 text-center">
+                Powered by Google Gemini
               </p>
             </div>
           </>

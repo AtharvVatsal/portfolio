@@ -1,21 +1,41 @@
-// Roles for typing animation
 export const roles = [
   'Computer Science Engineer',
+  'Machine Learning Engineer',
+  'Computer Vision Engineer',
+  'AI Systems Engineer',
+  'Software Engineer',
+  'Deep Learning Engineer',
   'Photographer',
-  'Video Editor',
-  'Creative Designer',
-  'Tech Enthusiast',
-  'AI Explorer',
-  'Computer Vision Developer'
+  'Visual Storyteller',
+  'Creative Technologist',
+  'Problem Solver',
+  'Builder',
+  'Systems Thinker',
+  'Human-Centered Engineer',
+  'AI Research Enthusiast',
+  'Vision AI Developer',
+  'AI Enthusiast',
+  'Engineering Student',
+  'Technology Innovator',
 ];
 
-// Taglines corresponding to roles
 export const taglines = [
-  'Building the future with code',
-  'Capturing moments that matter',
-  'Creating visual stories',
-  'Designing digital experiences',
-  'Exploring technology and innovation',
-  'Pushing the boundaries of AI',
-  'Advancing the field of Computer Vision'
+  'Building intelligent systems that solve real-world problems.',
+  'Teaching machines to understand the visual world.',
+  'Turning curiosity into software.',
+  'Designing systems that learn from observation.',
+  'Engineering ideas into meaningful products.',
+  'Exploring the intersection of AI and human creativity.',
+  'Capturing moments that inspire innovation.',
+  'Telling stories through light, code, and design.',
+  'Creating technology that feels intuitive and human.',
+  'Every problem is an opportunity to build something better.',
+  'Building with intention. Learning without limits.',
+  'Thinking in systems. Designing for people.',
+  'Technology is most powerful when it feels invisible.',
+  'Researching today. Building tomorrow.',
+  'Helping machines see, understand, and learn.',
+  'Always exploring what AI can become.',
+  'Learning relentlessly. Building deliberately.',
+  'Creating the future one experiment at a time.'
 ];

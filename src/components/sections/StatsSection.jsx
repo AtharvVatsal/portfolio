@@ -1,51 +1,45 @@
 import React from 'react';
 import { stats } from '../../data';
+import { getAnnotation } from '../../data/annotations';
+import MarginNote from '../common/MarginNote';
 
 const StatsSection = () => {
+  const statsAnnotation = getAnnotation('stats', 0);
+
   return (
-    <section className="py-12 sm:py-20 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+    <section className="py-10 sm:py-14 relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Metrics row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-notebook-border">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
                 key={stat.label}
-                className="group relative p-4 sm:p-6 rounded-2xl backdrop-blur-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-700 hover:scale-105 hover:border-cyan-400/50 text-center cursor-pointer animate-fade-in-up"
-                style={{ 
-                  animationDelay: `${index * 0.1}s`,
-                  transform: 'perspective(1000px)',
-                }}
-                onMouseMove={(e) => {
-                  if (window.innerWidth >= 768) {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = (y - centerY) / 10;
-                    const rotateY = (centerX - x) / 10;
-                    e.currentTarget.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (window.innerWidth >= 768) {
-                    e.currentTarget.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-                  }
-                }}
+                className="bg-notebook-bg p-5 sm:p-6 group hover:bg-notebook-surface transition-colors duration-300"
               >
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <div className="relative z-10">
-                  <Icon className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-3 text-cyan-400 group-hover:scale-110 group-hover:rotate-12 transition-all duration-700" />
-                  <div className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent mb-2">
-                    {stat.value}
+                <div className="flex items-center gap-3">
+                  <Icon size={14} className="text-ink-muted group-hover:text-blueprint transition-colors duration-300 flex-shrink-0" />
+                  <div>
+                    <div className="font-mono text-title sm:text-[1.5rem] text-ink-primary font-semibold">
+                      {stat.value}
+                    </div>
+                    <div className="meta-label mt-1">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-400">{stat.label}</div>
                 </div>
               </div>
             );
           })}
         </div>
+
+        {/* Annotation */}
+        {statsAnnotation && (
+          <div className="mt-4">
+            <MarginNote text={statsAnnotation.text} side={statsAnnotation.side} variant="amber" />
+          </div>
+        )}
       </div>
     </section>
   );

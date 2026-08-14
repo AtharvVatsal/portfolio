@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { ArrowUp, Bot, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowUp, Bot, Loader2 } from 'lucide-react';
 
 const AIChatbotLazy = lazy(() => import('./AIChatbot'));
 
@@ -15,15 +15,12 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
 
   const showScrollTop = scrollY > 500;
 
-  // Track if user is on the hero section (roughly first viewport)
   useEffect(() => {
     setIsOnHero(scrollY < window.innerHeight * 0.8);
   }, [scrollY]);
 
-  // Only pulse on hero section or when hovering near the button
   const shouldPulse = !showAIAssistant && (isOnHero || isHovering);
 
-  // Handle chatbot open - start loading when opened for first time
   const handleChatbotToggle = () => {
     if (!showAIAssistant && !chatbotReady) {
       setChatbotLoading(true);
@@ -31,7 +28,6 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
     setShowAIAssistant(!showAIAssistant);
   };
 
-  // Mark chatbot as ready once loaded
   const handleChatbotReady = () => {
     setChatbotLoading(false);
     setChatbotReady(true);
@@ -42,10 +38,10 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
       {/* Floating Buttons Container */}
       <div className="fixed bottom-6 right-4 sm:right-6 z-40 flex flex-col items-center gap-3">
         
-        {/* Scroll to Top Button */}
+        {/* Scroll to Top */}
         <button
           onClick={scrollToTop}
-          className={`group w-11 h-11 flex items-center justify-center rounded-full bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20 transition-all duration-500 hover:scale-110 shadow-lg ${
+          className={`group w-10 h-10 flex items-center justify-center border border-notebook-border bg-notebook-bg/90 backdrop-blur-sm hover:border-blueprint/30 transition-all duration-500 hover:scale-105 ${
             showScrollTop 
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-10 pointer-events-none'
@@ -53,48 +49,42 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
           aria-label="Scroll to top"
         >
           <ArrowUp 
-            size={20} 
-            className="text-white group-hover:-translate-y-1 transition-transform duration-300" 
+            size={18} 
+            className="text-ink-muted group-hover:text-ink-primary group-hover:-translate-y-0.5 transition-all duration-300" 
           />
         </button>
 
-        {/* AI Assistant Toggle Button */}
+        {/* AI Assistant Toggle */}
         <button
           onClick={handleChatbotToggle}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
-          className={`group relative w-12 h-12 flex items-center justify-center rounded-full transition-all duration-500 hover:scale-110 shadow-lg ${
+          className={`group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:scale-105 ${
             showAIAssistant
-              ? 'bg-gradient-to-r from-purple-600 to-pink-600'
-              : 'bg-white/10 backdrop-blur-xl border border-white/20 hover:bg-white/20'
+              ? 'bg-blueprint border border-blueprint text-white'
+              : 'border border-notebook-border bg-notebook-bg/90 backdrop-blur-sm hover:border-blueprint/30'
           }`}
           aria-label={showAIAssistant ? 'Close AI Assistant' : 'Open AI Assistant'}
         >
-          {/* Loading spinner when chatbot is loading */}
           {chatbotLoading ? (
-            <Loader2 size={22} className="text-white animate-spin" />
+            <Loader2 size={20} className="text-ink-muted animate-spin" />
           ) : (
             <>
-              {/* Animated ring — only on hero section or hover */}
               {shouldPulse && (
-                <span className="absolute inset-0 rounded-full border-2 border-purple-400/50 animate-ping" />
+                <span className="absolute inset-0 border border-blueprint/40 animate-ping" />
               )}
               
               <Bot 
-                size={22} 
+                size={20} 
                 className={`transition-all duration-300 ${
                   showAIAssistant 
-                    ? 'text-white rotate-0' 
-                    : 'text-purple-400 group-hover:text-white'
+                    ? 'text-white' 
+                    : 'text-ink-muted group-hover:text-blueprint'
                 }`}
               />
               
-              {/* Sparkle decoration — same condition */}
               {shouldPulse && (
-                <Sparkles 
-                  size={10} 
-                  className="absolute -top-1 -right-1 text-amber-400 animate-pulse" 
-                />
+                <span className="absolute -top-1 -right-1 w-1.5 h-1.5 bg-amber rounded-full animate-pulse" />
               )}
             </>
           )}
@@ -104,10 +94,10 @@ const FloatingActionButtons = ({ scrollY, showAIAssistant, setShowAIAssistant })
       {/* AI Chatbot - Lazy loaded */}
       {showAIAssistant && (
         <Suspense fallback={
-          <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[90vw] sm:w-96 h-[400px] bg-gray-900/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl flex items-center justify-center">
+          <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[90vw] sm:w-96 h-[400px] bg-notebook-bg border border-notebook-border shadow-2xl flex items-center justify-center">
             <div className="flex flex-col items-center gap-3">
-              <Loader2 size={32} className="text-purple-400 animate-spin" />
-              <p className="text-gray-400 text-sm">Loading AI Assistant...</p>
+              <Loader2 size={24} className="text-blueprint animate-spin" />
+              <p className="text-ink-muted text-xs font-mono">Retrieving archive...</p>
             </div>
           </div>
         }>

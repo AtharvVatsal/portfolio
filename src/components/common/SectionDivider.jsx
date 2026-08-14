@@ -1,23 +1,48 @@
 import React from 'react';
 
-const SectionDivider = ({ color = 'cyan', animated = true }) => {
-  const colorClasses = {
-    cyan: 'via-cyan-500/3',
-    purple: 'via-purple-500/3',
-    blue: 'via-blue-500/3',
-    pink: 'via-pink-500/3'
-  };
-
+const SectionDivider = () => {
   return (
-    <div className="relative h-20 sm:h-32 overflow-hidden">
-      <div className={`absolute inset-0 bg-gradient-to-b from-transparent ${colorClasses[color]} to-transparent`}></div>
-      {animated && (
-        <svg className="absolute inset-0 w-full h-full opacity-20">
-          <line x1="0" y1="50%" x2="100%" y2="50%" stroke="#22d3ee" strokeWidth="1" strokeDasharray="5,5">
-            <animate attributeName="stroke-dashoffset" from="0" to="10" dur="1s" repeatCount="indefinite" />
-          </line>
+    <div className="relative h-16 sm:h-20 overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center">
+        {/* Main line */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-notebook-border to-transparent" />
+
+        {/* Center diamond — reference mark */}
+        <div className="absolute flex items-center justify-center">
+          <div className="w-1 h-1 rotate-45 bg-blueprint/30" />
+        </div>
+
+        {/* Measurement ticks */}
+        <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+          <line
+            x1="15%"
+            y1="40%"
+            x2="15%"
+            y2="60%"
+            stroke="#6366F1"
+            strokeWidth="0.5"
+            opacity="0.15"
+          />
+          <line
+            x1="50%"
+            y1="30%"
+            x2="50%"
+            y2="70%"
+            stroke="#6366F1"
+            strokeWidth="0.5"
+            opacity="0.3"
+          />
+          <line
+            x1="85%"
+            y1="40%"
+            x2="85%"
+            y2="60%"
+            stroke="#6366F1"
+            strokeWidth="0.5"
+            opacity="0.15"
+          />
         </svg>
-      )}
+      </div>
     </div>
   );
 };

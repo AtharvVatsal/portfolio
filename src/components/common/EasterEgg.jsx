@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
 
-// ─── KONAMI CODE HOOK ───────────────────────────────────
-
 const KONAMI_SEQUENCE = [
   'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
   'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
@@ -19,7 +17,6 @@ export const useKonamiCode = (onActivate) => {
       if (e.key === expected || e.key.toLowerCase() === expected) {
         indexRef.current++;
 
-        // Reset if no key pressed within 2 seconds
         clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
           indexRef.current = 0;
@@ -42,8 +39,6 @@ export const useKonamiCode = (onActivate) => {
     };
   }, [onActivate]);
 };
-
-// ─── MATRIX RAIN COMPONENT ──────────────────────────────
 
 const ML_CHARS = [
   'import', 'torch', 'numpy', 'def', 'class', 'model', 'train',
@@ -93,11 +88,11 @@ const MatrixColumn = ({ x, speed, chars, opacity, fontSize }) => {
       {chars.map((char, i) => (
         <span
           key={i}
-          className={i === chars.length - 1 ? 'text-white font-bold' : 'text-cyan-400/70'}
+          className={i === chars.length - 1 ? 'text-white font-bold' : 'text-blueprint/70'}
           style={{
             textShadow: i === chars.length - 1
-              ? '0 0 12px rgba(34, 211, 238, 0.8)'
-              : '0 0 4px rgba(34, 211, 238, 0.3)',
+              ? '0 0 12px rgba(99, 102, 241, 0.8)'
+              : '0 0 4px rgba(99, 102, 241, 0.3)',
           }}
         >
           {char}
@@ -120,7 +115,6 @@ export const MatrixRain = ({ isActive, onComplete }) => {
       return;
     }
 
-    // Generate columns
     const cols = [];
     const count = Math.floor(window.innerWidth / 60);
     for (let i = 0; i < count; i++) {
@@ -137,13 +131,8 @@ export const MatrixRain = ({ isActive, onComplete }) => {
     }
     setColumns(cols);
 
-    // Show hidden message after 1.5s
     const msgTimer = setTimeout(() => setShowMessage(true), 1500);
-
-    // Start fade out
     const fadeTimer = setTimeout(() => setFadeOut(true), 5000);
-
-    // Complete
     const completeTimer = setTimeout(() => {
       onComplete();
     }, 5800);
@@ -162,7 +151,7 @@ export const MatrixRain = ({ isActive, onComplete }) => {
       className={`fixed inset-0 z-[200] transition-opacity duration-700 ${
         fadeOut ? 'opacity-0' : 'opacity-100'
       }`}
-      style={{ background: 'rgba(0, 2, 8, 0.92)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.95)' }}
     >
       {/* Rain columns */}
       <div className="absolute inset-0 overflow-hidden">
@@ -178,26 +167,18 @@ export const MatrixRain = ({ isActive, onComplete }) => {
         }`}
       >
         <div className="text-center px-6 relative">
-          {/* Glow behind text */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 blur-3xl scale-150"></div>
-          
-          <div className="relative">
-            <p className="text-cyan-400 text-xs sm:text-sm tracking-[0.3em] uppercase mb-3 font-mono">
-              // easter egg unlocked
-            </p>
-            <h2
-              className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
-              style={{ textShadow: '0 0 40px rgba(34, 211, 238, 0.3)' }}
-            >
-              You found it!
-            </h2>
-            <p className="text-gray-400 text-sm sm:text-base max-w-md mx-auto mb-2">
-              You're clearly the curious type — that's exactly who I want to work with.
-            </p>
-            <p className="text-gray-600 text-xs font-mono">
-              ↑↑↓↓←→←→BA • Thanks for exploring!
-            </p>
+          <div className="font-mono text-xs text-blueprint/60 tracking-[0.3em] uppercase mb-4">
+            // easter egg unlocked
           </div>
+          <h2 className="font-display text-3xl sm:text-5xl md:text-6xl mb-4 text-ink-primary">
+            You found it!
+          </h2>
+          <p className="text-ink-muted text-sm sm:text-base max-w-md mx-auto mb-3">
+            You're clearly the curious type — that's exactly who I want to work with.
+          </p>
+          <p className="text-ink-faint text-xs font-mono">
+            ↑↑↓↓←→←→BA · Thanks for exploring!
+          </p>
         </div>
       </div>
 

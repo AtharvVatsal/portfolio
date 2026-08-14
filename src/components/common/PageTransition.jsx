@@ -8,23 +8,21 @@ const PageTransition = ({ children }) => {
   const [isFirstMount, setIsFirstMount] = useState(true);
 
   useEffect(() => {
-    // Skip transition on initial mount
     if (isFirstMount) {
       setIsFirstMount(false);
       setDisplayChildren(children);
       return;
     }
 
-    // Fade out
+    // Archive page transition — slow, deliberate
     setIsVisible(false);
 
     const timeout = setTimeout(() => {
-      // Swap content, fade in
       setDisplayChildren(children);
       requestAnimationFrame(() => {
         setIsVisible(true);
       });
-    }, 250);
+    }, 350);
 
     return () => clearTimeout(timeout);
   }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -33,7 +31,7 @@ const PageTransition = ({ children }) => {
     <div
       style={{
         opacity: isVisible ? 1 : 0,
-        transition: 'opacity 0.3s ease-in-out',
+        transition: 'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
       {displayChildren}

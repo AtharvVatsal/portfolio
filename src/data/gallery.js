@@ -456,10 +456,11 @@ export const galleryPhotos = photoData.map(photo => {
 });
 
 // Gallery categories (auto-calculated from photos)
+const categoryNames = [...new Set(photoData.map(p => p.category))].sort();
 export const galleryCategories = [
   { name: "All", count: galleryPhotos.length },
-  { name: "Landscape", count: galleryPhotos.filter(p => p.category === "Landscape").length },
-  { name: "Portrait", count: galleryPhotos.filter(p => p.category === "Portrait").length },
-  { name: "Street", count: galleryPhotos.filter(p => p.category === "Street").length },
-  { name: "Architecture", count: galleryPhotos.filter(p => p.category === "Architecture").length },
+  ...categoryNames.map(name => ({
+    name,
+    count: galleryPhotos.filter(p => p.category === name).length,
+  })),
 ];

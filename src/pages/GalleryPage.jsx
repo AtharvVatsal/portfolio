@@ -1,51 +1,135 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Camera,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  Calendar,
-  Aperture,
-  Timer,
-  Gauge,
-  Focus,
-  Tag,
-  Home,
-  Sparkles,
-  Image as ImageIcon
-} from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { X, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { galleryPhotos, galleryCategories } from '../data/gallery';
-import { useTheme } from '../context/ThemeContext';
 import { SEO } from '../components/common';
+import PageHeader from '../components/layout/PageHeader';
+import { useInView } from '../hooks/useInView';
+
+const aspectClass = (ratio) => {
+  const r = (ratio || '').toLowerCase();
+  if (r === 'portrait') return 'aspect-[2/3]';
+  if (r === 'square') return 'aspect-square';
+  return 'aspect-[4/3]';
+};
+
+const Card = ({ photo, index, onClick, visible, phase, staggerBase }) => {
+  const [loaded, setLoaded] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const stagger = staggerBase + Math.min(index * 30, 450);
+  const isExiting = phase === 'exiting';
+  const isEntering = phase === 'entering';
+
+  return (
+    <div
+      onClick={() => onClick(photo, index)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="cursor-pointer break-inside-avoid mb-8 sm:mb-10"
+      style={{
+        opacity: isExiting ? 0 : (visible ? 1 : 0),
+        translate: isExiting ? '0 -12px' : (visible ? '0 0' : '0 20px'),
+        willChange: 'transform, opacity',
+        transition: isExiting
+          ? `opacity 0.25s cubic-bezier(0.25, 0.1, 0.25, 1), translate 0.25s cubic-bezier(0.25, 0.1, 0.25, 1)`
+          : isEntering
+            ? `opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${stagger}ms, translate 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) ${stagger}ms`
+            : `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${stagger}ms, translate 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) ${stagger}ms`,
+      }}
+    >
+      <div
+        className={`relative overflow-hidden ${aspectClass(photo.aspectRatio)}`}
+        style={{
+          transform: hovered ? 'scale(1.015)' : 'scale(1)',
+          transition: 'transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
+        }}
+      >
+        <img
+          src={photo.thumbnail}
+          alt={photo.title}
+          onLoad={() => setLoaded(true)}
+          className="w-full h-full object-cover"
+          style={{
+            filter: loaded ? 'brightness(1)' : 'brightness(0.6) blur(12px)',
+            transition: 'filter 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+          loading="lazy"
+        />
+      </div>
+
+      <div className="mt-3 sm:mt-4">
+        <p className="font-editorial text-lg sm:text-xl text-ink-primary leading-snug">
+          {photo.title}
+        </p>
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className="font-mono text-[0.9rem] uppercase tracking-widest" style={{ color: 'rgba(99,102,241,0.35)' }}>
+            {photo.category}
+          </span>
+          <span className="text-ink-faint/15">Ã‚Â·</span>
+          <div className="flex items-center gap-1">
+            <MapPin size={9} className="text-ink-faint/60" />
+            <span className="font-mono text-[0.9rem] uppercase tracking-wider text-ink-faint/45">
+              {photo.location}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const GalleryPage = () => {
-  const { currentTheme } = useTheme();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [imageErrors, setImageErrors] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [gridRef, gridVisible] = useInView({ threshold: 0.05, once: true });
+  const [filtersIn, setFiltersIn] = useState(false);
+  const [uiVisible, setUiVisible] = useState(true);
+  const [transitionPhase, setTransitionPhase] = useState('entering');
+  const uiTimerRef = useRef(null);
+  const navLockRef = useRef(false);
+  const prevPhotoRef = useRef(null);
+  const imgKeyRef = useRef(0);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    setTimeout(() => setIsLoaded(true), 100);
+    const t = setTimeout(() => setFiltersIn(true), 60);
+    return () => clearTimeout(t);
   }, []);
 
-  const handleImageError = (photoId) => {
-    setImageErrors(prev => ({ ...prev, [photoId]: true }));
-  };
+  const resetUiTimer = useCallback(() => {
+    setUiVisible(true);
+    if (uiTimerRef.current) clearTimeout(uiTimerRef.current);
+    uiTimerRef.current = setTimeout(() => setUiVisible(false), 2500);
+  }, []);
 
-  const filteredPhotos = useMemo(() => 
+  useEffect(() => {
+    resetUiTimer();
+    return () => { if (uiTimerRef.current) clearTimeout(uiTimerRef.current); };
+  }, [selectedPhoto, resetUiTimer]);
+
+  const filteredPhotos = useMemo(() =>
     galleryPhotos.filter(
       photo => selectedCategory === 'All' || photo.category === selectedCategory
     ),
     [selectedCategory]
   );
 
+  const handleFilterClick = (name) => {
+    if (name === selectedCategory || transitionPhase === 'exiting') return;
+    if (transitionPhase === 'entering') {
+      setTransitionPhase('idle');
+    }
+    setTransitionPhase('exiting');
+    setTimeout(() => {
+      setSelectedCategory(name);
+      setTransitionPhase('entering');
+      setTimeout(() => {
+        setTransitionPhase('idle');
+      }, 700);
+    }, 250);
+  };
+
   const openLightbox = (photo, index) => {
+    prevPhotoRef.current = null;
     setSelectedPhoto(photo);
     setCurrentIndex(index);
     document.body.style.overflow = 'hidden';
@@ -54,349 +138,288 @@ const GalleryPage = () => {
   const closeLightbox = () => {
     setSelectedPhoto(null);
     document.body.style.overflow = 'auto';
+    if (uiTimerRef.current) clearTimeout(uiTimerRef.current);
+    prevPhotoRef.current = null;
   };
 
-  const goToPrevious = useCallback(() => {
-    const newIndex = currentIndex === 0 ? filteredPhotos.length - 1 : currentIndex - 1;
+  const navigate = useCallback((dir) => {
+    if (navLockRef.current) return;
+    navLockRef.current = true;
+    prevPhotoRef.current = selectedPhoto;
+    imgKeyRef.current += 1;
+    const newIndex = dir === 'prev'
+      ? (currentIndex === 0 ? filteredPhotos.length - 1 : currentIndex - 1)
+      : (currentIndex === filteredPhotos.length - 1 ? 0 : currentIndex + 1);
     setCurrentIndex(newIndex);
     setSelectedPhoto(filteredPhotos[newIndex]);
-  }, [currentIndex, filteredPhotos]);
-
-  const goToNext = useCallback(() => {
-    const newIndex = currentIndex === filteredPhotos.length - 1 ? 0 : currentIndex + 1;
-    setCurrentIndex(newIndex);
-    setSelectedPhoto(filteredPhotos[newIndex]);
-  }, [currentIndex, filteredPhotos]);
+    resetUiTimer();
+    setTimeout(() => {
+      navLockRef.current = false;
+      prevPhotoRef.current = null;
+    }, 500);
+  }, [currentIndex, filteredPhotos, selectedPhoto, resetUiTimer]);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKey = (e) => {
       if (!selectedPhoto) return;
       if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') goToPrevious();
-      if (e.key === 'ArrowRight') goToNext();
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate('prev');
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate('next');
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedPhoto, goToPrevious, goToNext]);
-
-  const getAspectClass = (aspectRatio, index) => {
-    const patterns = [
-      'row-span-1', 'row-span-2', 'row-span-1', 'row-span-2',
-      'row-span-1', 'row-span-1', 'row-span-2', 'row-span-1',
-    ];
-    if (aspectRatio === 'portrait') return 'row-span-2';
-    if (aspectRatio === 'landscape') return 'row-span-1';
-    return patterns[index % patterns.length];
-  };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [selectedPhoto, navigate]);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${currentTheme.gradient} text-white`}>
+    <div className="min-h-screen bg-notebook-bg text-ink-primary">
       <SEO
-        title="Photography Gallery"
-        description="Photography portfolio by Atharv Vatsal — capturing portraits, landscapes, concerts, and nature through a creative lens."
+        title="Observations Ã¢â‚¬â€ Photography Gallery"
+        description="Observation log by Atharv Vatsal Ã¢â‚¬â€ landscapes, wildlife, concerts, street photography."
         url="/gallery"
-        keywords={['photography', 'gallery', 'portrait', 'landscape', 'concert photography', 'Nikon']}
       />
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link
-            to="/"
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors duration-300 group"
+      <PageHeader title="Observations" />
+
+      {/* Filters */}
+      <section className="border-b border-notebook-border">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          <div className="flex items-center gap-2 overflow-x-auto py-4 scrollbar-none"
+            style={{
+              opacity: filtersIn ? 1 : 0,
+              transition: 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
           >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform duration-300" />
-            <span>Back to Portfolio</span>
-          </Link>
-          
-          <div className="flex items-center gap-2">
-            <Camera size={20} className="text-purple-400" />
-            <span className="font-medium">Gallery</span>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="py-16 sm:py-20 relative overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <div 
-            className={`transition-all duration-700 ${
-              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-            }`}
-          >
-            <div className="flex justify-center mb-6">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-400/20 to-pink-500/20 backdrop-blur-xl">
-                <Camera size={40} className="text-purple-400" />
-              </div>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-              Photography
-            </h1>
-            
-            <p className="text-gray-400 text-lg sm:text-xl max-w-2xl mx-auto">
-              A collection of moments frozen in time. Each frame tells a story, 
-              each click captures an emotion.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="py-4 border-y border-white/5">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {galleryCategories.map((category) => (
-              <button
-                key={category.name}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                  selectedCategory === category.name
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                    : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {category.name}
-                <span className="ml-2 text-xs opacity-60">({category.count})</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Masonry Grid */}
-      <section className="py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-[200px]">
-            {filteredPhotos.map((photo, index) => {
-              const hasValidImage = !imageErrors[photo.id];
-              
+            {galleryCategories.map((c, i) => {
+              const active = selectedCategory === c.name;
               return (
-                <div
-                  key={photo.id}
-                  onClick={() => openLightbox(photo, index)}
-                  className={`group relative rounded-2xl overflow-hidden cursor-pointer ${getAspectClass(photo.aspectRatio, index)} ${
-                    isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-                  }`}
-                  style={{ 
-                    transitionDelay: `${index * 50}ms`,
-                    transition: 'opacity 0.5s ease, transform 0.5s ease'
+                <button
+                  key={c.name}
+                  onClick={() => handleFilterClick(c.name)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                  style={{
+                    background: active ? 'rgba(99,102,241,0.07)' : 'transparent',
+                    border: `1px solid ${active ? 'rgba(99,102,241,0.2)' : 'rgba(40,37,31,0.3)'}`,
+                    opacity: filtersIn ? 1 : 0,
+                    translate: filtersIn ? '0 0' : '0 -8px',
+                    willChange: 'transform, opacity',
+                    transition: `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.035}s, translate 0.5s cubic-bezier(0.25, 0.1, 0.25, 1) ${i * 0.035}s, background 0.3s, border-color 0.3s`,
                   }}
                 >
-                  {hasValidImage ? (
-                    <>
-                      <img
-                        src={photo.src}
-                        alt={photo.title}
-                        width="400"
-                        height="300"
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        onError={() => handleImageError(photo.id)}
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      
-                      <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                        <h3 className="text-white font-semibold text-sm mb-1 line-clamp-1">{photo.title}</h3>
-                        <div className="flex items-center gap-2 text-gray-300 text-xs">
-                          <MapPin size={12} />
-                          <span className="line-clamp-1">{photo.location}</span>
-                        </div>
-                      </div>
-
-                      {photo.featured && (
-                        <div className="absolute top-3 right-3">
-                          <Sparkles size={16} className="text-amber-400 drop-shadow-lg" />
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-white/5 border border-white/10 rounded-2xl">
-                      <ImageIcon size={32} className="text-gray-600" />
-                    </div>
-                  )}
-                </div>
+                  <span
+                    className="font-mono text-[0.9rem] tracking-[0.15em] uppercase whitespace-nowrap"
+                    style={{
+                      color: active ? 'rgba(245,242,237,0.85)' : 'rgba(140,134,125,0.3)',
+                      transition: 'color 0.3s',
+                    }}
+                  >
+                    {c.name}
+                  </span>
+                  <span
+                    className="font-mono text-[0.9rem]"
+                    style={{
+                      color: active ? 'rgba(99,102,241,0.4)' : 'rgba(140,134,125,0.35)',
+                      transition: 'color 0.3s',
+                    }}
+                  >
+                    {c.count}
+                  </span>
+                </button>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 text-center border-t border-white/5">
-        <Sparkles size={24} className="inline-block text-purple-400/40 animate-pulse mb-4" />
-        <p className="text-gray-600 text-sm mb-4">Every frame tells a story...</p>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-purple-400 transition-colors"
-        >
-          <Home size={16} />
-          Back to Portfolio
-        </Link>
-      </footer>
+      {/* Grid */}
+      <section ref={gridRef} className="py-12 sm:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+          {filteredPhotos.length > 0 ? (
+            <div className="columns-1 sm:columns-2 gap-6 sm:gap-8 lg:gap-10">
+              {filteredPhotos.map((photo, index) => (
+                <Card
+                  key={photo.id}
+                  photo={photo}
+                  index={index}
+                  onClick={openLightbox}
+                  visible={gridVisible}
+                  phase={transitionPhase}
+                  staggerBase={transitionPhase === 'entering' ? 200 : 0}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-24 text-center">
+              <p className="font-editorial text-xl text-ink-muted">No photographs in this category yet.</p>
+              <p className="font-mono text-xs text-ink-faint/60 mt-2 tracking-wider">Check back after the next expedition.</p>
+            </div>
+          )}
+        </div>
+      </section>
 
-      {/* Lightbox Overlay */}
+      {/* Lightbox */}
       {selectedPhoto && (
-        <div 
-          className="fixed inset-0 z-[100] flex"
+        <div
+          className="fixed inset-0 z-[100]"
           onClick={closeLightbox}
+          style={{
+            background: 'rgba(0,0,0,0)',
+            animation: 'lbOverlay 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both',
+          }}
         >
-          <div 
-            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-            style={{
-              backgroundImage: `url(${selectedPhoto.placeholder || selectedPhoto.src})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(50px) brightness(0.3)',
-            }}
-          />
-          
-          <div className="relative w-full h-full flex flex-col lg:flex-row" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={closeLightbox}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300"
-            >
-              <X size={24} />
-            </button>
+          <style>{`
+            @keyframes lbOverlay { from { background: rgba(0,0,0,0); } to { background: rgba(0,0,0,1); } }
+            @keyframes lbIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+            @keyframes lbOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.97); } }
+          `}</style>
 
-            <button
-              onClick={(e) => { e.stopPropagation(); goToPrevious(); }}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-110"
-            >
-              <ChevronLeft size={28} />
-            </button>
-
-            <button
-              onClick={(e) => { e.stopPropagation(); goToNext(); }}
-              className="absolute right-4 lg:right-[340px] top-1/2 -translate-y-1/2 z-10 p-3 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all duration-300 hover:scale-110"
-            >
-              <ChevronRight size={28} />
-            </button>
-
-            <div className="flex-1 flex items-center justify-center p-4 lg:p-8 lg:pr-[340px]">
+          {/* Previous image Ã¢â‚¬â€ crossfade out */}
+          {prevPhotoRef.current && (
+            <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
               <img
-                src={selectedPhoto.src}
-                alt={selectedPhoto.title}
-                width="800"
-                height="600"
-                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
-                onError={() => handleImageError(selectedPhoto.id)}
+                src={prevPhotoRef.current.src}
+                alt=""
+                className="w-full h-full object-contain select-none"
+                draggable={false}
+                style={{
+                  animation: 'lbOut 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) both',
+                  willChange: 'opacity, transform',
+                }}
               />
             </div>
+          )}
 
-            <div className="lg:absolute lg:right-0 lg:top-0 lg:bottom-0 lg:w-[320px] bg-black/50 backdrop-blur-xl border-t lg:border-t-0 lg:border-l border-white/10 overflow-y-auto">
-              <div className="p-6 space-y-6">
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-2">{selectedPhoto.title}</h2>
-                  <p className="text-gray-400 text-sm leading-relaxed">{selectedPhoto.description}</p>
-                </div>
+          {/* Current image Ã¢â‚¬â€ crossfade in */}
+          <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
+            <img
+              key={imgKeyRef.current}
+              src={selectedPhoto.src}
+              alt={selectedPhoto.title}
+              className="w-full h-full object-contain select-none"
+              draggable={false}
+              style={{
+                animation: 'lbIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) both',
+                willChange: 'opacity, transform',
+              }}
+            />
+          </div>
 
-                <div>
-                  <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-purple-500/20 text-purple-400">
-                    {selectedPhoto.category}
-                  </span>
-                </div>
+          {/* UI overlay */}
+          <div
+            className="absolute inset-0 z-20"
+            onMouseMove={resetUiTimer}
+            onTouchStart={resetUiTimer}
+            style={{ pointerEvents: 'none' }}
+          >
+            <button
+              onClick={(e) => { e.stopPropagation(); closeLightbox(); }}
+              className="absolute top-5 right-5 w-9 h-9 flex items-center justify-center rounded-full"
+              style={{
+                background: uiVisible ? 'rgba(40,37,31,0.25)' : 'rgba(40,37,31,0)',
+                color: uiVisible ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0)',
+                pointerEvents: 'auto',
+                willChange: 'opacity, background',
+                transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(40,37,31,0.25)'; e.currentTarget.style.color = 'rgba(255,255,255,0.35)'; }}
+            >
+              <X size={16} />
+            </button>
 
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <MapPin size={18} className="text-purple-400" />
-                    <span>{selectedPhoto.location}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <Calendar size={18} className="text-purple-400" />
-                    <span>{selectedPhoto.date}</span>
-                  </div>
-                </div>
+            <div
+              className="absolute top-5 left-5"
+              style={{
+                opacity: uiVisible ? 1 : 0,
+                willChange: 'opacity',
+                transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+              }}
+            >
+              <span className="font-mono text-xs tracking-[0.25em]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                {String(currentIndex + 1).padStart(2, '0')} / {String(filteredPhotos.length).padStart(2, '0')}
+              </span>
+            </div>
 
-                <div className="h-px bg-white/10"></div>
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate('prev'); }}
+              className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full"
+              style={{
+                background: uiVisible ? 'rgba(40,37,31,0.15)' : 'rgba(40,37,31,0)',
+                color: uiVisible ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0)',
+                pointerEvents: 'auto',
+                willChange: 'opacity, background',
+                transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, color 0.3s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.08)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(40,37,31,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.45)'; }}
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); navigate('next'); }}
+              className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center rounded-full"
+              style={{
+                background: uiVisible ? 'rgba(40,37,31,0.15)' : 'rgba(40,37,31,0)',
+                color: uiVisible ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0)',
+                pointerEvents: 'auto',
+                willChange: 'opacity, background',
+                transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s, color 0.3s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.08)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(40,37,31,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.45)'; }}
+            >
+              <ChevronRight size={18} />
+            </button>
 
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Equipment</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 text-gray-300">
-                      <Camera size={18} className="text-cyan-400" />
-                      <span>{selectedPhoto.camera}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-gray-300">
-                      <Focus size={18} className="text-cyan-400" />
-                      <span>{selectedPhoto.lens}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-px bg-white/10"></div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Settings</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
-                        <Aperture size={12} />
-                        <span>Aperture</span>
-                      </div>
-                      <div className="text-white font-medium">{selectedPhoto.settings.aperture}</div>
-                    </div>
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
-                        <Timer size={12} />
-                        <span>Shutter</span>
-                      </div>
-                      <div className="text-white font-medium">{selectedPhoto.settings.shutter}</div>
-                    </div>
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
-                        <Gauge size={12} />
-                        <span>ISO</span>
-                      </div>
-                      <div className="text-white font-medium">{selectedPhoto.settings.iso}</div>
-                    </div>
-                    <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                      <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
-                        <Focus size={12} />
-                        <span>Focal</span>
-                      </div>
-                      <div className="text-white font-medium">{selectedPhoto.settings.focalLength}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-px bg-white/10"></div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Tags</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedPhoto.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 rounded-full text-xs bg-white/5 border border-white/10 text-gray-400"
-                      >
-                        #{tag}
+            {/* Caption */}
+            <div
+              className="absolute bottom-0 left-0 right-0"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                opacity: uiVisible ? 1 : 0,
+                translate: uiVisible ? '0 0' : '0 20px',
+                willChange: 'transform, opacity',
+                transition: 'opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), translate 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                pointerEvents: uiVisible ? 'auto' : 'none',
+              }}
+            >
+              <div className="pb-6 sm:pb-8 px-6 sm:px-10">
+                <div
+                  className="inline-block max-w-lg rounded-lg px-4 py-3"
+                  style={{ background: 'rgba(16,15,13,0.8)', backdropFilter: 'blur(12px)' }}
+                >
+                  <h2 className="font-editorial text-base sm:text-lg text-white leading-snug">
+                    {selectedPhoto.title}
+                  </h2>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div className="flex items-center gap-1">
+                      <MapPin size={9} className="text-white/45" />
+                      <span className="font-mono text-[0.85rem] tracking-wider text-white/45 uppercase">
+                        {selectedPhoto.location}
                       </span>
-                    ))}
+                    </div>
+                    <span className="text-white/10">Ã‚Â·</span>
+                    <span className="font-mono text-[0.85rem] tracking-wider text-white/55">
+                      {selectedPhoto.date}
+                    </span>
+                    <span className="text-white/10">Ã‚Â·</span>
+                    <span className="font-mono text-[0.85rem] tracking-widest text-white/70 uppercase">
+                      {selectedPhoto.category}
+                    </span>
                   </div>
-                </div>
-
-                <div className="text-center pt-4 border-t border-white/10">
-                  <span className="text-gray-500 text-sm">
-                    {currentIndex + 1} / {filteredPhotos.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-center gap-4 text-gray-600 text-xs">
-                  <span className="flex items-center gap-1">
-                    <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">←</kbd>
-                    <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">→</kbd>
-                    <span className="ml-1">Navigate</span>
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <kbd className="px-2 py-1 rounded bg-white/5 border border-white/10">Esc</kbd>
-                    <span className="ml-1">Close</span>
-                  </span>
+                  <div
+                    className="flex items-center gap-3 mt-2 pt-2 font-mono text-[0.8rem] tracking-wider"
+                    style={{ borderTop: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)' }}
+                  >
+                    <span>{selectedPhoto.camera}</span>
+                    <span>Ã‚Â·</span>
+                    <span>{selectedPhoto.settings.aperture}</span>
+                    <span>Ã‚Â·</span>
+                    <span>{selectedPhoto.settings.shutter}</span>
+                    <span>Ã‚Â·</span>
+                    <span>ISO {selectedPhoto.settings.iso}</span>
+                    <span>Ã‚Â·</span>
+                    <span>{selectedPhoto.lens}</span>
+                  </div>
                 </div>
               </div>
             </div>

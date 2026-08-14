@@ -1,22 +1,23 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 
-const easeOutQuint = (t) => 1 - Math.pow(1 - t, 5);
+// Mechanical easing — deliberate, no bounce
+const easeOutDocument = (t) => 1 - Math.pow(1 - t, 4);
 
 const variantConfig = {
-  'fade-up':    { y: 40, x: 0,   scale: 1,    blur: 0 },
-  'fade-down':  { y: -40, x: 0,  scale: 1,    blur: 0 },
-  'fade-left':  { y: 0,  x: 40,  scale: 1,    blur: 0 },
-  'fade-right': { y: 0,  x: -40, scale: 1,    blur: 0 },
-  'scale':      { y: 20, x: 0,   scale: 0.92, blur: 0 },
-  'fade-scale': { y: 30, x: 0,   scale: 0.96, blur: 0 },
-  'fade-blur':  { y: 20, x: 0,   scale: 1,    blur: 6 },
+  'fade-up':    { y: 24, x: 0,   scale: 1,    blur: 0 },
+  'fade-down':  { y: -24, x: 0,  scale: 1,    blur: 0 },
+  'fade-left':  { y: 0,  x: 24,  scale: 1,    blur: 0 },
+  'fade-right': { y: 0,  x: -24, scale: 1,    blur: 0 },
+  'scale':      { y: 12, x: 0,   scale: 0.98, blur: 0 },
+  'fade-scale': { y: 16, x: 0,   scale: 0.99, blur: 0 },
+  'fade-blur':  { y: 12, x: 0,   scale: 1,    blur: 4 },
 };
 
 const ScrollReveal = ({
   children,
   variant = 'fade-up',
-  delay = 0,
-  duration = 1000,
+  delay = 100,
+  duration = 900,
   className = '',
   entryZone = 12,
   exitZone = 8,
@@ -34,7 +35,6 @@ const ScrollReveal = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // On mobile, track visibility for fade in/out
   useEffect(() => {
     if (!isMobile) return;
 
@@ -43,9 +43,6 @@ const ScrollReveal = ({
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight;
-      
-      // Fade in when top of element enters viewport
-      // Fade out when bottom of element leaves viewport
       const isVisible = rect.top < vh * 0.9 && rect.bottom > vh * 0.1;
       setProgress(isVisible ? 1 : 0);
       setDelayDone(true);
@@ -86,18 +83,18 @@ const ScrollReveal = ({
     if (elCenter >= visibleTop && elCenter <= visibleBottom) {
       p = 1;
     } else if (elCenter > visibleBottom) {
-      const transitionRange = vh * 0.45;
+      const transitionRange = vh * 0.4;
       const distance = elCenter - visibleBottom;
       p = 1 - Math.min(1, distance / transitionRange);
     } else if (elCenter < visibleTop) {
-      const transitionRange = vh * 0.35;
+      const transitionRange = vh * 0.3;
       const distance = visibleTop - elCenter;
       p = 1 - Math.min(1, distance / transitionRange);
     } else {
       p = 0;
     }
 
-    setProgress(easeOutQuint(Math.max(0, Math.min(1, p))));
+    setProgress(easeOutDocument(Math.max(0, Math.min(1, p))));
   }, [entryZone, exitZone, isMobile]);
 
   useEffect(() => {
@@ -142,8 +139,8 @@ const ScrollReveal = ({
 export const ScrollRevealGroup = ({
   children,
   variant = 'fade-up',
-  stagger = 100,
-  duration = 800,
+  stagger = 120,
+  duration = 900,
   className = '',
 }) => (
   <div className={className}>

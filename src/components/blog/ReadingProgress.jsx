@@ -13,7 +13,6 @@ const ReadingProgress = () => {
       const windowHeight = window.innerHeight;
       const scrollY = window.scrollY;
 
-      // Calculate progress relative to the article
       const start = articleTop - windowHeight * 0.2;
       const end = articleTop + articleHeight - windowHeight * 0.5;
       const current = scrollY - start;
@@ -30,9 +29,9 @@ const ReadingProgress = () => {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] h-1">
+    <div className="fixed top-0 left-0 right-0 z-[60] h-0.5">
       <div
-        className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400 transition-all duration-150 ease-out"
+        className="h-full bg-blueprint transition-all duration-150 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>

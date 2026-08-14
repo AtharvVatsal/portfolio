@@ -1,31 +1,36 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// Theme definitions
+// Theme definitions — materials, not decoration
 const themes = {
   purple: {
-    gradient: 'from-indigo-950 via-black to-violet-950',
-    primary: 'from-purple-400 to-pink-500',
-    secondary: 'from-cyan-400 to-purple-500',
-    spotlight: 'rgba(168, 85, 247, 0.4)'
+    // Background is always #0A0908 — warm near-black
+    gradient: 'bg-notebook-bg',
+    accent: '#6366F1',        // Blueprint blue
+    accentSecondary: '#A855F7',
+    accentFaint: 'rgba(99, 102, 241, 0.08)',
+    spotlight: 'rgba(99, 102, 241, 0.15)',
+    label: 'Blueprint',
   },
   cyan: {
-    gradient: 'from-cyan-950 via-black to-blue-950',
-    primary: 'from-cyan-400 to-blue-500',
-    secondary: 'from-blue-400 to-cyan-500',
-    spotlight: 'rgba(34, 211, 238, 0.4)'
+    gradient: 'bg-notebook-bg',
+    accent: '#22D3EE',
+    accentSecondary: '#06B6D4',
+    accentFaint: 'rgba(34, 211, 238, 0.08)',
+    spotlight: 'rgba(34, 211, 238, 0.15)',
+    label: 'Cyan',
   },
   green: {
-    gradient: 'from-emerald-950 via-black to-teal-950',
-    primary: 'from-emerald-400 to-green-500',
-    secondary: 'from-green-400 to-emerald-500',
-    spotlight: 'rgba(52, 211, 153, 0.4)'
-  }
+    gradient: 'bg-notebook-bg',
+    accent: '#34D399',
+    accentSecondary: '#10B981',
+    accentFaint: 'rgba(52, 211, 153, 0.08)',
+    spotlight: 'rgba(52, 211, 153, 0.15)',
+    label: 'Emerald',
+  },
 };
 
-// Create context
 const ThemeContext = createContext(undefined);
 
-// Theme Provider component
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState('purple');
 
@@ -41,7 +46,7 @@ export const ThemeProvider = ({ children }) => {
     setTheme,
     currentTheme: themes[theme],
     cycleTheme,
-    themes
+    themes,
   };
 
   return (
@@ -51,7 +56,6 @@ export const ThemeProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use theme
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (context === undefined) {
