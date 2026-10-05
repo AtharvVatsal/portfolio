@@ -5,6 +5,7 @@ import { CONTACT_INFO, SOCIAL_LINKS } from '../../config/links';
 import { getAnnotation } from '../../data/annotations';
 import SectionHeading from '../common/SectionHeading';
 import EditorialReveal from '../common/EditorialReveal';
+import { GlowBorder } from '../ui/spotlight-card';
 
 const SERVICE = process.env.REACT_APP_EMAILJS_SERVICE_ID || '';
 const TEMPLATE = process.env.REACT_APP_EMAILJS_TEMPLATE_ID || '';
@@ -129,7 +130,8 @@ const ContactSection = () => {
 
             {/* Form */}
             <div className="lg:col-span-3">
-              <div className="relative border border-notebook-border bg-notebook-surface">
+              <div className="relative isolate border border-notebook-border bg-notebook-surface">
+                <GlowBorder />
                 <div className="relative p-6 sm:p-8">
                   <h3 className="meta-label flex items-center gap-2">
                     <Send size={12} aria-hidden="true" className="text-accent" />

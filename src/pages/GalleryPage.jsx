@@ -7,6 +7,7 @@ import { observations, archiveSpan, subjectFilters, singleSubjects, camerasOnRec
 import PageHeader from '../components/layout/PageHeader';
 import AnimatedPhotoWall from '../components/observations/AnimatedPhotoWall';
 import ObservationViewer from '../components/observations/ObservationViewer';
+import { TextAnimate } from '../components/ui/text-animate';
 
 // Observations: the photographic archive. A short header and the subject
 // index, then the whole collection as one photographic wall that turns to face
@@ -57,9 +58,9 @@ const ObservationsPage = () => {
               Observations
             </EditorialHeading>
             {intro && (
-              <p className="mt-4 max-w-2xl text-body-sm sm:text-body text-ink-secondary">
+              <TextAnimate by="word" animation="blurInUp" delay={0.35} className="mt-4 max-w-2xl text-body-sm sm:text-body text-ink-secondary">
                 {intro}
-              </p>
+              </TextAnimate>
             )}
           </div>
           <p className="font-mono text-meta text-ink-muted lg:pb-2">
@@ -114,10 +115,10 @@ const ObservationsPage = () => {
               {observations.length} photographs &middot; {archiveSpan}
             </p>
             {singleSubjects.length > 0 && (
-              <p className="mt-2 text-body-sm text-ink-muted">Subjects with a single photograph: {singleSubjects.join(', ')}.</p>
+              <TextAnimate by="text" animation="fadeIn" className="mt-2 text-body-sm text-ink-muted">{`Subjects with a single photograph: ${singleSubjects.join(', ')}.`}</TextAnimate>
             )}
             {camerasOnRecord.length > 0 && (
-              <p className="mt-2 text-body-sm text-ink-muted">Cameras on record: {camerasOnRecord.join(', ')}.</p>
+              <TextAnimate by="text" animation="fadeIn" delay={0.1} className="mt-2 text-body-sm text-ink-muted">{`Cameras on record: ${camerasOnRecord.join(', ')}.`}</TextAnimate>
             )}
           </div>
           <Link

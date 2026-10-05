@@ -5,6 +5,8 @@ import { blogPosts } from '../data';
 import { SEO, DocumentHeader, EditorialHeading } from '../components/common';
 import { pageHeaders } from '../data/archiveMeta';
 import PageHeader from '../components/layout/PageHeader';
+import { GlowBorder } from '../components/ui/spotlight-card';
+import { TextAnimate } from '../components/ui/text-animate';
 
 // Field Notes: the writing index. Filters are the categories the entries
 // actually carry (with counts), plus one "All"; search filters as you type.
@@ -123,7 +125,8 @@ const BlogPage = () => {
                     to={`/blog/${post.slug}`}
                     className="group grid gap-5 py-6 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-8 lg:grid-cols-[14rem_minmax(0,1fr)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
                   >
-                    <div className="relative aspect-[16/10] overflow-hidden border border-notebook-border bg-notebook-surface">
+                    <div className="relative isolate aspect-[16/10] overflow-hidden border border-notebook-border bg-notebook-surface">
+                      <GlowBorder inset />
                       {hasValidImage ? (
                         <img
                           src={post.coverImage}
@@ -153,7 +156,7 @@ const BlogPage = () => {
                       >
                         {post.title}
                       </EditorialHeading>
-                      <p className="mt-2 text-small text-ink-muted line-clamp-2">{post.excerpt}</p>
+                      <TextAnimate by="text" animation="fadeIn" className="mt-2 text-small text-ink-muted line-clamp-2">{post.excerpt}</TextAnimate>
                       <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Tags">
                         {post.tags.slice(0, 3).map((tag) => (
                           <li key={tag} className="border border-notebook-border px-1.5 py-0.5 font-mono text-meta text-ink-muted">{tag}</li>

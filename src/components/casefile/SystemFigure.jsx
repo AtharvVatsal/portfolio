@@ -1,4 +1,5 @@
 import React from 'react';
+import { GlowBorder } from '../ui/spotlight-card';
 
 // The system of a case, drawn only from what its record states - nothing is
 // added, renamed or inferred.
@@ -24,7 +25,8 @@ export const parseComposition = (architecture = '') =>
   }).filter((c) => c.name);
 
 const Frame = ({ label, caption, children, className = '' }) => (
-  <figure className={`min-w-0 border border-notebook-border bg-notebook-surface ${className}`}>
+  <figure className={`relative isolate min-w-0 border border-notebook-border bg-notebook-surface ${className}`}>
+    <GlowBorder />
     <div className="border-b border-notebook-border px-4 py-2.5 font-mono text-meta uppercase text-ink-faint">{label}</div>
     <div className="px-4 py-6 sm:px-6 sm:py-8">{children}</div>
     <figcaption className="border-t border-notebook-border px-4 py-3 text-small text-ink-muted">{caption}</figcaption>

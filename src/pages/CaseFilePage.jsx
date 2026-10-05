@@ -7,6 +7,9 @@ import SystemFigure from '../components/casefile/SystemFigure';
 import CaseMeasures from '../components/casefile/CaseMeasures';
 import { getCaseFile } from '../data/caseFiles';
 import NotFoundPage from './NotFoundPage';
+import { GlowBorder } from '../components/ui/spotlight-card';
+import { TextAnimate } from '../components/ui/text-animate';
+import ReadingReveal from '../components/motion/ReadingReveal';
 
 // One case file, rendered from its existing project record and the evidence
 // registers in data/caseFiles.js. The page reads as a case: the author's note
@@ -36,7 +39,8 @@ const Section = ({ section, children }) => (
   </section>
 );
 
-const Prose = ({ children }) => <p className="max-w-2xl text-body-sm text-ink-secondary">{children}</p>;
+// Section prose arrives a line at a time; the result is read into focus.
+const Prose = ({ children }) => <TextAnimate by="line" animation="slideUp" className="max-w-2xl text-body-sm text-ink-secondary">{children}</TextAnimate>;
 const Label = ({ children, className = '' }) => <p className={`font-mono text-meta uppercase text-ink-faint ${className}`}>{children}</p>;
 
 // Desktop section index: shows where the reader is in a long case file.
@@ -121,7 +125,7 @@ const CaseFile = ({ caseFile }) => {
         {r.objective && (
           <div>
             <Label>Objective</Label>
-            <p className="mt-2 text-body-sm text-ink-secondary">{r.objective}</p>
+            <TextAnimate by="word" animation="blurIn" delay={0.3} className="mt-2 text-body-sm text-ink-secondary">{r.objective}</TextAnimate>
           </div>
         )}
       </div>
@@ -172,7 +176,7 @@ const CaseFile = ({ caseFile }) => {
                 {r.firstAttemptFailed && (
                   <div className="border-l-2 border-notebook-border-light pl-5">
                     <h3 className="font-mono text-meta uppercase text-ink-faint">First attempt</h3>
-                    <p className="mt-2 text-body-sm text-ink-secondary">{r.firstAttemptFailed}</p>
+                    <TextAnimate by="text" animation="fadeIn" className="mt-2 text-body-sm text-ink-secondary">{r.firstAttemptFailed}</TextAnimate>
                   </div>
                 )}
                 {r.revisionNote && (
@@ -180,7 +184,7 @@ const CaseFile = ({ caseFile }) => {
                     <h3 className="font-mono text-meta uppercase text-accent">
                       Revision{r.revision ? ` ${r.revision}` : ''}
                     </h3>
-                    <p className="mt-2 text-body-sm text-ink-secondary">{r.revisionNote}</p>
+                    <TextAnimate by="text" animation="fadeIn" delay={0.12} className="mt-2 text-body-sm text-ink-secondary">{r.revisionNote}</TextAnimate>
                   </div>
                 )}
               </div>
@@ -211,7 +215,7 @@ const CaseFile = ({ caseFile }) => {
 
           {by.result && (
             <Section section={by.result}>
-              {r.outcome && <Prose>{r.outcome}</Prose>}
+              {r.outcome && <ReadingReveal className="max-w-2xl text-body-sm text-ink-secondary" text={r.outcome} />}
               <div className={r.outcome ? 'mt-8' : ''}>
                 <CaseMeasures changes={resultChanges} metrics={r.metrics || []} notes={c.recordNotes} />
               </div>
@@ -272,13 +276,15 @@ const CaseFile = ({ caseFile }) => {
         </p>
         <nav aria-label="Other case files" className="mt-8 grid gap-4 sm:grid-cols-2">
           {prev ? (
-            <Link to={`/projects/${prev.slug}`} className="group block border border-notebook-border p-4 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus transition-colors duration-200">
+            <Link to={`/projects/${prev.slug}`} className="group relative isolate block border border-notebook-border p-4 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus transition-colors duration-200">
+              <GlowBorder />
               <span className="font-mono text-meta text-ink-faint">Previous case · {prev.ref}</span>
               <span className="mt-1 block font-editorial text-title text-ink-primary group-hover:text-accent-strong transition-colors duration-200">{prev.title}</span>
             </Link>
           ) : <span />}
           {next ? (
-            <Link to={`/projects/${next.slug}`} className="group block border border-notebook-border p-4 sm:text-right hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus transition-colors duration-200">
+            <Link to={`/projects/${next.slug}`} className="group relative isolate block border border-notebook-border p-4 sm:text-right hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus transition-colors duration-200">
+              <GlowBorder />
               <span className="font-mono text-meta text-ink-faint">Next case · {next.ref}</span>
               <span className="mt-1 block font-editorial text-title text-ink-primary group-hover:text-accent-strong transition-colors duration-200">{next.title}</span>
             </Link>

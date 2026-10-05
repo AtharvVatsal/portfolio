@@ -801,6 +801,55 @@
     transition: none;
   }
 
+  /* TEXT ANIMATE - Magic UI TextAnimate's presets (ui/text-animate.jsx),
+     played by this engine. A preset only sets where its segments (words,
+     lines, or the whole element for by="text") start: offset, blur, scale.
+     Quieter than the original for body text: 0.4em instead of 20px, a 4px
+     blur instead of 10px, 0.94/1.06 instead of 0.5/1.5. */
+  [data-anim] {
+    --ta-shift: 0.4em;
+    --ta-x: 0px;
+    --ta-y: 0px;
+    --ta-blur: 0px;
+    --ta-scale: 1;
+  }
+
+  [data-anim='fadeIn'] { --ta-y: var(--ta-shift); }
+  [data-anim='blurIn'] { --ta-blur: 4px; }
+  [data-anim='blurInUp'] { --ta-blur: 4px; --ta-y: var(--ta-shift); }
+  [data-anim='blurInDown'] { --ta-blur: 4px; --ta-y: calc(var(--ta-shift) * -1); }
+  [data-anim='slideUp'] { --ta-y: var(--ta-shift); }
+  [data-anim='slideDown'] { --ta-y: calc(var(--ta-shift) * -1); }
+  [data-anim='slideLeft'] { --ta-x: var(--ta-shift); }
+  [data-anim='slideRight'] { --ta-x: calc(var(--ta-shift) * -1); }
+  [data-anim='scaleUp'] { --ta-scale: 0.94; }
+  [data-anim='scaleDown'] { --ta-scale: 1.06; }
+
+  [data-reveal='armed'][data-anim] .reveal-word,
+  [data-reveal='armed'][data-anim][data-mode='fade'] {
+    opacity: 0;
+    translate: var(--ta-x) var(--ta-y);
+    filter: blur(var(--ta-blur));
+    scale: var(--ta-scale);
+  }
+
+  [data-reveal='revealing'][data-anim] .reveal-word {
+    transition:
+      opacity var(--reveal-duration) var(--motion-ease),
+      translate var(--reveal-duration) var(--motion-ease),
+      filter var(--reveal-duration) var(--motion-ease),
+      scale var(--reveal-duration) var(--motion-ease);
+    transition-delay: calc(var(--reveal-delay) + var(--i, 0) * var(--reveal-stagger));
+  }
+
+  [data-reveal='revealing'][data-anim][data-mode='fade'] {
+    transition:
+      opacity var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      translate var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      filter var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      scale var(--reveal-duration) var(--motion-ease) var(--reveal-delay);
+  }
+
   /* Hover: arrows on text links lean toward where they go. */
   .arrow-link .arrow {
     display: inline-block;
@@ -820,6 +869,7 @@
       opacity: 1 !important;
       translate: none !important;
       filter: none !important;
+      scale: none !important;
       transition: none !important;
     }
   }
@@ -1026,50 +1076,139 @@ section {
 }
 
 /* ═══════════════════════════════════════════════
-   ROLES WORDMARK - the hero's TextHoverEffect (RolesWordmark)
-   The Aceternity component is used unchanged; these rules fit it to
-   the archive from its parent. Its 300×100 viewBox is cropped to a band
-   around the line (the box's aspect-ratio is set from the measured type
-   size), the type becomes Inter at the fitted size, the outlines take
-   archive ink, and the hover gradient's five stops become a warm
-   ink → accent → ink sweep instead of the demo rainbow.
+   HERO ROLES - the hero's TechText line (TechRoles)
+   TechText centres its type in its box and fits it to 90% of the box
+   width. .hero-roles is the line itself: as wide as the type is to be
+   (up to 34rem), as tall as Inter's ink at that width. The canvas box
+   inside is 1/0.9 as wide and centred on it, so the fitted type spans
+   the line exactly, from the column's left edge. It also reaches 2rem
+   above and below, room for the selection frame, its label and its
+   specks; that height never binds the fit.
    ═══════════════════════════════════════════════ */
-.roles-wordmark {
-  --roles-size: 15px;
+.hero-roles {
   position: relative;
-  width: 100%;
-  aspect-ratio: 300 / 26;
-  overflow: hidden;
+  width: min(100%, 34rem);
+  aspect-ratio: 34 / 2.4;
 }
 
-.roles-wordmark svg {
+.hero-roles__canvas {
   position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: auto;
-  transform: translateY(-50%);
-}
-
-.roles-wordmark svg text {
+  top: -2rem;
+  bottom: -2rem;
+  left: -5.5556%;
+  right: -5.5556%;
   font-family: 'Inter', 'Inter Fallback', system-ui, sans-serif;
-  font-size: var(--roles-size);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  stroke-width: 0.42px;
 }
 
-/* The resting outline (drawn in once) and the hover outline. */
-.roles-wordmark svg > text:nth-of-type(1),
-.roles-wordmark svg > text:nth-of-type(2) {
-  stroke: rgb(var(--archive-ink) / 0.9);
+/* ═══════════════════════════════════════════════
+   GLOW BORDER - the pointer's spotlight on card and frame borders
+   (GlowBorder in components/ui/spotlight-card.jsx, from GlowCard)
+   The host is `relative isolate`; .glow-border covers its border box
+   (or, with data-inset, its padding box), and its layers stay off
+   until the shared tracker marks it data-active (pointer within 220px).
+   Lights, all centred on the pointer (--glow-x/--glow-y, in the
+   glow's own box) and tinted by --glow-hue:
+     fill  a faint pool on the surface, under the content
+     halo  a blurred band round the edge, under the content
+     ring  the border itself: a coloured ring with a bright core
+   Every gradient fades out within 220px, so switching a glow off
+   further away is never visible.
+   ═══════════════════════════════════════════════ */
+.glow-border {
+  --glow-o: var(--glow-bw, 1px);
+  --glow-w: max(var(--glow-bw, 1px), 1px);
+  --glow-hue: calc(var(--glow-base, 28) + var(--glow-xp, 0) * var(--glow-spread, 16));
+  position: absolute;
+  inset: calc(var(--glow-o) * -1);
+  border-radius: var(--glow-radius, 0px);
+  pointer-events: none;
 }
 
-.roles-wordmark linearGradient stop:nth-child(1) { stop-color: rgb(var(--archive-ink)); }
-.roles-wordmark linearGradient stop:nth-child(2) { stop-color: rgb(var(--archive-interactive)); }
-.roles-wordmark linearGradient stop:nth-child(3) { stop-color: rgb(var(--archive-accent)); }
-.roles-wordmark linearGradient stop:nth-child(4) { stop-color: rgb(var(--archive-interactive)); }
-.roles-wordmark linearGradient stop:nth-child(5) { stop-color: rgb(var(--archive-ink)); }
+.glow-border[data-inset] {
+  --glow-o: 0px;
+}
+
+/* The wrapper itself paints nothing and keeps its box (the tracker measures
+   it); only its layers are switched off. */
+.glow-border:not([data-active]) > span {
+  display: none;
+}
+
+.glow-border > span,
+.glow-border__halo::before,
+.glow-border__ring::before,
+.glow-border__ring::after {
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  background-origin: border-box;
+  background-repeat: no-repeat;
+}
+
+.glow-border__fill {
+  inset: var(--glow-o);
+  z-index: -1;
+  background-image: radial-gradient(
+    200px 200px at calc(var(--glow-x, -999px) - var(--glow-o)) calc(var(--glow-y, -999px) - var(--glow-o)),
+    hsl(var(--glow-hue) 80% 70% / 0.07), transparent
+  );
+}
+
+.glow-border__halo {
+  inset: 0;
+  z-index: -1;
+  filter: blur(16px);
+}
+
+.glow-border__ring {
+  inset: 0;
+  z-index: 1;
+}
+
+/* Masked to a band of the box's border width: everything inside the
+   padding box is cut away. */
+.glow-border__halo::before,
+.glow-border__ring::before,
+.glow-border__ring::after {
+  content: "";
+  inset: 0;
+  border: var(--glow-w) solid transparent;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.glow-border__halo::before {
+  inset: -8px;
+  border-width: 8px;
+  background-image: radial-gradient(
+    150px 150px at calc(var(--glow-x, -999px) + 8px) calc(var(--glow-y, -999px) + 8px),
+    hsl(var(--glow-hue) 80% 55% / 0.55), transparent
+  );
+}
+
+.glow-border__ring::before {
+  background-image: radial-gradient(
+    150px 150px at var(--glow-x, -999px) var(--glow-y, -999px),
+    hsl(var(--glow-hue) 85% 62%), transparent
+  );
+}
+
+.glow-border__ring::after {
+  background-image: radial-gradient(
+    100px 100px at var(--glow-x, -999px) var(--glow-y, -999px),
+    hsl(var(--glow-hue) 90% 90%), transparent
+  );
+}
+
+@media (forced-colors: active) {
+  .glow-border { display: none !important; }
+}
+
+@media print {
+  .glow-border { display: none !important; }
+}
 
 /* Page loader: held back 300ms so quick chunk loads never flash it. */
 @keyframes loaderIn {

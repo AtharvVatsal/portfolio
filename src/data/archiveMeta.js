@@ -1,7 +1,7 @@
 export const archiveMeta = {
   title: 'The Personal Archive of Atharv Vatsal',
   subtitle: 'Engineer · Photographer · Observer',
-  version: '4.0',
+  version: '3.0',
   lastUpdated: '2026-07',
   documentRef: 'AV-ARCH-2026',
   classification: 'PUBLIC',
@@ -51,10 +51,9 @@ export const pageHeaders = {
 
 export const footerMeta = {
   revisionHistory: [
-    { version: '4.0', date: '2026-07', note: 'The Personal Archive — complete redesign' },
-    { version: '3.0', date: '2026-03', note: 'The Engineer\'s Notebook — notebook aesthetic' },
-    { version: '2.0', date: '2025-09', note: 'Dark minimal — first major redesign' },
-    { version: '1.0', date: '2025-01', note: 'Initial launch — standard developer portfolio' },
+    { version: '3.0', date: '2026-10', note: 'The Personal Archive | complete redesign' },
+    { version: '2.0', date: '2025-09', note: 'Dark minimal | first major redesign' },
+    { version: '1.0', date: '2025-01', note: 'Initial launch | standard developer portfolio' },
   ],
   buildNote: 'Built with React. Deployed from a single terminal command. No page-builders, no drag-and-drop.',
 };

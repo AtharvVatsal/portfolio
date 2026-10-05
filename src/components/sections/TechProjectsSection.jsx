@@ -4,6 +4,8 @@ import { caseFiles } from '../../data/caseFiles';
 import EditorialHeading from '../common/EditorialHeading';
 import SectionHeading from '../common/SectionHeading';
 import CaseArtifact from '../casefile/CaseArtifact';
+import { GlowBorder } from '../ui/spotlight-card';
+import { TextAnimate } from '../ui/text-animate';
 
 // The home page's Case Files: a curated index, not the documentation. Each
 // entry gives its reference, the problem in the record's own first sentence,
@@ -72,7 +74,8 @@ const Card = ({ c }) => {
   // width so its lines are not cut, so it sits underneath.
   const beside = artifact && artifact.kind !== 'excerpt';
   return (
-    <article className="border border-notebook-border bg-notebook-surface">
+    <article className="relative isolate border border-notebook-border bg-notebook-surface">
+      <GlowBorder />
       <div className={`grid gap-8 p-6 sm:p-8 ${beside ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-10' : ''}`}>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -89,7 +92,7 @@ const Card = ({ c }) => {
           {r.problem && (
             <div className="mt-6 max-w-xl">
               <p className="meta-label">The problem</p>
-              <p className="mt-2 text-small sm:text-body-sm text-ink-secondary">{firstSentence(r.problem)}</p>
+              <TextAnimate by="line" animation="slideUp" className="mt-2 text-small sm:text-body-sm text-ink-secondary">{firstSentence(r.problem)}</TextAnimate>
             </div>
           )}
 

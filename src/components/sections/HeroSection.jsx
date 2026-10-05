@@ -4,12 +4,13 @@ import { getGalleryImageUrl, getCloudinaryUrl } from '../../config/cloudinary';
 import { archiveMeta } from '../../data/archiveMeta';
 import EditorialHeading from '../common/EditorialHeading';
 import DrawnText from '../motion/DrawnText';
-import RolesWordmark from '../motion/RolesWordmark';
+import TechRoles from '../motion/TechRoles';
 
 // Stable identity: name, one statement, one line of roles. Two moments, never
 // competing: the name is registered once on arrival (drawn: StrokeText), and
-// the roles line is the hero's one interaction - an outline wordmark lit by the
-// pointer (Aceternity TextHoverEffect). The statement (the page's h1) simply
+// the roles line is the hero's one interaction - a technical drawing whose
+// letters are selected, measured and dragged by the pointer (React Bits
+// TechText), swept once on arrival. The statement (the page's h1) simply
 // stands, so the hero reads at once with or without motion. Nothing loops or
 // retypes. The section fills the screen below the navigation bar.
 const HeroSection = memo(() => {
@@ -54,10 +55,7 @@ const HeroSection = memo(() => {
             {`${archiveMeta.author.currentFocus}.`}
           </EditorialHeading>
 
-          <RolesWordmark
-            text={archiveMeta.subtitle}
-            className="mt-6 max-w-xl text-small sm:text-body-sm text-white/80 leading-relaxed"
-          />
+          <TechRoles text={archiveMeta.subtitle} className="mt-6" />
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { GlowBorder } from '../ui/spotlight-card';
 
 // The measured result of a case: before → after changes quoted from the
 // record (data/caseFiles.js MEASURED_CHANGES, each citing its source field)
@@ -12,7 +13,8 @@ const CaseMeasures = ({ changes = [], metrics = [], notes = [] }) => {
       {changes.length > 0 && (
         <ul className="space-y-4">
           {changes.map((c) => (
-            <li key={c.measure} className="border border-notebook-border bg-notebook-surface px-4 py-5 sm:px-6">
+            <li key={c.measure} className="relative isolate border border-notebook-border bg-notebook-surface px-4 py-5 sm:px-6">
+              <GlowBorder />
               <p className="meta-label">{c.measure}</p>
               <p className="mt-3 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-editorial">
                 <span className="text-title text-ink-muted"><span className="sr-only">from </span>{c.before}</span>

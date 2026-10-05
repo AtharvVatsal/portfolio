@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { GlowBorder } from '../ui/spotlight-card';
 
 // One numbered piece of evidence filed with a case. A single figure handles
 // every kind, so a real screenshot can later replace a pending slot without
@@ -62,6 +63,7 @@ const ImageArtifact = ({ artifact, size, frame }) => {
   );
   return (
     <figure className={frame}>
+      <GlowBorder />
       <Header number={artifact.number} kind="image" meta={artifact.meta} />
       {artifact.href && !failed ? (
         <a href={artifact.href} target="_blank" rel="noopener noreferrer" aria-label={`${artifact.alt} (full size, opens in a new tab)`} className="block focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus">
@@ -82,6 +84,7 @@ const MarkArtifact = ({ artifact, size, frame }) => {
   const box = `block h-auto w-full ${size === 'primary' ? 'max-w-[16rem]' : 'max-w-[11rem]'}`;
   return (
     <figure className={frame}>
+      <GlowBorder />
       <Header number={artifact.number} kind="mark" />
       <div className="flex items-center justify-center px-6 py-8 sm:py-10">
         {failed ? (
@@ -109,13 +112,14 @@ const MarkArtifact = ({ artifact, size, frame }) => {
 
 const CaseArtifact = ({ artifact, size = 'primary', className = '' }) => {
   const { kind, number } = artifact;
-  const frame = `case-artifact min-w-0 border border-notebook-border bg-notebook-surface ${className}`;
+  const frame = `case-artifact relative isolate min-w-0 border border-notebook-border bg-notebook-surface ${className}`;
 
   if (kind === 'image') return <ImageArtifact artifact={artifact} size={size} frame={frame} />;
 
   if (kind === 'excerpt') {
     return (
       <figure className={frame}>
+        <GlowBorder />
         <Header number={number} kind={kind} />
         <pre tabIndex={0} aria-label="Console excerpt" className="overflow-x-auto px-4 py-4 font-mono text-meta leading-relaxed text-ink-secondary whitespace-pre focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus">{artifact.text}</pre>
         {artifact.caption && <figcaption className="border-t border-notebook-border px-4 py-3 text-body-sm text-ink-muted">{artifact.caption}</figcaption>}
@@ -140,6 +144,7 @@ const CaseArtifact = ({ artifact, size = 'primary', className = '' }) => {
     const linkClass = 'group arrow-link block px-4 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus';
     return (
       <figure className={frame}>
+        <GlowBorder />
         <Header number={number} kind={kind} />
         {isNote ? (
           <Link to={artifact.to} className={linkClass}>{body}</Link>
@@ -156,6 +161,7 @@ const CaseArtifact = ({ artifact, size = 'primary', className = '' }) => {
   // record it would prove - never a stand-in image.
   return (
     <figure className={frame}>
+      <GlowBorder />
       <Header number={number} kind={kind} />
       <div className={`case-pending relative flex flex-col items-center justify-center text-center px-6 py-10 ${size === 'primary' ? 'aspect-[16/10] sm:aspect-[16/9]' : 'aspect-[16/10]'}`}>
         <span aria-hidden="true" className="case-pending__corner case-pending__corner--tl" />

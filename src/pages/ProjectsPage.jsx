@@ -7,6 +7,7 @@ import { pageHeaders } from '../data/archiveMeta';
 import { caseFiles } from '../data/caseFiles';
 import PageHeader from '../components/layout/PageHeader';
 import CaseArtifact from '../components/casefile/CaseArtifact';
+import ProximityLine from '../components/motion/ProximityLine';
 
 // The Case Files register: every project as an entry in the archive, grouped
 // by the year in its reference number, in the archive's own order. Each entry
@@ -143,7 +144,7 @@ const ProjectsPage = () => {
         <div className="archive-container py-12 sm:py-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div>
             <p className="font-mono text-meta uppercase text-ink-faint">Additional experiments</p>
-            <p className="mt-2 text-body-sm text-ink-secondary">More projects, contributions, and experiments on GitHub.</p>
+            <ProximityLine className="mt-2 text-body-sm text-ink-secondary" text="More projects, contributions, and experiments on GitHub." />
           </div>
           <a
             href={SOCIAL_LINKS.github}

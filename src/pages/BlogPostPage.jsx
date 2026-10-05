@@ -6,6 +6,8 @@ import { SEO, EditorialHeading } from '../components/common';
 import { MarkdownRenderer, extractHeadings, TableOfContents } from '../components/blog';
 import { ArticleSkeleton } from '../components/common/Skeleton';
 import PageHeader from '../components/layout/PageHeader';
+import { GlowBorder } from '../components/ui/spotlight-card';
+import { TextAnimate } from '../components/ui/text-animate';
 
 // A field note, inside the archive shell: trail, record line, title and
 // excerpt, then the cover (shown as it is: no darkening, nothing printed on
@@ -18,7 +20,7 @@ const parseDate = (dateStr) => {
   return `${year}-${month}-${day}`;
 };
 
-const tailLink = 'group block border border-notebook-border p-4 transition-colors duration-200 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
+const tailLink = 'group relative isolate block border border-notebook-border p-4 transition-colors duration-200 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
 
 const BlogPostPage = () => {
   const { slug } = useParams();
@@ -130,15 +132,16 @@ const BlogPostPage = () => {
           <EditorialHeading as="h1" variant="page" reveal="lines" delay={80} className="mt-5">
             {post.title}
           </EditorialHeading>
-          <p className="mt-5 text-body text-ink-secondary">
+          <TextAnimate by="word" animation="blurInUp" delay={0.35} className="mt-5 text-body text-ink-secondary">
             {post.excerpt}
-          </p>
+          </TextAnimate>
         </div>
       </header>
 
       {hasValidImage && (
         <figure className="archive-container mt-10 sm:mt-12">
-          <div className="max-w-5xl overflow-hidden border border-notebook-border bg-notebook-surface">
+          <div className="relative isolate max-w-5xl overflow-hidden border border-notebook-border bg-notebook-surface">
+            <GlowBorder inset />
             <img
               src={post.coverImage}
               width={1440}
@@ -194,6 +197,7 @@ const BlogPostPage = () => {
                 {relatedPosts.map((related) => (
                   <li key={related.id}>
                     <Link to={`/blog/${related.slug}`} className={tailLink}>
+                      <GlowBorder />
                       <p className="flex flex-wrap gap-x-3 font-mono text-meta">
                         <span className="uppercase text-accent">{related.category}</span>
                         <span className="text-ink-faint">{related.readTime}</span>
@@ -209,6 +213,7 @@ const BlogPostPage = () => {
           <nav aria-label="Other field notes" className="mt-12 grid grid-cols-1 gap-4 border-t border-notebook-border pt-6 sm:grid-cols-2">
             {prevPost ? (
               <Link to={`/blog/${prevPost.slug}`} className={tailLink}>
+                <GlowBorder />
                 <span className="flex items-center gap-2 font-mono text-meta uppercase text-ink-faint">
                   <ArrowLeft size={12} aria-hidden="true" /> Previous
                 </span>
@@ -217,6 +222,7 @@ const BlogPostPage = () => {
             ) : <span />}
             {nextPost ? (
               <Link to={`/blog/${nextPost.slug}`} className={`${tailLink} sm:text-right`}>
+                <GlowBorder />
                 <span className="flex items-center gap-2 font-mono text-meta uppercase text-ink-faint sm:justify-end">
                   Next <ArrowRight size={12} aria-hidden="true" />
                 </span>

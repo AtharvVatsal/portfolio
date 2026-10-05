@@ -18,6 +18,8 @@ import { pageHeaders } from '../data/archiveMeta';
 import PageHeader from '../components/layout/PageHeader';
 import { SOCIAL_LINKS, CONTACT_INFO, RESUME_LINK, PROJECT_LINKS, SITE_SOURCE } from '../config/links';
 import { isPublicLink, caseFiles, getCaseFile } from '../data/caseFiles';
+import { GlowBorder } from '../components/ui/spotlight-card';
+import { TextAnimate } from '../components/ui/text-animate';
 
 // Project names come from the case records (data/projects.js), so the résumé
 // cannot drift from the case files.
@@ -255,7 +257,8 @@ const ResumePage = () => {
 
         <div className="mt-10 flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
           <figure className="shrink-0">
-            <div className="h-28 w-28 overflow-hidden border border-notebook-border bg-notebook-surface sm:h-32 sm:w-32">
+            <div className="relative isolate h-28 w-28 overflow-hidden border border-notebook-border bg-notebook-surface sm:h-32 sm:w-32">
+              <GlowBorder inset />
               <img src="/avPhoto.webp" alt="Atharv Vatsal" width="128" height="128" className="h-full w-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
             </div>
             <figcaption className="mt-2 font-mono text-meta text-ink-faint">Figure 001</figcaption>
@@ -265,9 +268,9 @@ const ResumePage = () => {
             <EditorialHeading as="h1" variant="page" id="resume-title" reveal="mask" delay={80}>
               Atharv Vatsal
             </EditorialHeading>
-            <p className="mt-3 text-body-sm text-ink-secondary">
+            <TextAnimate by="word" animation="blurIn" delay={0.3} className="mt-3 text-body-sm text-ink-secondary">
               CS Engineering (AI/ML) · VIT Vellore '27 · Photographer & Visual Storyteller
-            </p>
+            </TextAnimate>
 
             <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1">
               {[
@@ -416,7 +419,7 @@ const ResumePage = () => {
                       </div>
                     </div>
                     <p className="mt-1 text-small text-ink-muted">{project.subtitle}</p>
-                    <p className="mt-3 text-small text-ink-secondary">{project.desc}</p>
+                    <TextAnimate by="text" animation="fadeIn" className="mt-3 text-small text-ink-secondary">{project.desc}</TextAnimate>
                     <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Stack">
                       {project.tech.map((t) => (
                         <li key={t} className="border border-notebook-border px-2 py-0.5 font-mono text-meta text-ink-muted">{t}</li>
@@ -517,7 +520,7 @@ const ResumePage = () => {
                             <span className={period}>{item.period}</span>
                           </div>
                           <p className="mt-1 text-small text-ink-muted">{item.org}</p>
-                          {item.desc && <p className="mt-2 text-small text-ink-secondary">{item.desc}</p>}
+                          {item.desc && <TextAnimate by="text" animation="fadeIn" className="mt-2 text-small text-ink-secondary">{item.desc}</TextAnimate>}
                         </div>
                       </div>
                     </article>
@@ -536,9 +539,9 @@ const ResumePage = () => {
           <EditorialHeading as="h2" variant="section" id="resume-download" className="mt-4">
             Want the full resume?
           </EditorialHeading>
-          <p className="mt-3 text-small text-ink-muted">
+          <TextAnimate by="line" animation="slideUp" className="mt-3 text-small text-ink-muted">
             Download the complete PDF — formatted for print and ATS-friendly.
-          </p>
+          </TextAnimate>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <a
               href={RESUME_LINK}

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { blogPosts } from '../../data';
 import EditorialHeading from '../common/EditorialHeading';
 import SectionHeading from '../common/SectionHeading';
+import { GlowBorder } from '../ui/spotlight-card';
+import { TextAnimate } from '../ui/text-animate';
 
 const latest = blogPosts.slice(0, 3);
 
@@ -12,8 +14,9 @@ const NoteCard = ({ post }) => (
   <li>
     <Link
       to={`/blog/${post.slug}`}
-      className="group flex flex-col border border-notebook-border bg-notebook-surface transition-colors duration-200 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:flex-row"
+      className="group relative isolate flex flex-col border border-notebook-border bg-notebook-surface transition-colors duration-200 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus sm:flex-row"
     >
+      <GlowBorder />
       {post.coverImage && (
         <div className="relative h-36 shrink-0 overflow-hidden border-b border-notebook-border bg-notebook-bg sm:h-auto sm:w-44 sm:border-b-0 sm:border-r lg:w-52">
           <img
@@ -43,9 +46,9 @@ const NoteCard = ({ post }) => (
           {post.title}
         </EditorialHeading>
 
-        <p className="mb-4 line-clamp-2 text-small text-ink-secondary">
+        <TextAnimate by="text" animation="fadeIn" className="mb-4 line-clamp-2 text-small text-ink-secondary">
           {post.excerpt}
-        </p>
+        </TextAnimate>
 
         <div className="flex items-center justify-between gap-3">
           <ul className="flex flex-wrap gap-1.5" aria-label="Tags">

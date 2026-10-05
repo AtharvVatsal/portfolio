@@ -1,4 +1,5 @@
 import React from 'react';
+import { TextAnimate } from '../ui/text-animate';
 
 // The archive reference line that opens a page: TYPE · REF (· date), in mono,
 // with an optional note under it in the body face. "PUBLIC" is the default
@@ -23,7 +24,7 @@ const DocumentHeader = ({
           </React.Fragment>
         ))}
       </p>
-      {note && <p className="mt-2 max-w-2xl text-small text-ink-muted">{note}</p>}
+      {note && <TextAnimate by="text" animation="fadeIn" delay={0.15} className="mt-2 max-w-2xl text-small text-ink-muted">{note}</TextAnimate>}
     </div>
   );
 };

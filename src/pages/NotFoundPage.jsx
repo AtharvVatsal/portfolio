@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { SEO, DocumentHeader, EditorialHeading } from '../components/common';
 import PageHeader from '../components/layout/PageHeader';
+import { TextAnimate } from '../components/ui/text-animate';
 
 // 404, inside the archive shell: one h1, what happened, and where to go next.
 
@@ -26,10 +27,9 @@ const NotFoundPage = () => (
       <EditorialHeading as="h1" variant="page" reveal delay={80} className="mt-6">
         Entry not found
       </EditorialHeading>
-      <p className="mt-5 max-w-xl text-body-sm text-ink-secondary">
-        This document doesn't exist in the archive.
-        It may have been removed, or the reference number is incorrect.
-      </p>
+      <TextAnimate by="word" animation="blurInUp" delay={0.3} className="mt-5 max-w-xl text-body-sm text-ink-secondary">
+        This document doesn't exist in the archive. It may have been removed, or the reference number is incorrect.
+      </TextAnimate>
 
       <Link
         to="/"

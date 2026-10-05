@@ -1,367 +1,169 @@
-# Atharv Vatsal Portfolio
+# Atharv Vatsal — Personal Archive
 
-A modern, feature-rich portfolio website showcasing work as an AI/ML Engineer, Photographer, and Video Editor. Built with React, Tailwind CSS, and several modern web technologies.
+The personal site of Atharv Vatsal, a CS student at VIT specialising in AI/ML, and a photographer: project case files, field notes and photographs.
 
-## Tech Stack
+Live at **[atharvvatsal.com](https://atharvvatsal.com)**.
 
-- **Framework**: React 18.3.1 with React Router 6
-- **Styling**: Tailwind CSS 3.4.15 + PostCSS
-- **Build Tool**: Create React App (react-scripts 5.0.1)
-- **Icons**: Lucide React
-- **Animations**: Custom CSS animations + Framer Motion patterns
-- **Email**: EmailJS for contact form
-- **AI**: Google Gemini API for AI chatbot
-- **Images**: Cloudinary CDN
-- **SEO**: React Helmet Async
+The site is built as an archive. Projects are **case files** (problem → approach → first attempt and revision → evidence → result → lessons → technical record). Writing is **field notes**, and photographs are **observations**.
 
-## Project Structure
+## What's on the site
 
-```
-src/
-├── App.jsx                 # Main app with routing and PortfolioHome
-├── index.js                # Entry point
-├── index.css               # Tailwind imports + base styles
-│
-├── context/
-│   └── ThemeContext.jsx    # Theme state (purple/cyan/green)
-│
-├── hooks/                  # Custom React hooks
-│   ├── index.js
-│   ├── useAnalytics.js     # GA4 tracking
-│   ├── useGreeting.js       # Time-based greeting
-│   ├── useMousePosition.js  # Cursor tracking
-│   ├── useScrollProgress.js # Scroll position tracking
-│   ├── useTypingEffect.js   # Typing animation
-│   └── useVisibleSections.js # Intersection observer for nav
-│
-├── data/                   # Static data files
-│   ├── index.js            # Barrel exports
-│   ├── blog.js             # Blog posts metadata
-│   ├── gallery.js          # Photography gallery data
-│   ├── photoCategories.js  # Photo categories
-│   ├── projects.js         # Project showcase data
-│   ├── roles.js            # Typing animation roles
-│   ├── skills.js           # Skills by category
-│   ├── stats.js            # Statistics data
-│   └── testimonials.js     # Testimonials
-│
-├── config/                 # Configuration files
-│   ├── cloudinary.js       # Cloudinary cloud name + presets
-│   ├── gemini.js           # Gemini API context + config
-│   ├── links.js            # Social links + project links
-│   └── seo.js              # SEO defaults + keywords
-│
-├── components/
-│   ├── index.js            # Barrel exports
-│   │
-│   ├── common/             # Reusable UI components
-│   │   ├── AIChatbot.jsx        # Gemini-powered chatbot
-│   │   ├── CustomCursor.jsx     # Canvas cursor with glow
-│   │   ├── EasterEgg.jsx         # Konami code + Matrix rain
-│   │   ├── FloatingActionButtons.jsx # Scroll top + AI toggle
-│   │   ├── MouseGlow.jsx        # Mouse-following gradient
-│   │   ├── PageLoader.jsx       # Route loading spinner
-│   │   ├── PageTransition.jsx   # Route fade transitions
-│   │   ├── ScrollReveal.jsx      # Scroll-triggered animations
-│   │   ├── SectionDivider.jsx    # Section separators
-│   │   ├── SEO.jsx               # Helmet wrapper
-│   │   ├── Skeleton.jsx          # Loading placeholders
-│   │   └── index.js
-│   │
-│   ├── layout/             # Page structure
-│   │   ├── Navbar.jsx           # Fixed navigation
-│   │   ├── Footer.jsx           # Footer with links
-│   │   └── index.js
-│   │
-│   ├── preloader/          # Initial loading screen
-│   │   ├── Preloader.jsx
-│   │   └── index.js
-│   │
-│   ├── sections/           # Home page sections
-│   │   ├── HeroSection.jsx          # Landing hero
-│   │   ├── AboutSection.jsx         # Identity cards
-│   │   ├── StatsSection.jsx          # 3D tilt stats
-│   │   ├── SkillsSection.jsx        # Skill categories
-│   │   ├── QuoteSection.jsx          # Inspirational quote
-│   │   ├── TechProjectsSection.jsx   # Projects showcase
-│   │   ├── PhotographySection.jsx    # Photo marquee
-│   │   ├── TestimonialsSection.jsx  # Client testimonials
-│   │   ├── BlogPreviewSection.jsx    # Recent blog posts
-│   │   ├── ContactSection.jsx        # Contact form
-│   │   └── index.js
-│   │
-│   └── blog/               # Blog-specific components
-│       ├── MarkdownRenderer.jsx
-│       ├── TableOfContents.jsx
-│       ├── ReadingProgress.jsx
-│       └── index.js
-│
-├── pages/                  # Route pages
-│   ├── BlogPage.jsx             # Blog listing
-│   ├── BlogPostPage.jsx         # Individual post
-│   ├── GalleryPage.jsx          # Photo gallery
-│   ├── ProjectsPage.jsx         # Full projects list
-│   ├── ResumePage.jsx           # Interactive resume
-│   ├── NotFoundPage.jsx         # 404 page
-│   └── index.js
-│
-└── styles/
-    └── animations.css        # Custom keyframe animations
-```
+| Route | Page |
+|---|---|
+| `/` | Home: hero, Curiosity (about), Toolbox (skills), Case Files (four most recent), Field Notes (latest three), Observations (a desk of prints), Contact |
+| `/projects` | The case-file register: all eight projects |
+| `/projects/:slug` | One case file, with its evidence and technical record |
+| `/blog` | Field notes, searchable and filterable by category |
+| `/blog/:slug` | One field note (Markdown, with maths and code) |
+| `/gallery` | Observations: the full photographic archive and a photo viewer |
+| `/resume` | The résumé, with a downloadable PDF |
+| `*` | Not-found page |
 
-## Getting Started
+There is also an AI assistant (Google Gemini) on the home page. It answers from the site's own data.
 
-### Prerequisites
+## Tech stack
 
-- Node.js 16.x or higher
-- npm or yarn
+| Area | Tools |
+|---|---|
+| App | React 18, React Router 6, Create React App (`react-scripts` 5) |
+| Styling | Tailwind CSS 3, PostCSS |
+| Motion | `motion` (the gallery wall), GSAP ScrollTrigger (one reading reveal); restrained, and off under `prefers-reduced-motion` |
+| Content | `react-markdown` + `remark-gfm`, `remark-math`/`rehype-katex`, `react-syntax-highlighter` (Prism light build) |
+| Services | Cloudinary (photographs), EmailJS (contact form), Google Gemini (assistant), optional Google Analytics |
+| SEO | `react-helmet-async` (titles, Open Graph/Twitter cards, JSON-LD) |
+| Icons | `lucide-react` |
 
-### Installation
+## Getting started
+
+**Prerequisites:** Node.js 18 or later (developed on Node 24) and npm.
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/portfolio.git
+git clone https://github.com/AtharvVatsal/portfolio.git
 cd portfolio
-
-# Install dependencies
 npm install
+npm start          # http://localhost:3000
 ```
 
-### Environment Variables
+### Environment variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the project root. Every variable is optional: the site works without them, and only the feature that needs one is affected.
 
 ```env
-# Required for AI Chatbot
-REACT_APP_GEMINI_API_KEY=your_gemini_api_key
+# AI assistant (Google Gemini)
+REACT_APP_GEMINI_API_KEY=
 
-# Optional - Google Analytics
-REACT_APP_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+# Contact form (EmailJS)
+REACT_APP_EMAILJS_SERVICE_ID=
+REACT_APP_EMAILJS_TEMPLATE_ID=
+REACT_APP_EMAILJS_PUBLIC_KEY=
+
+# Analytics (Google Analytics 4)
+REACT_APP_GA_MEASUREMENT_ID=
 ```
 
-**Note**: Without `REACT_APP_GEMINI_API_KEY`, the AI chatbot will show a warning but the rest of the site works fine.
+Create React App bakes these in at **build time**, so set them on your host before building.
 
-### Development
+### Scripts
 
-```bash
-# Start development server
-npm start
-# Opens at http://localhost:3000
+| Command | What it does |
+|---|---|
+| `npm start` | Development server |
+| `npm run build` | Production build in `build/` |
+| `CI=true npm run build` | Production build that fails on any warning (as CI hosts run it) |
+| `npx eslint --ext .js,.jsx src` | Lint (`--ext` is needed so `.jsx` files are checked) |
 
-# Build for production
-npm run build
+## Project structure
 
-# Build for GitHub Pages (if hosted there)
-npm run deploy
+```
+public/
+  blog/posts/*.md        field-note text (Markdown)
+  blog/                  field-note images
+  Case Files/<project>/  case-file evidence (originals in original/, WebP display copies beside them)
+  AtharvVatsalResume.pdf the downloadable résumé
+src/
+  App.jsx                routes and the home page
+  index.css              design tokens, base styles, font fallbacks
+  config/                links.js (contact + links), seo.js, gemini.js (assistant), cloudinary.js, env.js
+  data/                  the site's content (see below)
+  components/
+    sections/            home-page sections
+    casefile/            case-file figures, evidence and measures
+    observations/        gallery wall and photo viewer
+    blog/                Markdown renderer, table of contents
+    common/              shared UI (headings, reveals, SEO, assistant, …)
+    layout/              navigation bar, page header, footer
+    motion/, reactbits/  the few text-motion pieces
+  pages/                 one file per route
 ```
 
-## Features
+## Content: where each fact lives
 
-### Themes
-Three color themes available:
-- **Purple** (default) - Deep purple gradients
-- **Cyan** - Cyan/teal accents
-- **Green** - Green/emerald accents
+Every fact has one home, and the pages, the résumé page and the AI assistant all read from it. Change a fact there, not in a component.
 
-Toggle via Navbar button.
+| Fact | File |
+|---|---|
+| Projects: names, problems, approaches, results, metrics, periods, stacks | `src/data/projects.js` |
+| Contact details, social profiles, project links | `src/config/links.js` |
+| Case-file evidence, open evidence requests, measured changes, notes on unresolved figures, private projects | `src/data/caseFiles.js` |
+| Skills (the Toolbox) | `src/data/toolbox.js` |
+| Field notes: metadata, excerpts, cover origins | `src/data/blog.js` (text in `public/blog/posts/`) |
+| Photographs: titles, captions, places, dates, camera, lens, settings | `src/data/gallery.js` |
+| Site title, page headers, footer notes | `src/data/archiveMeta.js` |
 
-### Animations
+### Adding or editing
 
-**Desktop:**
-- Scroll-triggered fade-up/scale animations
-- 3D tilt effects on cards
-- Mouse-following glow effects
-- Custom canvas cursor with trail
+- **A project.** Add a record to `src/data/projects.js`. Its `projectKey` is its URL slug. Add its repository and demo links to `PROJECT_LINKS` in `src/config/links.js`.
+- **Case-file evidence.** File real artifacts only:
+  1. Put the original, unedited, in `public/Case Files/<project>/original/`.
+  2. Add resized WebP copies beside it.
+  3. Register it in `VISUAL_EVIDENCE` in `src/data/caseFiles.js`, with its `source`.
+  4. Remove the matching entry from `EVIDENCE_REQUESTS`.
 
-**Mobile:**
-- Simple fade in/out on scroll
-- No heavy animations for performance
+  A case's evidence status (complete, partial, awaiting evidence, private) is derived automatically.
+- **A field note.** Add the Markdown file to `public/blog/posts/` and an entry to `src/data/blog.js`. The list is newest first, so add new entries at the top. Label AI-generated images "(AI Generated)" in their alt text.
+- **A photograph.** Upload it to Cloudinary and add an entry to `src/data/gallery.js` with its `publicId`. Record a lens or exposure setting only where the file's own EXIF records it; leave unknown values out rather than guessing.
+- **Skills.** Edit `src/data/toolbox.js`.
 
-### Special Features
-- **Easter Egg**: Press `↑↑↓↓←→←→BA` (Konami code) for Matrix rain effect
-- **AI Chatbot**: Gemini-powered assistant with portfolio context
-- **Photography Gallery**: Lightbox with Cloudinary images
-- **Blog**: Markdown rendering with syntax highlighting
-- **Reading Progress**: Progress bar on blog posts
+The résumé PDF is a curated presentation of the same facts. Where it differs from the data files, the data files are authoritative for the site.
 
-## Pages
+## Quality bar
 
-| Route | Page | Description |
-|-------|------|-------------|
-| `/` | Home | Single-page portfolio with all sections |
-| `/blog` | Blog | Blog listing with search/filter |
-| `/blog/:slug` | Post | Individual blog post |
-| `/gallery` | Gallery | Photography with lightbox |
-| `/projects` | Projects | Full projects listing |
-| `/resume` | Resume | Interactive resume |
-| `*` | 404 | Not found page |
-
-## Data Files
-
-### Adding a Project
-
-Edit `src/data/projects.js`:
-
-```javascript
-export const projects = [
-  {
-    id: 'project-id',
-    title: 'Project Title',
-    description: 'Short description',
-    tech: ['React', 'Node.js'],
-    color: 'from-cyan-500 to-blue-500',
-    featured: true,
-  },
-  // ...
-];
-```
-
-Then add links in `src/config/links.js`:
-```javascript
-export const PROJECT_LINKS = {
-  'project-id': {
-    demo: 'https://demo.com',
-    github: 'https://github.com/username/repo',
-  },
-};
-```
-
-### Adding a Blog Post
-
-1. Create markdown file in `public/blog/` folder
-2. Add metadata in `src/data/blog.js`:
-```javascript
-export const blogPosts = [
-  {
-    slug: 'post-slug',
-    title: 'Post Title',
-    excerpt: 'Short excerpt',
-    date: '2024-01-15',
-    readTime: '5 min',
-    tags: ['Tech', 'AI'],
-    coverImage: '/images/cover.jpg',
-  },
-];
-```
-
-### Adding Gallery Photos
-
-Edit `src/data/gallery.js`:
-```javascript
-export const galleryPhotos = [
-  {
-    id: 'photo-1',
-    title: 'Photo Title',
-    location: 'Location',
-    camera: 'Sony A7III',
-    thumbnail: 'cloudinary-url-thumb',
-    src: 'cloudinary-url-full',
-    category: 'Landscape',
-    featured: true,
-    exif: {
-      aperture: 'f/2.8',
-      shutter: '1/250s',
-      iso: 400,
-      focalLength: '50mm',
-    },
-  },
-];
-```
-
-### Adding Skills
-
-Edit `src/data/skills.js` and `src/data/roles.js`.
-
-## Components
-
-### ScrollReveal
-
-Wrapper component for scroll animations:
-
-```jsx
-<ScrollReveal variant="fade-up" duration={1000} delay={200}>
-  <YourComponent />
-</ScrollReveal>
-```
-
-**Variants**: `fade-up`, `fade-down`, `fade-left`, `fade-right`, `scale`, `fade-scale`, `fade-blur`
-
-### MouseGlow
-
-Gradient that follows cursor:
-
-```jsx
-<MouseGlow
-  mousePosition={mousePosition}
-  size={600}
-  blur={80}
-  gradient="radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)"
-/>
-```
-
-### SectionDivider
-
-Visual section separators:
-
-```jsx
-<SectionDivider color="cyan" animated />
-```
-
-**Colors**: `cyan`, `purple`, `blue`, `pink`
+At launch the site was checked on the production build, at 17 screen sizes from 320×568 to 2560×1440, on every route:
+- no horizontal overflow, clipped text, or text under 12px
+- no broken or distorted images
+- touch targets of at least 24px
+- 16px form inputs (no iOS zoom)
+- keyboard access throughout, with a skip link, visible focus and dialogs that trap and return focus
+- 0 axe violations (WCAG 2.2 AA plus best practice)
+- no layout shift
+- motion that respects reduced-motion preferences
 
 ## Deployment
 
-### GitHub Pages
-
 ```bash
-npm run deploy
+npm run build      # upload build/ to any static host
 ```
 
-Requires `homepage` field in `package.json`:
-```json
-{
-  "homepage": "https://username.github.io/repository"
-}
-```
+- **SPA fallback.** This is a single-page app: configure your host to serve `index.html` for unknown paths, so that deep links such as `/projects/drivesense` load on refresh. Missing asset files should still return 404.
+- **Headers.** `public/_headers` holds response headers for hosts that read that file.
+- **Environment variables.** Set the variables above in your host's settings before building.
 
-### Vercel / Netlify
+## Local-only documentation
 
-1. Push to GitHub
-2. Connect repository in Vercel/Netlify
-3. Build command: `npm run build`
-4. Output directory: `build`
-
-### Static Hosting
-
-```bash
-npm run build
-# Upload 'build' folder to any static host
-```
-
-## Performance Notes
-
-- Code splitting via React.lazy for page routes
-- Image lazy loading
-- Cloudinary responsive images
-- Mobile-specific animation optimizations
-- Passive scroll listeners
-
-## Browser Support
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-Not optimized for IE11.
+The design and QA record is kept locally and is deliberately untracked (see `.gitignore`):
+- `DESIGN-IMPLEMENTATION-CHECKPOINT.md`
+- the phase reports in `docs/`
+- the content validators in `scripts/`
+- the audit and browser test suite in `design-audit/`
 
 ## License
 
-MIT License - feel free to use and modify.
+MIT License — feel free to use and modify.
 
 ## Author
 
 **Atharv Vatsal**
 - Website: [atharvvatsal.com](https://atharvvatsal.com)
-- GitHub: [@atharvvatsal](https://github.com/atharvvatsal)
-- LinkedIn: [Atharv Vatsal](https://linkedin.com/in/atharvvatsal)
+- GitHub: [@AtharvVatsal](https://github.com/AtharvVatsal)
+- LinkedIn: [atharvvatsal](https://www.linkedin.com/in/atharvvatsal)
+- Instagram (photography): [@privet.avos](https://instagram.com/privet.avos)

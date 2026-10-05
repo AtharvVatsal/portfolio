@@ -2,6 +2,8 @@ import React from 'react';
 import EditorialReveal from '../common/EditorialReveal';
 import SectionHeading from '../common/SectionHeading';
 import ReadingReveal from '../motion/ReadingReveal';
+import { GlowBorder } from '../ui/spotlight-card';
+import { TextAnimate } from '../ui/text-animate';
 
 const AboutSection = () => {
   return (
@@ -37,10 +39,10 @@ const AboutSection = () => {
             <div className="space-y-7 text-small sm:text-body-sm text-ink-secondary">
               <div className="flex gap-4 sm:gap-5">
                 <span aria-hidden="true" className="font-mono text-meta text-accent shrink-0 pt-1 select-none">01</span>
-                <p>
+                <TextAnimate by="text" animation="blurIn">
                   <span className="float-left text-[3.8rem] sm:text-[4.5rem] font-editorial leading-[0.7] mr-3 mt-0.5 text-accent">M</span>
                   ountains teach you to observe. You watch light change, weather shift, landscapes transform. I didn't know it then, but that habit of watching would become the foundation for everything I build.
-                </p>
+                </TextAnimate>
               </div>
               <div className="flex gap-4 sm:gap-5">
                 <span aria-hidden="true" className="font-mono text-meta text-accent shrink-0 pt-1 select-none">02</span>
@@ -48,9 +50,9 @@ const AboutSection = () => {
               </div>
               <div className="flex gap-4 sm:gap-5">
                 <span aria-hidden="true" className="font-mono text-meta text-accent shrink-0 pt-1 select-none">03</span>
-                <p>
+                <TextAnimate by="line" animation="slideUp">
                   Now I study Computer Science at VIT, specializing in AI/ML. I build systems that learn from the world — computer vision, reinforcement learning, NLP — and I photograph the world those systems try to understand.
-                </p>
+                </TextAnimate>
               </div>
             </div>
 
@@ -76,8 +78,9 @@ const AboutSection = () => {
               {/* Outer frame — archival mat */}
               <div className="relative">
                 {/* Mat board — wide border */}
-                <div className="relative bg-notebook-surface border border-notebook-border p-4 sm:p-5"
+                <div className="relative isolate bg-notebook-surface border border-notebook-border p-4 sm:p-5"
                   style={{ boxShadow: '0 4px 24px rgb(0 0 0 / 0.3)' }}>
+                  <GlowBorder />
 
                   {/* Image area */}
                   <div className="relative overflow-hidden">

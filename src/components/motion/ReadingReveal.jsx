@@ -1,8 +1,9 @@
 import React, { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import useMediaQuery, { REDUCED_MOTION } from '../../hooks/useMediaQuery';
 
-// Scroll-linked editorial text, used once on the site (the About thesis
-// paragraph): the words come into focus as the reader scrolls through them -
+// Scroll-linked editorial text, used at most once per route (the About thesis
+// paragraph on home, a case file's result): the words come into focus as the
+// reader scrolls through them -
 // blur and opacity scrubbed to scroll, no rotation (React Bits ScrollReveal,
 // source unmodified in ../reactbits). Scrubbing ends when the paragraph's foot
 // reaches the bottom of the viewport, so a paragraph fully on screen is fully

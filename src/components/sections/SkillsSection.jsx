@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import EditorialReveal from '../common/EditorialReveal';
 import SectionHeading from '../common/SectionHeading';
 import { toolbox, TOOLBOX_LABELS } from '../../data/toolbox';
+import { TextAnimate } from '../ui/text-animate';
 
 const skillDetails = {
   PyTorch: { description: 'Open-source deep learning framework with dynamic computation graphs and extensive ecosystem.', usage: 'Research prototyping, model training, computer vision, NLP, reinforcement learning pipelines.', wiki: 'https://en.wikipedia.org/wiki/PyTorch' },
@@ -186,9 +187,9 @@ const SkillsSection = () => {
             ))}
           </div>
 
-          <p className="mt-14 border-t border-notebook-border pt-5 font-mono text-meta uppercase text-ink-faint">
+          <TextAnimate by="text" animation="slideRight" className="mt-14 border-t border-notebook-border pt-5 font-mono text-meta uppercase text-ink-faint">
             Tool inventory · continuously updated
-          </p>
+          </TextAnimate>
         </div>
       </div>
 

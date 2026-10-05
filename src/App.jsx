@@ -49,8 +49,7 @@ const PortfolioHome = () => {
   const [isReturnVisit] = useState(() => hasVisitedHome);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
 
-  // Where the home page opens: at a section named in the hash (/#about), at
-  // the reader's previous position on a return visit, otherwise at the top.
+  // Where the home page opens: at a section named in the hash (/#about), at the reader's previous position on a return visit, otherwise at the top.
   useEffect(() => {
     hasVisitedHome = true;
     const id = location.hash.slice(1);
@@ -94,8 +93,7 @@ const PortfolioHome = () => {
   );
 };
 
-// One shell for every route: skip link, the archive navigation, one
-// main#main-content, the colophon. Page types lay themselves out inside it.
+// One shell for every route: skip link, the archive navigation, one main#main-content, the colophon. Page types lay themselves out inside it.
 const ArchiveShell = () => {
   const location = useLocation();
   const mainRef = useRef(null);
@@ -104,10 +102,7 @@ const ArchiveShell = () => {
   hash.current = location.hash;
   useAnalytics();
 
-  // A new route opens at its top (the home page and hash links place
-  // themselves). Focus moves to the main landmark so keyboard and screen
-  // reader users start at the new content, not in the old page's position;
-  // the landmark is not a visible focus target, so mouse users see nothing.
+  // A new route opens at its top (the home page and hash links place themselves). Focus moves to the main landmark so keyboard and screen reader users start at the new content, not in the old page's position; the landmark is not a visible focus target, so mouse users see nothing.
   useEffect(() => {
     // Compared with the last path (not a first-render flag), so the initial
     // load never moves focus, even when effects run twice (StrictMode).
