@@ -1,8 +1,8 @@
-import { Siren, ScanEye, MessageCircleWarning, FileChartColumn, Brain, TrendingUp, Camera } from 'lucide-react';
+import { Siren, ScanEye, MessageCircleWarning, FileChartColumn, TrendingUp, Camera } from 'lucide-react';
 
 export const projects = [
   {
-    id: 8,
+    id: 7,
     title: 'keeper.raw',
     subtitle: 'AI-Powered Photo Culling Desktop App',
     caseNumber: 'AV-2026-008',
