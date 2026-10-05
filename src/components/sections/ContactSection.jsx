@@ -62,7 +62,7 @@ const ContactSection = () => {
       className="relative pt-12 sm:pt-16 lg:pt-20 overflow-hidden"
     >
       <div className="archive-container relative z-10">
-        <div className="max-w-5xl">
+        <div>
           <SectionHeading number="06" id="contact-title" className="mb-8" reveal="fade">Contact</SectionHeading>
 
           {CLOSING && (

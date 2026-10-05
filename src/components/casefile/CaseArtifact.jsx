@@ -71,7 +71,7 @@ const ImageArtifact = ({ artifact, size, frame }) => {
         </a>
       ) : img}
       {/* Captions cite repository paths, which may break anywhere on narrow screens. */}
-      {artifact.caption && <figcaption className="border-t border-notebook-border px-4 py-3 text-body-sm text-ink-muted [overflow-wrap:anywhere]">{artifact.caption}</figcaption>}
+      {artifact.caption && <figcaption className={`border-t border-notebook-border px-4 py-3 text-ink-muted ${size === 'compact' ? 'text-small' : 'text-body-sm'} [overflow-wrap:anywhere]`}>{artifact.caption}</figcaption>}
     </figure>
   );
 };
@@ -105,7 +105,7 @@ const MarkArtifact = ({ artifact, size, frame }) => {
           />
         )}
       </div>
-      {artifact.caption && <figcaption className="border-t border-notebook-border px-4 py-3 text-body-sm text-ink-muted">{artifact.caption}</figcaption>}
+      {artifact.caption && <figcaption className={`border-t border-notebook-border px-4 py-3 text-ink-muted ${size === 'compact' ? 'text-small' : 'text-body-sm'}`}>{artifact.caption}</figcaption>}
     </figure>
   );
 };
@@ -122,7 +122,7 @@ const CaseArtifact = ({ artifact, size = 'primary', className = '' }) => {
         <GlowBorder />
         <Header number={number} kind={kind} />
         <pre tabIndex={0} aria-label="Console excerpt" className="overflow-x-auto px-4 py-4 font-mono text-meta leading-relaxed text-ink-secondary whitespace-pre focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus">{artifact.text}</pre>
-        {artifact.caption && <figcaption className="border-t border-notebook-border px-4 py-3 text-body-sm text-ink-muted">{artifact.caption}</figcaption>}
+        {artifact.caption && <figcaption className={`border-t border-notebook-border px-4 py-3 text-ink-muted ${size === 'compact' ? 'text-small' : 'text-body-sm'}`}>{artifact.caption}</figcaption>}
       </figure>
     );
   }

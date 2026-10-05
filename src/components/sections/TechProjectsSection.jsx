@@ -67,47 +67,65 @@ const Result = ({ c }) => {
   return null;
 };
 
+// Text | picture, by the picture's proportions (width / height).
+const COLUMNS = {
+  wide: 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]',   // 16:9 screenshots and frames
+  mid: 'lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]',     // 3:2
+  square: 'lg:grid-cols-[minmax(0,1fr)_minmax(0,0.72fr)]', // 4:3 and squarer figures
+};
+
 const Card = ({ c }) => {
   const r = c.record;
   const artifact = c.leadArtifact;
-  // A mark or picture sits beside the text; recorded output needs the full
-  // width so its lines are not cut, so it sits underneath.
+  // A mark or picture sits beside the text, in the wider column, so it stands
+  // wide rather than tall and its caption wraps less. Recorded output needs
+  // the full width so its lines are not cut, so it sits underneath; above it
+  // the text runs in two columns (the case | its result) to keep the card low.
   const beside = artifact && artifact.kind !== 'excerpt';
+  const split = !beside;
+  // The picture's column follows its shape, so a squarer figure does not
+  // stand much taller than the text beside it (nothing is cropped).
+  const [aw, ah] = (artifact && artifact.ratio) || [16, 9];
+  const columns = aw / ah >= 1.6 ? COLUMNS.wide : aw / ah >= 1.4 ? COLUMNS.mid : COLUMNS.square;
   return (
     <article className="relative isolate border border-notebook-border bg-notebook-surface">
       <GlowBorder />
-      <div className={`grid gap-8 p-6 sm:p-8 ${beside ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:gap-10' : ''}`}>
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <StatusBadge status={r.status} />
-            <span className="font-mono text-meta text-ink-faint">{r.period}</span>
-            <span className="font-mono text-meta uppercase text-ink-faint">{r.caseNumber}</span>
+      <div className={`grid gap-8 p-6 sm:p-8 ${beside ? `${columns} lg:items-center lg:gap-10 xl:gap-12` : ''}`}>
+        <div className={`min-w-0 ${split ? 'lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] lg:gap-12' : ''}`}>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <StatusBadge status={r.status} />
+              <span className="font-mono text-meta text-ink-faint">{r.period}</span>
+              <span className="font-mono text-meta uppercase text-ink-faint">{r.caseNumber}</span>
+            </div>
+
+            <EditorialHeading as="h3" variant="subsection" className="mt-5 !leading-[1.15]">
+              {r.title}
+            </EditorialHeading>
+            {r.subtitle && <p className="mt-1 text-small text-ink-muted">{r.subtitle}</p>}
+
+            {r.problem && (
+              <div className="mt-6 max-w-xl">
+                <p className="meta-label">The problem</p>
+                <TextAnimate by="line" animation="slideUp" className="mt-2 text-small sm:text-body-sm text-ink-secondary">{firstSentence(r.problem)}</TextAnimate>
+              </div>
+            )}
           </div>
 
-          <EditorialHeading as="h3" variant="subsection" className="mt-5 !leading-[1.15]">
-            {r.title}
-          </EditorialHeading>
-          {r.subtitle && <p className="mt-1 text-small text-ink-muted">{r.subtitle}</p>}
+          <div className={`min-w-0 ${split ? 'lg:self-end' : ''}`}>
+            <div className="mt-6"><Result c={c} /></div>
 
-          {r.problem && (
-            <div className="mt-6 max-w-xl">
-              <p className="meta-label">The problem</p>
-              <TextAnimate by="line" animation="slideUp" className="mt-2 text-small sm:text-body-sm text-ink-secondary">{firstSentence(r.problem)}</TextAnimate>
-            </div>
-          )}
-
-          <div className="mt-6"><Result c={c} /></div>
-
-          <Link
-            to={`/projects/${c.slug}`}
-            className="arrow-link mt-7 inline-flex min-h-11 items-center gap-1.5 text-small text-ink-primary underline decoration-notebook-border-light underline-offset-4 transition-colors duration-200 hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-          >
-            Open case file<span className="sr-only">: {r.title}</span> <span aria-hidden="true" className="arrow">{'→'}</span>
-          </Link>
+            <Link
+              to={`/projects/${c.slug}`}
+              className="arrow-link mt-7 inline-flex min-h-11 items-center gap-1.5 text-small text-ink-primary underline decoration-notebook-border-light underline-offset-4 transition-colors duration-200 hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            >
+              Open case file<span className="sr-only">: {r.title}</span> <span aria-hidden="true" className="arrow">{'→'}</span>
+            </Link>
+          </div>
         </div>
 
         {artifact && (
-          <div className="min-w-0 self-start">
+          <div className="min-w-0">
             {/* Preview only: the full-size link belongs to the case file itself. */}
             <CaseArtifact artifact={{ ...artifact, number: undefined, href: undefined }} size="compact" />
           </div>
@@ -125,7 +143,7 @@ const TechProjectsSection = () => {
       className="relative pt-12 sm:pt-16 lg:pt-20 overflow-hidden"
     >
       <div className="archive-container relative z-10">
-        <div className="max-w-5xl">
+        <div>
           <SectionHeading number="03" id="tech-title" className="mb-8" reveal="lines">Case Files</SectionHeading>
 
           <div className="space-y-6 sm:space-y-8">
