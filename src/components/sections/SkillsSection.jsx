@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import EditorialReveal from '../common/EditorialReveal';
@@ -53,16 +53,103 @@ const tones = {
 const categories = ['building', 'exploring', 'experienced'].map((key) => ({ key, label: TOOLBOX_LABELS[key], skills: toolbox[key] }));
 
 // A tool name that opens its note. A real button: focusable, Enter/Space work.
+// On hover it lifts a pixel; pressed, it settles back.
 const SkillTag = ({ name, tone, onClick }) => (
   <button
     type="button"
     onClick={onClick}
     aria-haspopup="dialog"
-    className={`inline-flex min-h-11 select-none items-center border px-3 text-small text-ink-secondary transition-colors duration-200 hover:text-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${tone.tag}`}
+    className={`inline-flex min-h-11 select-none items-center border px-3 text-small text-ink-secondary transition-[color,border-color,transform] duration-200 ease-out hover:-translate-y-px hover:text-ink-primary active:translate-y-0 motion-reduce:transform-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${tone.tag}`}
   >
     {name}
   </button>
 );
+
+// A group's arrival, once, when it comes into view: its rule draws in from
+// the left, its count fades in, and its tags rise into place one after
+// another (see TOOLBOX in index.css). Same rules as EditorialReveal: the
+// group is visible unless, just before first paint, it can be shown again
+// (IntersectionObserver, no reduced-motion preference, not scrolled past);
+// a group that stays in view without crossing the line still arrives after a
+// moment; keyboard focus arriving inside shows it at once; afterwards the
+// attribute is removed and nothing is left animating.
+const ARRIVE_MS = 1400;
+
+const useArrival = (ref) => {
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (
+      !node ||
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+      node.getBoundingClientRect().bottom <= 0
+    ) {
+      return undefined;
+    }
+    let done = null;
+    let late = null;
+    const settle = () => { delete node.dataset.arrive; };
+    const stopWatching = () => {
+      enter.disconnect();
+      visible.disconnect();
+      clearTimeout(late);
+    };
+    const arrive = () => {
+      if (node.dataset.arrive !== 'armed') return;
+      stopWatching();
+      node.dataset.arrive = 'arriving';
+      done = setTimeout(settle, ARRIVE_MS);
+    };
+    const show = () => {
+      if (node.dataset.arrive !== 'armed') return;
+      stopWatching();
+      settle();
+    };
+    const enter = new IntersectionObserver(([e]) => { if (e.isIntersecting) arrive(); }, { rootMargin: '0px 0px -10% 0px' });
+    const visible = new IntersectionObserver(([e]) => {
+      clearTimeout(late);
+      if (e.isIntersecting) late = setTimeout(arrive, 600);
+    });
+    node.dataset.arrive = 'armed';
+    enter.observe(node);
+    visible.observe(node);
+    node.addEventListener('focusin', show);
+    return () => {
+      stopWatching();
+      clearTimeout(done);
+      node.removeEventListener('focusin', show);
+      settle();
+    };
+  }, [ref]);
+};
+
+// One group: label, rule and count, then its tags.
+const ToolGroup = ({ cat, index, onOpen }) => {
+  const ref = useRef(null);
+  useArrival(ref);
+  const n = cat.skills.length;
+  return (
+    <div
+      ref={ref}
+      className="toolbox-group"
+      style={{ '--group-delay': `${index * 90}ms`, '--tag-step': `${Math.min(40, Math.round(480 / Math.max(n - 1, 1)))}ms` }}
+    >
+      <div className="mb-4 flex items-center gap-3">
+        <EditorialReveal as="h3" mode="fade" level="micro" delay={index * 90} className={`meta-label ${tones[cat.key].label}`}>{cat.label}</EditorialReveal>
+        <div aria-hidden="true" className="toolbox-rule h-px flex-1 bg-notebook-border" />
+        <span className="toolbox-count font-mono text-meta text-ink-faint">{n}</span>
+      </div>
+
+      <ul className="flex flex-wrap gap-2">
+        {cat.skills.map((t, i) => (
+          <li key={t} className="toolbox-tag" style={{ '--i': i }}>
+            <SkillTag name={t} tone={tones[cat.key]} onClick={() => onOpen(t, cat.key)} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
 // Modal dialog: focus moves to the close button on open, Tab stays inside,
 // Esc closes, and focus returns to the tag that opened it.
@@ -96,14 +183,14 @@ const SkillModal = ({ skill, name, onClose, group }) => {
   const tone = tones[group] || tones.building;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-notebook-bg/90 p-4" onClick={onClose}>
+    <div className="tool-note-backdrop fixed inset-0 z-50 flex items-center justify-center bg-notebook-bg/90 p-4" onClick={onClose}>
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="skill-modal-title"
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-lg border border-notebook-border-light bg-notebook-surface-alt"
+        className="tool-note relative w-full max-w-lg border border-notebook-border-light bg-notebook-surface-alt"
       >
         <button
           onClick={onClose}
@@ -169,21 +256,7 @@ const SkillsSection = () => {
 
           <div className="space-y-12">
             {categories.map((cat, ci) => (
-              <div key={cat.key}>
-                <div className="mb-4 flex items-center gap-3">
-                  <EditorialReveal as="h3" mode="fade" level="micro" delay={ci * 90} className={`meta-label ${tones[cat.key].label}`}>{cat.label}</EditorialReveal>
-                  <div aria-hidden="true" className="h-px flex-1 bg-notebook-border" />
-                  <span className="font-mono text-meta text-ink-faint">{cat.skills.length}</span>
-                </div>
-
-                <ul className="flex flex-wrap gap-2">
-                  {cat.skills.map((t) => (
-                    <li key={t}>
-                      <SkillTag name={t} tone={tones[cat.key]} onClick={() => openSkill(t, cat.key)} />
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <ToolGroup key={cat.key} cat={cat} index={ci} onOpen={openSkill} />
             ))}
           </div>
 
