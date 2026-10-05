@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { List, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const TableOfContents = ({ headings }) => {
   const [activeId, setActiveId] = useState('');
@@ -34,48 +34,52 @@ const TableOfContents = ({ headings }) => {
   const handleClick = (id) => {
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      window.history.replaceState(null, '', `#${id}`);
     }
   };
 
   return (
-    <nav className="mb-8 border border-notebook-border overflow-hidden">
-      {/* Header */}
+    <nav aria-label="Contents" className="mb-10 border border-notebook-border">
       <button
+        type="button"
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-surface transition-colors duration-300"
+        aria-expanded={!isCollapsed}
+        aria-controls="toc-list"
+        className="flex min-h-12 w-full items-center justify-between px-4 transition-colors duration-200 hover:bg-notebook-surface focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
       >
-        <div className="flex items-center gap-3">
-          <List size={16} className="text-amber" />
-          <span className="font-mono text-xs text-ink-primary uppercase tracking-wider">Table of Contents</span>
-          <span className="text-[10px] text-ink-faint font-mono">({headings.length})</span>
-        </div>
+        <span className="flex items-center gap-3">
+          <span className="meta-label">Contents</span>
+          <span className="font-mono text-meta text-ink-faint">{headings.length}</span>
+        </span>
         {isCollapsed ? (
-          <ChevronDown size={16} className="text-ink-faint" />
+          <ChevronDown size={16} aria-hidden="true" className="text-ink-faint" />
         ) : (
-          <ChevronUp size={16} className="text-ink-faint" />
+          <ChevronUp size={16} aria-hidden="true" className="text-ink-faint" />
         )}
       </button>
 
-      {/* Links */}
       {!isCollapsed && (
-        <div className="px-4 pb-3 space-y-0.5 border-t border-notebook-border">
+        <ol id="toc-list" className="border-t border-notebook-border px-2 py-2">
           {headings.map(({ id, text, level }) => (
-            <button
-              key={id}
-              onClick={() => handleClick(id)}
-              className={`block w-full text-left py-1.5 transition-all duration-300 text-sm font-mono ${
-                level === 3 ? 'pl-8' : 'pl-3'
-              } ${
-                activeId === id
-                  ? 'text-blueprint bg-blueprint/5'
-                  : 'text-ink-faint hover:text-ink-primary hover:bg-surface'
-              }`}
-            >
-              {text}
-            </button>
+            <li key={id}>
+              <a
+                href={`#${id}`}
+                onClick={(e) => { e.preventDefault(); handleClick(id); }}
+                aria-current={activeId === id ? 'location' : undefined}
+                className={`flex min-h-11 items-center py-1.5 pr-2 text-small transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus ${
+                  level === 3 ? 'pl-8' : 'pl-3'
+                } ${
+                  activeId === id
+                    ? 'border-l border-accent text-ink-primary'
+                    : 'border-l border-transparent text-ink-muted hover:text-ink-primary'
+                }`}
+              >
+                {text}
+              </a>
+            </li>
           ))}
-        </div>
+        </ol>
       )}
     </nav>
   );

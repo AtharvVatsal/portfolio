@@ -1,3 +1,52 @@
+/* Metric-matched fallback for Instrument Serif (a narrow face). Until the web
+   font arrives, Georgia is drawn at the serif's width and vertical metrics, so
+   titles wrap the same before and after the swap and the vertically centred
+   hero does not jump (layout shift). Measured: Instrument Serif runs 75.3% of
+   Georgia's width; ascent 0.99 em, descent 0.31 em (overrides divided by the
+   size-adjust, as metric-override tools do). */
+@font-face {
+  font-family: 'Instrument Serif Fallback';
+  src: local('Georgia');
+  size-adjust: 75.3%;
+  ascent-override: 131.5%;
+  descent-override: 41.2%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Instrument Serif Fallback';
+  font-style: italic;
+  src: local('Georgia Italic'), local('Georgia');
+  size-adjust: 75.3%;
+  ascent-override: 131.5%;
+  descent-override: 41.2%;
+  line-gap-override: 0%;
+}
+
+
+/* Metric-matched fallbacks for Inter and JetBrains Mono (same method as the
+   serif above), so text-heavy pages (case files, the register) wrap the same
+   before and after the web fonts arrive. Measured in the browser: Inter runs
+   106% of Arial's width, ascent 0.97 em, descent 0.24 em; JetBrains Mono
+   matches Courier New's width (100%), ascent 1.02 em, descent 0.30 em. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 106%;
+  ascent-override: 91.5%;
+  descent-override: 22.6%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,6 +56,59 @@
    ═══════════════════════════════════════════════ */
 
 @layer base {
+  /* Archive colour, atmosphere and motion tokens */
+  :root {
+    /* ── Archive tokens: the single source of colour (RGB channels, so any
+       use can apply its own alpha). Tailwind's notebook / ink / accent /
+       success / warning / error colours and the older --ink-faint,
+       --accent* names all resolve to these. Contrast on the ground #0A0908
+       (and on the elevated surface #151412):
+         ink 17.82 (16.49) · ink-secondary 12.85 (11.89) · ink-muted 7.08 (6.55)
+         ink-faint 5.50 (5.09) · accent 6.93 (6.41) · accent-muted 5.29 (4.89)
+         interactive / focus 8.98 (8.31) · success 8.15 (7.54)
+         warning 9.84 (9.10) · error 7.93 (7.34)
+       Every text colour passes WCAG AA (4.5:1) on both grounds.
+       Rule: text uses a token at full strength; alpha is for lines and fills. */
+    --archive-ground: 10 9 8;              /* #0A0908 page ground */
+    --archive-ground-elevated: 21 20 18;   /* #151412 raised surface (cards, dialogs) */
+    --archive-ground-sunken: 16 15 13;     /* #100F0D image wells, inputs */
+    --archive-ink: 245 242 237;            /* #F5F2ED primary text */
+    --archive-ink-secondary: 212 207 200;  /* #D4CFC8 body copy */
+    --archive-ink-muted: 156 154 150;      /* #9C9A96 supporting text */
+    --archive-ink-faint: 138 134 128;      /* #8A8680 metadata, labels */
+    --archive-hairline: 40 37 31;          /* #28251F rules, quiet borders */
+    --archive-divider: 54 52 47;           /* #36342F stronger dividers, hover borders */
+    --archive-accent: 201 140 66;          /* #C98C42 sodium ochre: links, active, references */
+    --archive-accent-muted: 184 116 50;    /* #B87432 fills, rules, large marks */
+    --archive-interactive: 218 164 102;    /* #DAA466 hover / pressed text */
+    --archive-focus: 218 164 102;          /* #DAA466 focus ring */
+    --archive-success: 143 175 126;        /* #8FAF7E functional only */
+    --archive-warning: 214 178 92;         /* #D6B25C functional only */
+    --archive-error: 224 143 120;          /* #E08F78 functional only */
+
+    /* Atmosphere (the homepage gradient, transitions and wave only) */
+    --archive-night: 10 9 8;     /* #0A0908 — same as --archive-ground */
+    --archive-warm: 24 16 10;    /* #18100A — very dark warm brown */
+    --archive-amber: 184 116 50; /* #B87432 — muted darkroom amber */
+    --archive-light: 232 206 172;/* #E8CEAC — warm cream */
+
+    /* Older names, kept as aliases of the archive tokens. */
+    --ink-faint: var(--archive-ink-faint);
+    --accent: var(--archive-accent);
+    --accent-strong: var(--archive-interactive);
+    --accent-deep: var(--archive-accent-muted);
+    --success: var(--archive-success);
+    --error: var(--archive-error);
+
+    /* Motion tokens: one easing (settles, never overshoots) and three
+       durations for the text hierarchy, plus a fast one for hover. */
+    --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-micro: 480ms;
+    --motion-editorial: 820ms;
+    --motion-feature: 1050ms;
+    --motion-hover: 180ms;
+  }
+
   *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -20,9 +122,9 @@
   }
 
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: #0A0908;
-    color: #F5F2ED;
+    font-family: 'Inter', 'Inter Fallback', system-ui, -apple-system, sans-serif;
+    background: rgb(var(--archive-ground));
+    color: rgb(var(--archive-ink));
     overflow-x: hidden;
     line-height: 1.9;
     font-size: 1.25rem;
@@ -30,13 +132,73 @@
 
   /* Selection — amber annotation highlight */
   ::selection {
-    background: rgba(245, 166, 35, 0.25);
-    color: #F5F2ED;
+    background: rgb(var(--archive-accent) / 0.25);
+    color: rgb(var(--archive-ink));
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   ARCHIVE GRID - one set of edges for the whole site
+     archive-container  the margin every route aligns to (80rem, 20/32/40px gutters)
+     inside it: reading column max-w-2xl/3xl, wide content max-w-6xl, and
+     full-bleed media (the gallery wall, the hero) which may break out.
+   ═══════════════════════════════════════════════ */
+@layer components {
+  .archive-container {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
   }
 
-  ::-moz-selection {
-    background: rgba(245, 166, 35, 0.25);
-    color: #F5F2ED;
+  @media (min-width: 640px) {
+    .archive-container { padding-inline: 2rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .archive-container { padding-inline: 2.5rem; }
+  }
+
+  /* The fixed navigation bar is 3.5rem tall; every route starts below it and
+     in-page anchors land below it. */
+  /* At least a screen tall, so the footer starts below the fold while a
+     route (or the home page's lazy sections) is still arriving: it never
+     appears under the bar and then jumps away (layout shift). */
+  .archive-main {
+    padding-top: 3.5rem;
+    min-height: 100vh;
+  }
+
+  html {
+    scroll-padding-top: 4.5rem;
+  }
+
+  /* Home: reading position, a 2px rule under the navigation bar driven by a
+     CSS scroll timeline (no script). Absent where scroll timelines aren't
+     supported. */
+  .archive-progress {
+    display: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .archive-progress {
+      display: block;
+      position: fixed;
+      top: calc(3.5rem - 1px);
+      left: 0;
+      right: 0;
+      height: 2px;
+      z-index: 51;
+      background: rgb(var(--archive-accent));
+      transform-origin: 0 50%;
+      animation: archive-progress linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+
+  @keyframes archive-progress {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
   }
 }
 
@@ -48,125 +210,770 @@
   top: -100px;
   left: 50%;
   transform: translateX(-50%);
-  background: #0A0908;
-  color: #6366F1;
+  background: rgb(var(--archive-ground));
+  color: rgb(var(--archive-interactive));
   padding: 12px 24px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', 'JetBrains Mono Fallback', monospace;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   z-index: 9999;
-  transition: top 0.3s ease;
-  border: 1px solid #28251F;
+  border: 1px solid rgb(var(--archive-hairline));
 }
 
 .skip-link:focus {
   top: 16px;
-  outline: 1px solid #6366F1;
+  outline: 2px solid rgb(var(--archive-focus));
   outline-offset: 2px;
 }
 
+/* The assistant's panel sits 6rem above the bottom edge; keep its top clear of the
+   3.5rem site bar on short viewports (small phones, landscape, an open on-screen
+   keyboard): 6rem + 3.5rem + 0.5rem gap. dvh tracks the visible viewport; vh is
+   the fallback where dvh is unsupported. */
+.chat-panel {
+  max-height: calc(100vh - 10rem);
+  max-height: calc(100dvh - 10rem);
+}
+
+
 /* ═══════════════════════════════════════════════
-   CUSTOM CURSOR HIDING
+   ARCHIVE ATMOSPHERE — the single background system
+   Light entering a dark room. Static (no animation),
+   decorative only, never placed behind body text at
+   its brightest point. Stops are eased to avoid banding.
    ═══════════════════════════════════════════════ */
-@media (hover: hover) and (pointer: fine) {
-  * {
-    cursor: none !important;
+@layer components {
+  /* Hero field: sits between the photograph and the hero text.
+     Mobile-first: a vertical warm shade behind the centred text,
+     the sky at the top of the photo left untouched. */
+  .archive-hero-atmosphere {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .archive-hero-atmosphere::before,
+  .archive-hero-atmosphere::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .archive-hero-atmosphere::before {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--archive-night) / 0.08) 0%,
+      rgb(var(--archive-warm) / 0.30) 24%,
+      rgb(var(--archive-warm) / 0.62) 40%,
+      rgb(var(--archive-warm) / 0.78) 58%,
+      rgb(var(--archive-night) / 0.90) 80%,
+      rgb(var(--archive-night)) 100%
+    );
+  }
+
+  .archive-hero-atmosphere::after {
+    background: radial-gradient(
+      120% 40% at 50% 100%,
+      rgb(var(--archive-amber) / 0.10) 0%,
+      rgb(var(--archive-amber) / 0.05) 35%,
+      rgb(var(--archive-amber) / 0.015) 60%,
+      rgb(var(--archive-amber) / 0) 80%
+    );
+  }
+
+  /* Tablet and small desktop (640–1279): the text column is wide here,
+     so the field reaches further; the photograph keeps the right edge */
+  @media (min-width: 640px) {
+    .archive-hero-atmosphere::before {
+      background:
+        radial-gradient(
+          ellipse 70% 42% at 32% 56%,
+          rgb(var(--archive-warm) / 0.55) 0%,
+          rgb(var(--archive-warm) / 0.36) 45%,
+          rgb(var(--archive-warm) / 0.12) 72%,
+          rgb(var(--archive-warm) / 0) 90%
+        ),
+        linear-gradient(
+          90deg,
+          rgb(var(--archive-warm) / 0.84) 0%,
+          rgb(var(--archive-warm) / 0.74) 40%,
+          rgb(var(--archive-warm) / 0.50) 64%,
+          rgb(var(--archive-warm) / 0.20) 82%,
+          rgb(var(--archive-warm) / 0) 96%
+        ),
+        linear-gradient(
+          0deg,
+          rgb(var(--archive-night)) 0%,
+          rgb(var(--archive-night) / 0.72) 9%,
+          rgb(var(--archive-night) / 0.28) 22%,
+          rgb(var(--archive-night) / 0) 38%
+        );
+    }
+
+    .archive-hero-atmosphere::after {
+      background: radial-gradient(
+        70% 75% at 0% 100%,
+        rgb(var(--archive-amber) / 0.13) 0%,
+        rgb(var(--archive-amber) / 0.07) 35%,
+        rgb(var(--archive-amber) / 0.025) 58%,
+        rgb(var(--archive-amber) / 0) 78%
+      );
+    }
+  }
+
+  /* Wide desktop (≥1280): the text column is narrower relative to the
+     viewport, so the field tightens and more of the photograph stays clear.
+     Warm light rises from the lower-left corner. */
+  @media (min-width: 1280px) {
+    .archive-hero-atmosphere::before {
+      background:
+        radial-gradient(
+          ellipse 50% 40% at 24% 57%,
+          rgb(var(--archive-warm) / 0.55) 0%,
+          rgb(var(--archive-warm) / 0.34) 45%,
+          rgb(var(--archive-warm) / 0.11) 72%,
+          rgb(var(--archive-warm) / 0) 90%
+        ),
+        linear-gradient(
+          90deg,
+          rgb(var(--archive-warm) / 0.84) 0%,
+          rgb(var(--archive-warm) / 0.70) 24%,
+          rgb(var(--archive-warm) / 0.44) 44%,
+          rgb(var(--archive-warm) / 0.16) 62%,
+          rgb(var(--archive-warm) / 0) 76%
+        ),
+        linear-gradient(
+          0deg,
+          rgb(var(--archive-night)) 0%,
+          rgb(var(--archive-night) / 0.72) 9%,
+          rgb(var(--archive-night) / 0.28) 22%,
+          rgb(var(--archive-night) / 0) 38%
+        );
+    }
+
+    .archive-hero-atmosphere::after {
+      background: radial-gradient(
+        60% 85% at 0% 100%,
+        rgb(var(--archive-amber) / 0.18) 0%,
+        rgb(var(--archive-amber) / 0.10) 30%,
+        rgb(var(--archive-amber) / 0.04) 52%,
+        rgb(var(--archive-amber) / 0.01) 66%,
+        rgb(var(--archive-amber) / 0) 78%
+      );
+    }
+  }
+
+  /* Section transition: a wide, soft field centred on a section
+     boundary. Zero height, painted behind content (needs an
+     `isolate` ancestor), so it never changes layout. */
+  .archive-transition {
+    --archive-span: 360px;
+    --archive-tone: var(--archive-amber);
+    --archive-strength: 0.05;
+    position: relative;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .archive-transition::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--archive-span) * -0.5);
+    height: var(--archive-span);
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 95% 50% at 50% 50%,
+      rgb(var(--archive-tone) / var(--archive-strength)) 0%,
+      rgb(var(--archive-tone) / calc(var(--archive-strength) * 0.72)) 22%,
+      rgb(var(--archive-tone) / calc(var(--archive-strength) * 0.42)) 44%,
+      rgb(var(--archive-tone) / calc(var(--archive-strength) * 0.18)) 64%,
+      rgb(var(--archive-tone) / calc(var(--archive-strength) * 0.05)) 82%,
+      rgb(var(--archive-tone) / 0) 100%
+    );
+  }
+
+  .archive-transition[data-tone='warm']    { --archive-strength: 0.06; }
+  .archive-transition[data-tone='quiet']   { --archive-strength: 0.035; }
+
+  @media (min-width: 640px) {
+    .archive-transition { --archive-span: 480px; }
+    .archive-transition[data-tone='warm']    { --archive-strength: 0.08; }
+    .archive-transition[data-tone='quiet']   { --archive-strength: 0.05; }
+  }
+
+  @media (min-width: 1024px) {
+    .archive-transition { --archive-span: 640px; }
+    .archive-transition[data-tone='warm']    { --archive-strength: 0.10; }
+    .archive-transition[data-tone='quiet']   { --archive-strength: 0.06; }
+  }
+
+  /* Crossing: the engineering -> photography boundary. A band of warm,
+     layered waves with real height of its own; its faded top and bottom
+     tuck into the empty padding of the neighbouring sections (negative
+     margins), so no content ever sits on the waves. No glow here.
+     Palette: light through a darkroom - warm cream, aged amber, ochre,
+     burnt sienna over dark copper and photographic brown grounds that
+     dissolve into the page before the photographs begin.
+     Motion: every layer drifts sideways (one period per 34-80s, alternate
+     directions) and breathes vertically (8-13s, ease-in-out) - each on its
+     own rhythm, transforms only, paused off screen. */
+  .archive-transition[data-tone='crossing'] {
+    --wave-h: 280px;
+    --wave-tuck-top: 16px;
+    --wave-tuck-bottom: 56px;
+    height: var(--wave-h);
+    margin-top: calc(var(--wave-tuck-top) * -1);
+    margin-bottom: calc(var(--wave-tuck-bottom) * -1);
+
+    --wave-veil: 232 206 172;   /* warm cream (archive-light) */
+    --wave-amber: 184 116 50;   /* aged amber (archive-amber) */
+    --wave-ochre: 201 140 66;   /* sodium-vapour ochre */
+    --wave-sienna: 140 70 34;   /* burnt sienna */
+    --wave-copper: 74 38 18;    /* dark copper */
+    --wave-deep: 30 18 10;      /* photographic brown, near archive-warm */
+  }
+
+  .archive-transition[data-tone='crossing']::before {
+    content: none;
+  }
+
+  .archive-wave {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 66%, transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 66%, transparent 100%);
+  }
+
+  .archive-wave__layer {
+    --breathe: 9s;
+    --lift: 10px;
+    position: absolute;
+    inset: 0;
+    transform-origin: 50% 70%;
+    animation: archive-breathe var(--breathe) ease-in-out infinite alternate;
+    animation-play-state: paused;
+  }
+
+  /* One period is at least 500px wide on phones and 720px from tablet up,
+     so small screens get long, readable swells instead of a squeezed
+     zigzag, without rasterising a needlessly wide strip. */
+  .archive-wave__drift {
+    --drift: 30s;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: max(200%, var(--wave-span, 1000px));
+    height: 100%;
+    animation: archive-drift var(--drift) linear infinite;
+    animation-play-state: paused;
+  }
+
+  .archive-wave[data-active] .archive-wave__layer,
+  .archive-wave[data-active] .archive-wave__drift {
+    animation-play-state: running;
+  }
+
+  .archive-wave svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* back to front */
+  .archive-wave__layer[data-layer='veil']   { --breathe: 13s; --lift: 14px; }
+  .archive-wave__layer[data-layer='veil']   .archive-wave__drift { --drift: 66s; }
+  .archive-wave__layer[data-layer='veil']   path { fill: rgb(var(--wave-veil) / 0.16); }
+  .archive-wave__layer[data-layer='veil']   svg { filter: blur(6px); }
+
+  .archive-wave__layer[data-layer='amber']  { --breathe: 9s; --lift: 12px; animation-delay: -3s; }
+  .archive-wave__layer[data-layer='amber']  .archive-wave__drift { --drift: 44s; animation-direction: reverse; }
+  .archive-wave__layer[data-layer='amber']  path { fill: rgb(var(--wave-amber) / 0.5); }
+  .archive-wave__layer[data-layer='amber']  svg { filter: blur(2px); }
+
+  .archive-wave__layer[data-layer='ochre']  { --breathe: 8s; --lift: 16px; animation-delay: -5s; }
+  .archive-wave__layer[data-layer='ochre']  .archive-wave__drift { --drift: 34s; }
+  .archive-wave__layer[data-layer='ochre']  path { fill: rgb(var(--wave-ochre) / 0.62); }
+  .archive-wave__layer[data-layer='ochre']  .archive-wave__edge { fill: none; stroke: rgb(var(--wave-veil) / 0.55); stroke-width: 1.5px; }
+
+  .archive-wave__layer[data-layer='sienna'] { --breathe: 11s; --lift: 12px; animation-delay: -7s; }
+  .archive-wave__layer[data-layer='sienna'] .archive-wave__drift { --drift: 50s; animation-direction: reverse; }
+  .archive-wave__layer[data-layer='sienna'] path { fill: rgb(var(--wave-sienna) / 0.78); }
+
+  .archive-wave__layer[data-layer='copper'] { --breathe: 10s; --lift: 8px; animation-delay: -2s; transform-origin: 50% 100%; }
+  .archive-wave__layer[data-layer='copper'] .archive-wave__drift { --drift: 58s; }
+  .archive-wave__layer[data-layer='copper'] path { fill: rgb(var(--wave-copper) / 0.85); }
+
+  .archive-wave__layer[data-layer='deep']   { --breathe: 12s; --lift: 6px; animation-delay: -6s; transform-origin: 50% 100%; }
+  .archive-wave__layer[data-layer='deep']   .archive-wave__drift { --drift: 80s; animation-direction: reverse; }
+  .archive-wave__layer[data-layer='deep']   path { fill: rgb(var(--wave-deep) / 0.95); }
+
+  /* Phones: four layers (no veil, no sienna), the same palette and motion. */
+  @media (max-width: 639px) {
+    .archive-wave__layer[data-layer='veil'],
+    .archive-wave__layer[data-layer='sienna'] {
+      display: none;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .archive-transition[data-tone='crossing'] {
+      --wave-h: 360px;
+      --wave-tuck-top: 20px;
+      --wave-tuck-bottom: 80px;
+      --wave-span: 1440px;
+    }
+  }
+
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .archive-wave__layer[data-layer='veil'] {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .archive-transition[data-tone='crossing'] {
+      --wave-h: 460px;
+      --wave-tuck-top: 24px;
+      --wave-tuck-bottom: 96px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .archive-wave__layer,
+    .archive-wave__drift {
+      animation: none;
+    }
+  }
+
+  @keyframes archive-drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  @keyframes archive-breathe {
+    from { transform: translateY(calc(var(--lift) * -1)) scaleY(0.93); }
+    to { transform: translateY(var(--lift)) scaleY(1.07); }
   }
 }
 
 /* ═══════════════════════════════════════════════
-   BLUEPRINT GRID — Subtle drafting paper
+   PHOTO DESK - homepage prints the visitor can move
+   Prints sit still until handled. Below 1024px they form a loose
+   overlapping column, each print tucked under the one above so every
+   caption stays readable without interaction;
+   from 1024px they are composed freely on a desk.
+   touch-action: pan-y keeps vertical swipes scrolling the page;
+   only a sideways gesture picks a print up.
    ═══════════════════════════════════════════════ */
 @layer components {
-  .blueprint-grid {
-    background-image:
-      linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  .blueprint-grid-fine {
-    background-image:
-      linear-gradient(rgba(99, 102, 241, 0.02) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(99, 102, 241, 0.02) 1px, transparent 1px),
-      linear-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
-    background-size: 10px 10px, 10px 10px, 40px 40px, 40px 40px;
-  }
-
-  /* Paper surface — a sheet on a desk */
-  .paper-surface {
-    background: transparent;
-    border: none;
+  .photo-desk {
     position: relative;
+    isolation: isolate;
   }
 
-  .paper-surface::before {
-    content: '';
+  .photo-print {
+    --r: var(--r-sm, 0deg);
+    position: relative;
+    z-index: var(--stack, auto);
+    width: var(--w-sm);
+    margin-left: var(--x-sm);
+    rotate: var(--r);
+    translate: 0 0;
+    padding: 5px 5px 0;
+    background-color: theme('colors.ink.secondary');
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.35),
+      0 14px 30px -12px rgb(0 0 0 / 0.6);
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    transition: rotate 0.18s ease-out, scale 0.18s ease-out, box-shadow 0.18s ease-out;
+  }
+
+  .photo-print + .photo-print {
+    margin-top: -18%;
+  }
+
+  .photo-print img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    background-color: rgb(var(--archive-warm));
+  }
+
+  .photo-print.is-lifted {
+    scale: 1.025;
+    cursor: grabbing;
+    box-shadow:
+      0 2px 4px rgb(0 0 0 / 0.35),
+      0 24px 44px -14px rgb(0 0 0 / 0.7);
+  }
+
+  .photo-print.is-restacking {
+    transition: translate 0.45s cubic-bezier(0.2, 0.7, 0.2, 1), rotate 0.18s ease-out, scale 0.18s ease-out, box-shadow 0.18s ease-out;
+  }
+
+  .photo-print:focus-visible {
+    outline: 2px solid rgb(var(--archive-light));
+    outline-offset: 4px;
+  }
+
+  @media (min-width: 768px) {
+    .photo-print {
+      width: var(--w-md);
+      margin-left: var(--x-md);
+    }
+
+    .photo-print + .photo-print {
+      margin-top: -20%;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .photo-desk {
+      aspect-ratio: 3 / 2;
+    }
+
+    .photo-print {
+      --r: var(--r-lg, 0deg);
+      position: absolute;
+      z-index: auto;
+      left: var(--x-lg);
+      top: var(--y-lg);
+      width: var(--w-lg);
+      margin-left: 0;
+      padding: 6px 6px 0;
+    }
+
+    .photo-print + .photo-print {
+      margin-top: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .photo-print,
+    .photo-print.is-restacking {
+      --r: 0deg;
+      transition: none;
+    }
+
+    .photo-print.is-lifted {
+      scale: 1;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   EDITORIAL REVEAL - the archive's text motion (EditorialReveal.jsx)
+   Levels set timing; modes set the treatment:
+     fade   the element as one block       (labels, metadata)
+     words  words rise one after another    (titles)
+     mask   words rise out of a baseline mask (headings, hero)
+     lines  rendered lines rise in turn     (short descriptions)
+     scroll words resolve as you read down  (one statement; CSS only)
+   Text is visible unless EditorialReveal has armed it
+   (data-reveal="armed"). Words become inline-blocks only while
+   data-reveal is set, i.e. while moving; afterwards they are plain
+   inline text again, so find-in-page matches across words.
+   Opacity, translate and (feature only) a little blur: no reflow.
+   ═══════════════════════════════════════════════ */
+@layer components {
+  /* stagger = gap between words; spread = the most the whole sequence
+     may stretch, so long text tightens its stagger instead of dragging. */
+  .editorial-reveal {
+    --reveal-duration: var(--motion-editorial);
+    --reveal-stagger: 55ms;
+    --reveal-spread: 600ms;
+    --reveal-shift: 0.45em;
+  }
+
+  .editorial-reveal[data-level='micro'] {
+    --reveal-duration: var(--motion-micro);
+    --reveal-stagger: 30ms;
+    --reveal-spread: 300ms;
+    --reveal-shift: 8px;
+  }
+
+  .editorial-reveal[data-level='feature'] {
+    --reveal-duration: var(--motion-feature);
+    --reveal-stagger: 75ms;
+    --reveal-spread: 750ms;
+    --reveal-shift: 0.5em;
+  }
+
+  .editorial-reveal[data-mode='lines'] {
+    --reveal-stagger: 90ms;
+    --reveal-spread: 450ms;
+    --reveal-shift: 0.7em;
+  }
+
+  /* fade: the whole element */
+  [data-reveal='armed'][data-mode='fade'] {
+    opacity: 0;
+    translate: 0 var(--reveal-shift);
+  }
+
+  [data-reveal='revealing'][data-mode='fade'] {
+    transition:
+      opacity var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      translate var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      filter var(--reveal-duration) var(--motion-ease) var(--reveal-delay);
+  }
+
+  /* heading: the whole heading, as one piece. Rises 24px out of a 5px blur
+     over 620ms on the archive easing; transform, opacity and filter only. */
+  .editorial-reveal[data-mode='heading'] {
+    --reveal-duration: 620ms;
+    --reveal-shift: 24px;
+  }
+
+  [data-reveal='armed'][data-mode='heading'] {
+    opacity: 0;
+    translate: 0 var(--reveal-shift);
+    filter: blur(5px);
+  }
+
+  [data-reveal='revealing'][data-mode='heading'] {
+    transition:
+      opacity var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      translate var(--reveal-duration) var(--motion-ease) var(--reveal-delay),
+      filter calc(var(--reveal-duration) * 0.8) var(--motion-ease) var(--reveal-delay);
+  }
+
+  /* words / lines / mask: each word moves on its own */
+  [data-reveal] .reveal-word {
+    display: inline-block;
+  }
+
+  [data-reveal='armed'] .reveal-word {
+    opacity: 0;
+    translate: 0 var(--reveal-shift);
+  }
+
+  [data-reveal='revealing'] .reveal-word,
+  [data-reveal='revealing'] .reveal-word__inner {
+    transition:
+      opacity var(--reveal-duration) var(--motion-ease),
+      translate var(--reveal-duration) var(--motion-ease),
+      filter var(--reveal-duration) var(--motion-ease);
+    transition-delay: calc(var(--reveal-delay) + var(--i, 0) * var(--reveal-stagger));
+  }
+
+  /* feature words and blocks resolve from a slight blur */
+  [data-reveal='armed'][data-level='feature']:not([data-mode='mask']) .reveal-word,
+  [data-reveal='armed'][data-level='feature'][data-mode='fade'] {
+    filter: blur(6px);
+  }
+
+  /* mask: the word stays put and clips; the inner text rises through it.
+     The clip reaches past the box so ascenders, descenders and italic
+     overhang are never cut once the word is in place. */
+  [data-reveal][data-mode='mask'] .reveal-word {
+    clip-path: inset(-0.35em -0.2em -0.22em -0.2em);
+  }
+
+  [data-reveal='armed'][data-mode='mask'] .reveal-word {
+    opacity: 1;
+    translate: none;
+  }
+
+  [data-reveal][data-mode='mask'] .reveal-word__inner {
+    display: inline-block;
+  }
+
+  [data-reveal='armed'][data-mode='mask'] .reveal-word__inner {
+    translate: 0 135%;
+  }
+
+  [data-reveal='revealing'][data-mode='mask'] .reveal-word__inner {
+    transition-delay: calc(var(--reveal-delay) + var(--i, 0) * var(--reveal-stagger));
+  }
+
+  [data-reveal='revealing'][data-mode='mask'] .reveal-word {
+    transition: none;
+  }
+
+  /* Hover: arrows on text links lean toward where they go. */
+  .arrow-link .arrow {
+    display: inline-block;
+    transition: translate var(--motion-hover) var(--motion-ease);
+  }
+
+  .arrow-link:hover .arrow,
+  .arrow-link:focus-visible .arrow {
+    translate: 0.25em 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal],
+    [data-reveal] .reveal-word,
+    [data-reveal] .reveal-word__inner,
+    .arrow-link .arrow {
+      opacity: 1 !important;
+      translate: none !important;
+      filter: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   CASE FILES - evidence slots
+   A pending artifact is an empty mounting slot: four photo corners in the
+   archive amber around a plain label. It is never a stand-in image; a real
+   screenshot or diagram drops into the same frame later.
+   ═══════════════════════════════════════════════ */
+@layer components {
+  .case-pending__corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: rgb(var(--accent-deep) / 0.7);
+    border-style: solid;
+    border-width: 0;
+  }
+
+  .case-pending__corner--tl { top: 12px; left: 12px; border-top-width: 1px; border-left-width: 1px; }
+  .case-pending__corner--tr { top: 12px; right: 12px; border-top-width: 1px; border-right-width: 1px; }
+  .case-pending__corner--bl { bottom: 12px; left: 12px; border-bottom-width: 1px; border-left-width: 1px; }
+  .case-pending__corner--br { bottom: 12px; right: 12px; border-bottom-width: 1px; border-right-width: 1px; }
+}
+
+/* ═══════════════════════════════════════════════
+   OBSERVATIONS - the photographic archive (/gallery)
+   One dark wall of photographs in columns (AnimatedPhotoWall). Every
+   photograph keeps its real proportions (--r = width / height, measured):
+   no aspect boxes, no object-fit crop, no filters, no overlays, square edges.
+   The wall's 3D sequence is motion's useScroll/useTransform (see
+   animatedGallery.jsx); on phones alternate frames drift a few pixels with a
+   CSS view timeline. Reduced motion: everything stands still.
+   ═══════════════════════════════════════════════ */
+@layer components {
+  .obs-item__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--r);
+    background: theme('colors.notebook.surface');
+  }
+
+  .obs-item__open {
+    cursor: zoom-in;
+    outline-offset: 4px;
+  }
+
+  .obs-item__open:hover {
+    outline: 1px solid rgb(var(--accent-deep) / 0.7);
+  }
+
+  /* Fixed record-line height: the wall's geometry is computed from it. */
+  .obs-item__meta {
+    margin-top: 0.375rem;
+    height: 1.5rem;
+    line-height: 1.5rem;
+  }
+
+  /* While the wall is tilted, far-below photographs wait at the column top,
+     out of flow and invisible (see AnimatedPhotoWall). */
+  .obs-item--parked {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(245, 242, 237, 0.05), transparent);
+    opacity: 0;
+    pointer-events: none;
   }
 
-  /* Engineering reference line */
-  .ref-line {
-    height: 0.5px;
-    background: linear-gradient(90deg, transparent, #28251F 50%, transparent);
+  /* Phones: one column; portrait frames at 74%, alternating sides. */
+  .obs-wall[data-cols='1'] .obs-item[data-orient='portrait'] {
+    width: 74%;
   }
 
-  /* Engineering annotation — marginal notes */
-  .annotation {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.6875rem;
-    letter-spacing: 0.06em;
-    color: #F5A623;
-    opacity: 0.7;
-    line-height: 1.5;
+  .obs-wall[data-cols='1'] .obs-item[data-side='right'] {
+    margin-left: auto;
   }
 
-  .annotation-blue {
-    color: #6366F1;
+  /* A new selection settles in; nothing slides or reorders on screen. */
+  .obs-wall {
+    animation: obs-wall-in 260ms ease-out both;
   }
 
-/* Document card — like a case file on desk */
-  .doc-card {
-    background: transparent;
-    border: none;
-    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  @keyframes obs-wall-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
-  .doc-card:hover {
-    background: rgba(16, 15, 13, 0.5);
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .obs-wall[data-mode='stream'] .obs-item {
+        animation: obs-drift linear both;
+        animation-timeline: view();
+        animation-range: cover;
+      }
+
+      .obs-wall[data-mode='stream'] .obs-item:nth-child(even) {
+        animation-name: obs-drift-reverse;
+      }
+    }
   }
 
-  /* Measurement ticks on edges */
-  .measurement-ticks {
-    position: relative;
+  @keyframes obs-drift {
+    from { translate: 0 14px; }
+    to { translate: 0 -14px; }
   }
 
-  .measurement-ticks::before,
-  .measurement-ticks::after {
-    content: '';
-    position: absolute;
-    background: rgba(99, 102, 241, 0.1);
+  @keyframes obs-drift-reverse {
+    from { translate: 0 -10px; }
+    to { translate: 0 10px; }
   }
 
-  .measurement-ticks::before {
-    top: 0;
-    left: 24px;
-    right: 24px;
-    height: 0.5px;
+  /* Viewer: a sideways swipe on the photograph steps; vertical stays native. */
+  .obs-viewer__stage {
+    touch-action: pan-y pinch-zoom;
   }
 
-  .measurement-ticks::after {
-    top: 24px;
-    bottom: 24px;
-    left: 0;
-    width: 0.5px;
+  .obs-viewer__img {
+    animation: obs-viewer-in 240ms ease-out both;
+  }
+
+  @keyframes obs-viewer-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   MARKDOWN LISTS - list items are flex rows with a glyph; ordered
+   lists swap the glyph for a real counter so steps keep their numbers.
+   ═══════════════════════════════════════════════ */
+@layer components {
+  .md-ol {
+    counter-reset: md-step;
+  }
+
+  .md-ol > li {
+    counter-increment: md-step;
+  }
+
+  .md-ol > li > .md-bullet {
+    display: none;
+  }
+
+  .md-ol > li::before {
+    content: counter(md-step) ".";
+    flex-shrink: 0;
+    min-width: 1.5em;
+    color: rgb(var(--accent));
+    font-family: 'JetBrains Mono', 'JetBrains Mono Fallback', monospace;
+    font-size: 0.9em;
   }
 }
 
@@ -175,21 +982,7 @@
    ═══════════════════════════════════════════════ */
 @layer utilities {
   .font-editorial {
-    font-family: 'Instrument Serif', Georgia, serif;
-  }
-
-  .text-gradient-blueprint {
-    background: linear-gradient(135deg, #6366F1, #818CF8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .text-gradient-amber {
-    background: linear-gradient(135deg, #F5A623, #FBBF24);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-family: 'Instrument Serif', 'Instrument Serif Fallback', Georgia, serif;
   }
 
   /* Reading width — 75-85 characters per line */
@@ -197,109 +990,22 @@
     max-width: 800px;
   }
 
-  .max-narrow {
-    max-width: 680px;
-  }
 
-  /* Prose spacing — generous paragraph gaps */
-  .prose > p + p {
-    margin-top: 2em;
-  }
 
-  .prose > h2 {
-    margin-top: 3em;
-    margin-bottom: 1em;
-  }
 
-  .prose > h3 {
-    margin-top: 2em;
-    margin-bottom: 0.75em;
-  }
 
   /* Metadata — small, light, uppercase */
+  /* The 'micro' step of the type scale: reference lines and compact labels. */
   .meta-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.6875rem;
+    font-family: 'JetBrains Mono', 'JetBrains Mono Fallback', monospace;
+    font-size: 0.8125rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #9C9A96;
+    color: rgb(var(--archive-ink-muted));
     line-height: 1.4;
   }
 
-  .meta-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.8125rem;
-    letter-spacing: 0.02em;
-    color: #D4CFC8;
-    line-height: 1.5;
-  }
 
-    /* Document frame — folio corner brackets */
-  .doc-frame {
-    position: relative;
-  }
-
-  .doc-frame::before {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    width: 10px;
-    height: 10px;
-    border-top: 1px solid rgba(99, 102, 241, 0.15);
-    border-left: 1px solid rgba(99, 102, 241, 0.15);
-    pointer-events: none;
-  }
-
-  .doc-frame::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    right: -1px;
-    width: 10px;
-    height: 10px;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.15);
-    border-right: 1px solid rgba(99, 102, 241, 0.15);
-    pointer-events: none;
-  }
-
-  /* Left margin line — like ruled notebook paper */
-  .margin-line {
-    position: relative;
-    padding-left: 12px;
-  }
-
-  .margin-line::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, rgba(99, 102, 241, 0.08), rgba(245, 166, 35, 0.03) 60%, transparent);
-    pointer-events: none;
-  }
-
-  /* Binder holes — 3-ring margin decoration */
-  .binder-margin {
-    position: relative;
-  }
-
-  .binder-margin::before {
-    content: '';
-    position: absolute;
-    left: -8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: rgba(99, 102, 241, 0.06);
-    pointer-events: none;
-    box-shadow:
-      0 -24px 0 0 rgba(99, 102, 241, 0.06),
-      0 24px 0 0 rgba(99, 102, 241, 0.06);
-  }
 
   /* Line clamp utilities */
   .line-clamp-2 {
@@ -309,34 +1015,8 @@
     overflow: hidden;
   }
 
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
 }
 
-/* ═══════════════════════════════════════════════
-   SCROLLBAR — Minimal engineering style
-   ═══════════════════════════════════════════════ */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0A0908;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #28251F;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #6B6966;
-}
 
 /* ═══════════════════════════════════════════════
    GLOBAL ANIMATION CURVE
@@ -346,51 +1026,73 @@ section {
 }
 
 /* ═══════════════════════════════════════════════
-   NOISE TEXTURE (SVG data URI)
+   ROLES WORDMARK - the hero's TextHoverEffect (RolesWordmark)
+   The Aceternity component is used unchanged; these rules fit it to
+   the archive from its parent. Its 300×100 viewBox is cropped to a band
+   around the line (the box's aspect-ratio is set from the measured type
+   size), the type becomes Inter at the fitted size, the outlines take
+   archive ink, and the hover gradient's five stops become a warm
+   ink → accent → ink sweep instead of the demo rainbow.
    ═══════════════════════════════════════════════ */
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+.roles-wordmark {
+  --roles-size: 15px;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 300 / 26;
+  overflow: hidden;
+}
+
+.roles-wordmark svg {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: auto;
+  transform: translateY(-50%);
+}
+
+.roles-wordmark svg text {
+  font-family: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  font-size: var(--roles-size);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  stroke-width: 0.42px;
+}
+
+/* The resting outline (drawn in once) and the hover outline. */
+.roles-wordmark svg > text:nth-of-type(1),
+.roles-wordmark svg > text:nth-of-type(2) {
+  stroke: rgb(var(--archive-ink) / 0.9);
+}
+
+.roles-wordmark linearGradient stop:nth-child(1) { stop-color: rgb(var(--archive-ink)); }
+.roles-wordmark linearGradient stop:nth-child(2) { stop-color: rgb(var(--archive-interactive)); }
+.roles-wordmark linearGradient stop:nth-child(3) { stop-color: rgb(var(--archive-accent)); }
+.roles-wordmark linearGradient stop:nth-child(4) { stop-color: rgb(var(--archive-interactive)); }
+.roles-wordmark linearGradient stop:nth-child(5) { stop-color: rgb(var(--archive-ink)); }
+
+/* Page loader: held back 300ms so quick chunk loads never flash it. */
+@keyframes loaderIn {
+  to { opacity: 1; }
 }
 
 /* ═══════════════════════════════════════════════
-   ODOMETER PRELOADER ANIMATIONS
+   REDUCED MOTION - safety net
+   The designed systems handle reduced motion themselves (EditorialReveal
+   never arms, the wave stands still, the photo desk drops its tilt, the
+   route fade is skipped). This rule catches everything
+   else - legacy hover and state transitions - so with reduced motion the
+   same design appears instantly, standing still. Nothing is hidden.
    ═══════════════════════════════════════════════ */
-@keyframes odometerClack {
-  0% {
-    opacity: 0;
-    transform: translateY(80%);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-8%);
-  }
-  55% {
-    transform: translateY(3%);
-  }
-  75% {
-    transform: translateY(-2%);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(0);
-  }
-}
-
-@keyframes amberFlash {
-  0% {
-    opacity: 0.8;
-    transform: scaleX(1);
-  }
-  20% {
-    opacity: 0.9;
-    transform: scaleX(1.15);
-  }
-  60% {
-    opacity: 0.3;
-    transform: scaleX(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scaleX(0.8);
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }

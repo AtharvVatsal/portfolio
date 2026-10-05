@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -22,34 +20,34 @@ class ErrorBoundary extends Component {
 
   render() {
     if (this.state.hasError) {
+      // Rendered outside the shell (the shell itself may be what failed), so
+      // this view supplies its own main landmark. "Home" is a full page load:
+      // a client-side route change would keep this boundary in its error state.
       return (
-        <div className="min-h-screen bg-notebook-bg text-ink-primary flex items-center justify-center p-4">
-          <div className="text-center max-w-md">
-            <div className="w-16 h-16 mx-auto mb-6 border border-red-500/30 flex items-center justify-center">
-              <AlertTriangle size={28} className="text-red-400" />
-            </div>
-            <h1 className="font-display text-2xl mb-3">Something Went Wrong</h1>
-            <p className="text-ink-muted text-sm mb-6 font-mono">
-              // unexpected error encountered
+        <main id="main-content" tabIndex={-1} className="min-h-screen bg-notebook-bg text-ink-primary outline-none">
+          <div className="archive-container pt-24 pb-24">
+            <p className="meta-label !text-error">Error · unexpected</p>
+            <h1 className="mt-5 font-editorial text-headline sm:text-display text-ink-primary">Something went wrong</h1>
+            <p className="mt-4 max-w-xl text-body-sm text-ink-secondary">
+              This page failed to render. Trying again often works; if it does not, start again from the archive.
             </p>
-            <div className="flex items-center justify-center gap-3">
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <button
+                type="button"
                 onClick={this.handleRetry}
-                className="flex items-center gap-2 px-5 py-2.5 border border-notebook-border text-ink-secondary hover:text-ink-primary hover:border-blueprint transition-all duration-300 text-sm font-mono"
+                className="inline-flex min-h-11 items-center gap-2 border border-accent px-5 text-small text-ink-primary transition-colors duration-200 hover:bg-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
-                <RefreshCw size={14} />
-                Try Again
+                Try again
               </button>
-              <Link
-                to="/"
-                className="flex items-center gap-2 px-5 py-2.5 bg-blueprint text-white hover:bg-blueprint/90 transition-all duration-300 text-sm font-mono"
+              <a
+                href="/"
+                className="inline-flex min-h-11 items-center gap-2 text-small text-ink-secondary underline decoration-notebook-border-light underline-offset-4 transition-colors duration-200 hover:text-ink-primary hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
               >
-                <Home size={14} />
-                Home
-              </Link>
+                Return to the archive
+              </a>
             </div>
           </div>
-        </div>
+        </main>
       );
     }
 

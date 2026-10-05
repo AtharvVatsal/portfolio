@@ -17,6 +17,46 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://atharvvatsal.com/projects/keeperraw</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/drivesense</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/lzquant</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/newtonsnightmare</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/riskgrid</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/canspiracy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/phqreport</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://atharvvatsal.com/projects/hppolice</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://atharvvatsal.com/gallery</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

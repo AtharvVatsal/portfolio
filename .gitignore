@@ -3,6 +3,14 @@
 /.pnp
 .pnp.js
 
+# Docs
+/design-audit
+/DESIGN-IMPLEMENTATION-CHECKPOINT.md
+/DESIGN-IMPLEMENTATION-CHECKPOINT.md
+/docs
+
+# Scripts
+/scripts
 # Testing
 /coverage
 

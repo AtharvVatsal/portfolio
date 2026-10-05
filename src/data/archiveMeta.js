@@ -12,7 +12,7 @@ export const archiveMeta = {
     currentFocus: 'Building systems that learn, observing systems that exist',
   },
   siteMeta: {
-    description: 'Personal archive of Atharv Vatsal — engineer, photographer, and observer.',
+    description: 'Personal archive of Atharv Vatsal, a CS student at VIT specializing in AI/ML, and a photographer: project case files, field notes and photographs.',
     keywords: ['portfolio', 'AI engineer', 'photographer', 'VIT Vellore', 'machine learning', 'computer vision'],
   },
 };

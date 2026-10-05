@@ -11,7 +11,7 @@ export const SkeletonLine = ({ width = 'w-full', height = 'h-4', className = '' 
 );
 
 export const ArticleSkeleton = () => (
-  <div className="space-y-6 py-4" style={scanAnimation}>
+  <div role="status" aria-label="Loading the note" className="space-y-6 py-4" style={scanAnimation}>
     {/* Document header reference line */}
     <div className="flex items-center gap-3 mb-6">
       <SkeletonLine width="w-24" height="h-3" />

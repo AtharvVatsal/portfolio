@@ -1,12 +1,43 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+// The light Prism build: only the grammars registered here are bundled (the full
+// build added ~1 MB to every post, and no post's code fence names a language).
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
+import json from 'react-syntax-highlighter/dist/esm/languages/prism/json';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Copy, Check, Maximize2, Minimize2 } from 'lucide-react';
+
+SyntaxHighlighter.registerLanguage('python', python);
+SyntaxHighlighter.registerLanguage('javascript', javascript);
+SyntaxHighlighter.registerLanguage('js', javascript);
+SyntaxHighlighter.registerLanguage('bash', bash);
+SyntaxHighlighter.registerLanguage('json', json);
+
+// A wide table scrolls sideways on phones: the scroller is a focusable region,
+// named after its column headings so several tables on a page stay distinct.
+const TableRegion = ({ children }) => {
+  const ref = useRef(null);
+  const [label, setLabel] = useState('Table');
+  useEffect(() => {
+    const heads = [...(ref.current?.querySelectorAll('thead th') || [])].map((t) => t.textContent.trim()).filter(Boolean).slice(0, 4);
+    if (heads.length) setLabel(`Table: ${heads.join(', ')}`);
+  }, [children]);
+  return (
+    <div ref={ref} tabIndex={0} role="region" aria-label={label} className="overflow-x-auto my-6 border border-notebook-border focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus">
+      <table className="w-full text-small">
+        {children}
+      </table>
+    </div>
+  );
+};
 
 const CodeBlock = ({ children, className, ...props }) => {
   const [copied, setCopied] = React.useState(false);
@@ -23,7 +54,7 @@ const CodeBlock = ({ children, className, ...props }) => {
   if (!className && !codeString.includes('\n')) {
     return (
       <code
-        className="text-blueprint bg-blueprint/5 px-1.5 py-0.5 text-sm font-mono"
+        className="bg-notebook-surface px-1.5 py-0.5 font-mono text-[0.9em] text-accent-strong"
         {...props}
       >
         {children}
@@ -34,22 +65,24 @@ const CodeBlock = ({ children, className, ...props }) => {
   return (
     <div className="relative group my-6 border border-notebook-border overflow-hidden">
       {/* Language label + copy button */}
-      <div className="flex items-center justify-between px-4 py-2 bg-surface border-b border-notebook-border">
-        <span className="text-xs font-mono text-ink-faint uppercase">
+      <div className="flex items-center justify-between border-b border-notebook-border bg-notebook-surface-alt pl-4 pr-1">
+        <span className="font-mono text-meta uppercase text-ink-faint">
           {language || 'code'}
         </span>
         <button
+          type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs font-mono text-ink-faint hover:text-ink-primary transition-colors duration-300"
+          aria-label={copied ? 'Copied' : `Copy ${language || 'code'} to clipboard`}
+          className="flex min-h-11 items-center gap-1.5 px-3 text-small text-ink-muted transition-colors duration-200 hover:text-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
         >
           {copied ? (
             <>
-              <Check size={14} className="text-green-400" />
-              <span className="text-green-400">Copied</span>
+              <Check size={14} aria-hidden="true" className="text-success" />
+              <span className="text-success">Copied</span>
             </>
           ) : (
             <>
-              <Copy size={14} />
+              <Copy size={14} aria-hidden="true" />
               <span>Copy</span>
             </>
           )}
@@ -59,10 +92,14 @@ const CodeBlock = ({ children, className, ...props }) => {
         style={oneDark}
         language={language || 'text'}
         PreTag="div"
+        tabIndex={0}
+        role="region"
+        aria-label={`${language ? `${language} code` : 'Code'}: ${(codeString.split('\n').find((l) => l.trim()) || '').trim().slice(0, 48)}`}
+        className="focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-focus"
         customStyle={{
           margin: 0,
           padding: '1.25rem',
-          background: 'rgba(0, 0, 0, 0.3)',
+          background: 'rgb(var(--archive-ground-sunken))',
           fontSize: '0.875rem',
           lineHeight: '1.7',
         }}
@@ -98,61 +135,81 @@ export const extractHeadings = (markdown) => {
   return headings;
 };
 
+// Markdown wraps images in <p>, so everything rendered in place is phrasing
+// content (a button and spans). The enlarged view is a modal dialog rendered
+// in a portal: focus moves to its close button, stays inside, Esc closes it,
+// and focus returns to the image that opened it.
 const ZoomableBlogImage = ({ src, alt }) => {
   const [zoomed, setZoomed] = useState(false);
-  const [natural, setNatural] = useState({ w: 0, h: 0 });
-  const imgRef = useRef(null);
+  const triggerRef = useRef(null);
+  const closeRef = useRef(null);
 
   useEffect(() => {
-    if (zoomed) { document.body.style.overflow = 'hidden'; }
-    else { document.body.style.overflow = ''; }
-    return () => { document.body.style.overflow = ''; };
+    if (!zoomed) return undefined;
+    document.body.style.overflow = 'hidden';
+    const trigger = triggerRef.current;
+    closeRef.current?.focus();
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setZoomed(false); }
+      else if (e.key === 'Tab') { e.preventDefault(); closeRef.current?.focus(); }
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey, true);
+      trigger?.focus();
+    };
   }, [zoomed]);
 
   return (
     <>
-      <div className="my-8 group cursor-zoom-in relative overflow-hidden"
-        onClick={() => { if (imgRef.current) setNatural({ w: imgRef.current.naturalWidth, h: imgRef.current.naturalHeight }); setZoomed(true); }}
+      <button
+        type="button"
+        ref={triggerRef}
+        onClick={() => setZoomed(true)}
+        aria-label={alt ? `Enlarge image: ${alt}` : 'Enlarge image'}
+        className="group relative my-8 block w-full cursor-zoom-in overflow-hidden text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
       >
         <img
-          ref={imgRef}
           src={src}
           alt={alt || ''}
-          className="w-full border border-notebook-border transition-all duration-700"
+          className="w-full border border-notebook-border"
           loading="lazy"
         />
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-          style={{ background: 'rgba(0,0,0,0.3)' }}>
-          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)' }}>
-            <Maximize2 size={13} className="text-white/70" />
-          </div>
-        </div>
-      </div>
-      {alt && <p className="text-center text-xs text-ink-faint/70 mt-1 mb-6 font-mono italic">{alt}</p>}
+        <span aria-hidden="true" className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center border border-notebook-border-light bg-notebook-bg/90 text-ink-secondary opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+          <Maximize2 size={13} />
+        </span>
+      </button>
+      {alt && <span className="-mt-6 mb-8 block text-small text-ink-muted">{alt}</span>}
 
-      {zoomed && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" onClick={() => setZoomed(false)}
-          style={{ background: 'rgba(10,9,8,0.96)', animation: 'imgZoomOv 0.25s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+      {zoomed && createPortal(
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={alt || 'Enlarged image'}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-notebook-bg/95"
+          onClick={() => setZoomed(false)}
         >
-          <style>{`@keyframes imgZoomOv { from { opacity: 0; } to { opacity: 1; } }`}</style>
-          <button onClick={(e) => { e.stopPropagation(); setZoomed(false); }}
-            className="absolute top-5 right-5 z-30 w-9 h-9 flex items-center justify-center rounded-full transition-all duration-300"
-            style={{ background: 'rgba(40,37,31,0.3)', color: 'rgba(255,255,255,0.35)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.12)'; e.currentTarget.style.color = '#fff'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(40,37,31,0.3)'; e.currentTarget.style.color = 'rgba(255,255,255,0.35)'; }}
+          <button
+            type="button"
+            ref={closeRef}
+            onClick={(e) => { e.stopPropagation(); setZoomed(false); }}
+            aria-label="Close enlarged image"
+            className="absolute right-4 top-4 z-30 flex h-11 w-11 items-center justify-center border border-notebook-border-light bg-notebook-bg text-ink-secondary transition-colors duration-200 hover:text-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
           >
-            <Minimize2 size={15} />
+            <Minimize2 size={15} aria-hidden="true" />
           </button>
-          <img src={src} alt={alt || ''} className="max-w-[90vw] max-h-[90vh] object-contain select-none" draggable={false}
-            style={{ animation: 'imgZoomIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both' }} />
-          <style>{`@keyframes imgZoomIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }`}</style>
-        </div>
+          <img src={src} alt={alt || ''} className="max-w-[90vw] max-h-[90vh] object-contain select-none" draggable={false} />
+        </div>,
+        document.body
       )}
     </>
   );
 };
 
-const createHeadingComponent = (level) => {
+// level sets the look; tag sets the element. A Markdown "#" renders as <h2>
+// (styled as level 1) because the post title above is the page's only <h1>.
+const createHeadingComponent = (level, tag = level) => {
   const HeadingComponent = ({ children, ...props }) => {
     const text = typeof children === 'string'
       ? children
@@ -166,12 +223,12 @@ const createHeadingComponent = (level) => {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
 
-    const Tag = `h${level}`;
+    const Tag = `h${tag}`;
     
     const sizeClasses = {
-      1: 'text-3xl sm:text-4xl mt-12 mb-6 font-editorial',
-      2: 'text-2xl sm:text-3xl mt-10 mb-4 font-editorial',
-      3: 'text-xl sm:text-2xl mt-8 mb-3 font-editorial',
+      1: 'text-title sm:text-headline mt-14 mb-6 font-editorial',
+      2: 'text-title mt-12 mb-4 font-editorial',
+      3: 'text-lead mt-10 mb-3 font-editorial',
     };
 
     return (
@@ -182,10 +239,10 @@ const createHeadingComponent = (level) => {
       >
         <a
           href={`#${id}`}
-          className="no-underline hover:no-underline flex items-center gap-2"
+          className="flex items-center gap-2 no-underline hover:no-underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
         >
           {children}
-          <span className="opacity-0 group-hover:opacity-40 transition-opacity duration-300 text-blueprint text-sm font-mono">
+          <span aria-hidden="true" className="font-mono text-meta text-accent opacity-0 transition-opacity duration-200 group-hover:opacity-70">
             #
           </span>
         </a>
@@ -198,12 +255,12 @@ const createHeadingComponent = (level) => {
 
 const MarkdownRenderer = ({ content }) => {
   const components = useMemo(() => ({
-    h1: createHeadingComponent(1),
+    h1: createHeadingComponent(1, 2),
     h2: createHeadingComponent(2),
     h3: createHeadingComponent(3),
 
     p: ({ children }) => (
-      <p className="text-ink-secondary leading-relaxed mb-6 text-base sm:text-lg">
+      <p className="mb-6 text-small sm:text-body-sm text-ink-secondary">
         {children}
       </p>
     ),
@@ -221,27 +278,27 @@ const MarkdownRenderer = ({ content }) => {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-blueprint hover:text-blueprint/80 underline underline-offset-2 decoration-blueprint/30 hover:decoration-blueprint/60 transition-colors duration-300"
+        className="text-accent-strong underline decoration-accent/50 underline-offset-4 transition-colors duration-200 hover:decoration-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
       >
         {children}
       </a>
     ),
 
     ul: ({ children }) => (
-      <ul className="space-y-2 mb-6 ml-4">
+      <ul className="md-list space-y-2 mb-6 ml-4">
         {children}
       </ul>
     ),
 
     ol: ({ children }) => (
-      <ol className="space-y-2 mb-6 ml-4 list-decimal list-inside">
+      <ol className="md-list md-ol space-y-2 mb-6 ml-4">
         {children}
       </ol>
     ),
 
     li: ({ children }) => (
-      <li className="text-ink-secondary text-base sm:text-lg leading-relaxed flex items-start gap-2">
-        <span className="text-blueprint mt-2 flex-shrink-0 font-mono">â€º</span>
+      <li className="flex items-start gap-3 text-small sm:text-body-sm text-ink-secondary">
+        <span aria-hidden="true" className="md-bullet mt-[0.85em] h-px w-3 shrink-0 bg-accent" />
         <span>{children}</span>
       </li>
     ),
@@ -249,7 +306,7 @@ const MarkdownRenderer = ({ content }) => {
     code: ({ inline, className, children, ...props }) => {
       if (inline) {
         return (
-          <code className="text-blueprint bg-blueprint/5 px-1.5 py-0.5 text-sm font-mono">
+          <code className="bg-notebook-surface px-1.5 py-0.5 font-mono text-[0.9em] text-accent-strong">
             {children}
           </code>
         );
@@ -260,21 +317,18 @@ const MarkdownRenderer = ({ content }) => {
     pre: ({ children }) => <>{children}</>,
 
     blockquote: ({ children }) => (
-      <blockquote className="border-l-2 border-blueprint/40 pl-6 my-6 bg-blueprint/5 py-4 pr-4">
-        <div className="text-ink-secondary italic">{children}</div>
+      <blockquote className="my-8 border-l-2 border-accent pl-6">
+        <div className="font-editorial text-body italic text-ink-secondary [&_p]:mb-0 [&_p]:font-editorial [&_p]:text-body">{children}</div>
       </blockquote>
     ),
 
+    // A wide table scrolls sideways on phones; the scroller is a focusable, named region.
     table: ({ children }) => (
-      <div className="overflow-x-auto my-6 border border-notebook-border">
-        <table className="w-full text-sm">
-          {children}
-        </table>
-      </div>
+      <TableRegion>{children}</TableRegion>
     ),
 
     thead: ({ children }) => (
-      <thead className="bg-surface text-ink-primary">{children}</thead>
+      <thead className="bg-notebook-surface text-ink-primary">{children}</thead>
     ),
 
     tbody: ({ children }) => (
@@ -282,14 +336,16 @@ const MarkdownRenderer = ({ content }) => {
     ),
 
     tr: ({ children }) => (
-      <tr className="hover:bg-surface transition-colors">{children}</tr>
+      <tr>{children}</tr>
     ),
 
-    th: ({ children }) => (
-      <th className="px-4 py-3 text-left font-semibold text-ink-primary border-b border-notebook-border font-mono text-xs uppercase tracking-wider">
+    th: ({ children }) => (React.Children.toArray(children).some((c) => (typeof c === 'string' ? c.trim() : true)) ? (
+      <th className="px-4 py-3 text-left font-semibold text-ink-primary border-b border-notebook-border font-mono text-meta uppercase">
         {children}
       </th>
-    ),
+    ) : (
+      <td className="px-4 py-3 border-b border-notebook-border" />
+    )),
 
     td: ({ children }) => (
       <td className="px-4 py-3 text-ink-secondary">{children}</td>

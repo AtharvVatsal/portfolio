@@ -37,7 +37,7 @@ export const PROJECT_LINKS = {
     demo: null,
   },
   keeperraw: {
-    github: 'https://github.com/AtharvVatsal/keeper-raw',
+    github: 'https://github.com/AtharvVatsal/keeper.raw',
     demo: null,
   },
 };
@@ -45,9 +45,12 @@ export const PROJECT_LINKS = {
 export const CONTACT_INFO = {
   email: 'atharv.vatsal2023@vitstudent.ac.in',
   emailAlt: 'atharvvatsal@outlook.com',
-  phone: '+91 9726240828',
-  phoneAlt: '+91 86268796190',
+  // Canonical contact number (owner, Phase 13, 2026-10-05). The single source:
+  // the résumé page, its tel: link and the AI assistant all read it from here.
+  phone: '+91 9736340828',
   location: 'Dharamshala, Himachal Pradesh',
 };
+// This site's own source repository (the git remote of this project).
+export const SITE_SOURCE = 'https://github.com/AtharvVatsal/portfolio';
 // Resume Link
 export const RESUME_LINK = '/AtharvVatsalResume.pdf';

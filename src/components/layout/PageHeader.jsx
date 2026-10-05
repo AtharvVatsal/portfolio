@@ -1,32 +1,41 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 
-const PageHeader = ({ title, sectionNum, subtitle, backLabel = '← Archive' }) => {
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  return (
-    <header className="sticky top-0 z-50 backdrop-blur-xl bg-notebook-bg/80 border-b border-notebook-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center justify-between">
+// The archive trail at the top of every sub-page: "← Archive / Section /
+// Entry". One arrow (the icon), one treatment on every route. The global
+// navigation bar sits above it; this only says where the page is filed.
+//   title  the current page (last crumb)
+//   trail  crumbs between the archive and the page: [{ label, to }]
+const PageHeader = ({ title, trail = [] }) => (
+  <nav aria-label="Breadcrumb" className="archive-container pt-6 sm:pt-8">
+    <ol className="flex flex-wrap items-center gap-x-2 font-mono text-meta uppercase text-ink-faint">
+      <li>
         <Link
           to="/"
-          className="flex items-center gap-2 text-ink-muted hover:text-ink-primary transition-colors duration-300 group"
+          className="group inline-flex min-h-11 items-center gap-1.5 text-ink-muted transition-colors duration-200 hover:text-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
         >
-          <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform duration-300" />
-          <span className="font-mono text-meta uppercase tracking-wider">{backLabel}</span>
+          <ArrowLeft size={14} aria-hidden="true" className="transition-transform duration-200 group-hover:-translate-x-0.5 motion-reduce:transform-none" />
+          Archive
         </Link>
-
-        <div className="flex items-center gap-2">
-          {sectionNum && (
-            <span className="font-mono text-meta text-blueprint">{sectionNum}</span>
-          )}
-          <span className="text-body-sm text-ink-primary font-medium">{title}</span>
-        </div>
-      </div>
-    </header>
-  );
-};
+      </li>
+      {trail.map((crumb) => (
+        <li key={crumb.to} className="flex items-center gap-x-2">
+          <span aria-hidden="true">/</span>
+          <Link
+            to={crumb.to}
+            className="inline-flex min-h-11 items-center text-ink-muted transition-colors duration-200 hover:text-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            {crumb.label}
+          </Link>
+        </li>
+      ))}
+      <li className="flex items-center gap-x-2">
+        <span aria-hidden="true">/</span>
+        <span aria-current="page" className="text-ink-secondary">{title}</span>
+      </li>
+    </ol>
+  </nav>
+);
 
 export default PageHeader;

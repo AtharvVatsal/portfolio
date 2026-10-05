@@ -162,7 +162,7 @@ It is like people who like tennis will sit together, maybe accompanied by people
 
 This is called **semantic similarity in embedding space**, and it's the engine behind image search, face recognition, and content recommendation.
 
-![2D t-SNN Projection](/blog/pixels/snn.png)
+![2D t-SNN Projection (AI Generated)](/blog/pixels/snn.png)
 
 You can measure how "different" two images are using cosine similarity:
 
@@ -238,7 +238,7 @@ Originally invented for language, Transformers were adapted for images as **Visi
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
 
-![Attention Overlay Map On An Image - ViT](/blog/pixels/ViT.png)
+![Attention Overlay Map On An Image - ViT (AI Generated)](/blog/pixels/ViT.png)
 
 The intuition: when you see a dog, your eyes don't move uniformly across the whole image. You attend to the face, the fur texture, the ears. ViTs learn to do something analogous.
 

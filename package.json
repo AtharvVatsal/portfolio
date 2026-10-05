@@ -1,11 +1,13 @@
 {
   "name": "atharv-vatsal-portfolio",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "private": true,
   "description": "Personal portfolio website for Atharv Vatsal",
   "dependencies": {
     "@emailjs/browser": "^4.3.3",
+    "gsap": "^3.15.0",
     "lucide-react": "^0.460.0",
+    "motion": "^14.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet-async": "^3.0.0",
@@ -26,7 +28,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "CI=false react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

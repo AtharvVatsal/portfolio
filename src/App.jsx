@@ -1,18 +1,15 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 
-import { ThemeProvider } from './context/ThemeContext';
-import { useScrollProgress, useVisibleSections, useAnalytics } from './hooks';
+import { useAnalytics } from './hooks';
 
 import './styles/animations.css';
 
-import { Preloader } from './components/preloader';
-import { CustomCursor, FloatingActionButtons, SEO, Atmosphere } from './components/common';
+import { FloatingActionButtons, SEO, ArchiveTransition } from './components/common';
 import { Navbar, Footer } from './components/layout';
 import PageTransition from './components/common/PageTransition';
 import PageLoader from './components/common/PageLoader';
-import { MatrixRain, useKonamiCode } from './components/common/EasterEgg';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
 const HeroSection = lazy(() => import('./components/sections/HeroSection'));
@@ -23,161 +20,136 @@ const PhotographySection = lazy(() => import('./components/sections/PhotographyS
 const ContactSection = lazy(() => import('./components/sections/ContactSection'));
 const BlogPreviewSection = lazy(() => import('./components/sections/BlogPreviewSection'));
 
-
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const BlogPostPage = lazy(() => import('./pages/BlogPostPage'));
 const GalleryPage = lazy(() => import('./pages/GalleryPage'));
 const ProjectsPage = lazy(() => import('./pages/ProjectsPage'));
+const CaseFilePage = lazy(() => import('./pages/CaseFilePage'));
 const ResumePage = lazy(() => import('./pages/ResumePage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
-let hasLoadedOnce = false;
+let hasVisitedHome = false;
 
-const PortfolioHome = () => {
-  const { scrollY, scrollProgress, showNavbar } = useScrollProgress();
-  const { activeSection, setActiveSection } = useVisibleSections([
-    'home', 'about', 'skills', 'photography', 'tech', 'blog', 'contact'
-  ]);
-
-  const isReturnVisit = hasLoadedOnce;
-  const [isLoading, setIsLoading] = useState(!isReturnVisit);
-  const [loadingProgress, setLoadingProgress] = useState(isReturnVisit ? 100 : 0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const [matrixActive, setMatrixActive] = useState(false);
-  useKonamiCode(() => setMatrixActive(true));
-
-  useEffect(() => {
-    if (isReturnVisit) return;
-    const timer = setInterval(() => {
-      setLoadingProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer);
-          setTimeout(() => { setIsLoading(false); hasLoadedOnce = true; }, 200);
-          return 100;
-        }
-        return prev + 4;
-      });
-    }, 20);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => sessionStorage.setItem('homeScrollY', String(window.scrollY));
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!isReturnVisit) return;
-    const targetSection = sessionStorage.getItem('scrollToSection');
-    if (targetSection) {
-      sessionStorage.removeItem('scrollToSection');
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const el = document.getElementById(targetSection);
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        });
-      });
+// Scroll to an element once it exists (the home sections load lazily).
+const scrollWhenReady = (id) => {
+  let tries = 0;
+  const attempt = () => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'instant' });
       return;
     }
-    const saved = sessionStorage.getItem('homeScrollY');
-    if (saved && Number(saved) > 0) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => window.scrollTo(0, Number(saved)));
-      });
+    if (tries++ < 40) setTimeout(attempt, 100);
+  };
+  attempt();
+};
+
+const PortfolioHome = () => {
+  const location = useLocation();
+  const [isReturnVisit] = useState(() => hasVisitedHome);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+
+  // Where the home page opens: at a section named in the hash (/#about), at
+  // the reader's previous position on a return visit, otherwise at the top.
+  useEffect(() => {
+    hasVisitedHome = true;
+    const id = location.hash.slice(1);
+    if (id) { scrollWhenReady(id); return; }
+    const saved = Number(sessionStorage.getItem('homeScrollY'));
+    if (isReturnVisit && saved > 0) {
+      requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo({ top: saved, behavior: 'instant' })));
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
+  }, [location.hash, isReturnVisit]);
+
+  useEffect(() => {
+    const remember = () => sessionStorage.setItem('homeScrollY', String(window.scrollY));
+    window.addEventListener('pagehide', remember);
+    return () => { remember(); window.removeEventListener('pagehide', remember); };
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-      setActiveSection(sectionId);
-      setIsMenuOpen(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-notebook-bg text-ink-primary overflow-x-hidden">
+    <div className="isolate overflow-x-clip">
       <SEO url="/" keywords={['portfolio', 'AI engineer', 'photographer', 'VIT Vellore']} />
-      <Atmosphere />
-      <Preloader progress={loadingProgress} isLoading={isLoading} isReturnVisit={isReturnVisit} />
 
-      <div
-        className="fixed top-0 left-0 h-0.5 z-[60] transition-all duration-150"
-        style={{
-          width: `${scrollProgress}%`,
-          background: 'linear-gradient(90deg, #6366F1, #818CF8, #6366F1)',
-          boxShadow: '0 0 8px rgba(99, 102, 241, 0.3)',
-        }}
-      />
-      <div className="fixed top-0 left-0 right-0 h-px bg-notebook-border/30 z-[60] pointer-events-none" />
+      {/* Reading position along the home page: a CSS scroll timeline, no JS. */}
+      <div aria-hidden="true" className="archive-progress" />
 
-      <Navbar
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        activeSection={activeSection}
-        showNavbar={showNavbar}
-        scrollToSection={scrollToSection}
-      />
+      <Suspense fallback={null}>
+        <HeroSection />
+        <ArchiveTransition tone="warm" />
+        <AboutSection />
+        <SkillsSection />
+        <ArchiveTransition tone="quiet" />
+        <TechProjectsSection />
+        <BlogPreviewSection />
+        <ArchiveTransition tone="crossing" />
+        <PhotographySection />
+        <ContactSection />
+      </Suspense>
 
-      <div id="main-content">
-        <Suspense fallback={null}>
-          <HeroSection scrollY={scrollY} />
-          <AboutSection />
-          <SkillsSection />
-          <TechProjectsSection />
-          <PhotographySection />
-          <BlogPreviewSection />
-          <ContactSection />
-        </Suspense>
-      </div>
-
-      <Footer />
-      <FloatingActionButtons scrollY={scrollY} showAIAssistant={showAIAssistant} setShowAIAssistant={setShowAIAssistant} />
-      <MatrixRain isActive={matrixActive} onComplete={() => setMatrixActive(false)} />
+      <FloatingActionButtons showAIAssistant={showAIAssistant} setShowAIAssistant={setShowAIAssistant} />
     </div>
   );
 };
 
-const AnimatedRoutes = () => {
+// One shell for every route: skip link, the archive navigation, one
+// main#main-content, the colophon. Page types lay themselves out inside it.
+const ArchiveShell = () => {
   const location = useLocation();
+  const mainRef = useRef(null);
+  const lastPath = useRef(location.pathname);
+  const hash = useRef(location.hash);
+  hash.current = location.hash;
   useAnalytics();
+
+  // A new route opens at its top (the home page and hash links place
+  // themselves). Focus moves to the main landmark so keyboard and screen
+  // reader users start at the new content, not in the old page's position;
+  // the landmark is not a visible focus target, so mouse users see nothing.
+  useEffect(() => {
+    // Compared with the last path (not a first-render flag), so the initial
+    // load never moves focus, even when effects run twice (StrictMode).
+    if (lastPath.current === location.pathname) return;
+    lastPath.current = location.pathname;
+    if (location.pathname !== '/' && !hash.current) window.scrollTo({ top: 0, behavior: 'instant' });
+    mainRef.current?.focus({ preventScroll: true });
+  }, [location.pathname]);
+
   return (
     <>
-      <CustomCursor />
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <Navbar />
       <PageTransition>
-        <Suspense fallback={<PageLoader />}>
-          <main id="main-content">
+        <main id="main-content" ref={mainRef} tabIndex={-1} className="archive-main outline-none">
+          <Suspense fallback={<PageLoader />}>
             <Routes location={location}>
               <Route path="/" element={<PortfolioHome />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/projects" element={<ProjectsPage />} />
+              <Route path="/projects/:slug" element={<CaseFilePage />} />
               <Route path="/resume" element={<ResumePage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
-          </main>
-        </Suspense>
+          </Suspense>
+        </main>
+        <Footer />
       </PageTransition>
     </>
   );
 };
 
-const App = () => {
-  return (
-    <HelmetProvider>
-      <ThemeProvider>
-        <Router>
-          <ErrorBoundary>
-            <AnimatedRoutes />
-          </ErrorBoundary>
-        </Router>
-      </ThemeProvider>
-    </HelmetProvider>
-  );
-};
+const App = () => (
+  <HelmetProvider>
+    <Router>
+      <ErrorBoundary>
+        <ArchiveShell />
+      </ErrorBoundary>
+    </Router>
+  </HelmetProvider>
+);
 
 export default App;

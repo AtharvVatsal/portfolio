@@ -1,5 +1,8 @@
 import React from 'react';
 
+// The archive reference line that opens a page: TYPE · REF (· date), in mono,
+// with an optional note under it in the body face. "PUBLIC" is the default
+// state of everything here, so it is not printed; any other classification is.
 const DocumentHeader = ({
   type = 'ARCHIVE ENTRY',
   docRef = 'AV-ARCH-000',
@@ -8,28 +11,19 @@ const DocumentHeader = ({
   note,
   className = '',
 }) => {
+  const parts = [docRef, classification !== 'PUBLIC' && classification, date].filter(Boolean);
   return (
-    <div className={`meta-label ${className}`}>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-        <span className="text-blueprint/60">{type}</span>
-        <span className="text-ink-faint/70">|</span>
-        <span>{docRef}</span>
-        <span className="text-ink-faint/70">|</span>
-        <span className={classification === 'PUBLIC' ? 'text-ink-faint/60' : 'text-amber/60'}>
-          {classification}
-        </span>
-        {date && (
-          <>
-            <span className="text-ink-faint/70">|</span>
-            <span>{date}</span>
-          </>
-        )}
-      </div>
-      {note && (
-        <p className="mt-1 text-meta text-ink-faint/60 tracking-normal normal-case font-normal italic">
-          {note}
-        </p>
-      )}
+    <div className={className}>
+      <p className="meta-label flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="text-accent">{type}</span>
+        {parts.map((part) => (
+          <React.Fragment key={part}>
+            <span aria-hidden="true" className="text-ink-faint">·</span>
+            <span>{part}</span>
+          </React.Fragment>
+        ))}
+      </p>
+      {note && <p className="mt-2 max-w-2xl text-small text-ink-muted">{note}</p>}
     </div>
   );
 };

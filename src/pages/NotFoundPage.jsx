@@ -1,72 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { SEO } from '../components/common';
+import { ArrowRight } from 'lucide-react';
+import { SEO, DocumentHeader, EditorialHeading } from '../components/common';
+import PageHeader from '../components/layout/PageHeader';
 
-const NotFoundPage = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
+// 404, inside the archive shell: one h1, what happened, and where to go next.
 
-  useEffect(() => {
-    setTimeout(() => setIsLoaded(true), 100);
-  }, []);
+const ROUTES = [
+  { to: '/projects', label: 'Case Files' },
+  { to: '/blog', label: 'Field Notes' },
+  { to: '/gallery', label: 'Observations' },
+  { to: '/resume', label: 'Résumé' },
+];
 
-  return (
-    <div className="min-h-screen bg-notebook-bg text-ink-primary flex items-center justify-center relative overflow-hidden">
-      <SEO title="404 — Archive Entry Not Found" description="The page you're looking for doesn't exist." noIndex />
+const linkClass = 'inline-flex min-h-11 items-center gap-2 text-small text-ink-secondary underline decoration-notebook-border-light underline-offset-4 transition-colors duration-200 hover:text-ink-primary hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus';
 
-      {/* Blueprint grid background */}
-      <div className="absolute inset-0 blueprint-grid opacity-30" />
+const NotFoundPage = () => (
+  <div className="min-h-screen bg-notebook-bg text-ink-primary">
+    <SEO title="Entry not found (404)" description="The page you're looking for doesn't exist." noIndex />
 
-      <div className="relative z-10 text-center px-4 max-w-lg mx-auto">
-        <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          {/* Reference number */}
-          <div className="font-mono text-meta text-ink-faint uppercase tracking-widest mb-6">
-            Error 404 — Archive Entry Not Found
-          </div>
+    <PageHeader title="Not found" />
 
-          {/* Large 404 */}
-          <h1 className="font-editorial text-[8rem] sm:text-[10rem] leading-none text-ink-primary/10 mb-4 select-none">
-            404
-          </h1>
+    <div className="archive-container pt-12 sm:pt-16 pb-24">
+      <DocumentHeader type="ERROR 404" docRef="AV-ARCH-000" />
+      <EditorialHeading as="h1" variant="page" reveal delay={80} className="mt-6">
+        Entry not found
+      </EditorialHeading>
+      <p className="mt-5 max-w-xl text-body-sm text-ink-secondary">
+        This document doesn't exist in the archive.
+        It may have been removed, or the reference number is incorrect.
+      </p>
 
-          {/* Message */}
-          <h2 className="text-xl sm:text-2xl font-semibold text-ink-primary mb-3">
-            Entry not found
-          </h2>
-          <p className="text-body-sm text-ink-muted mb-8 max-w-sm mx-auto leading-relaxed">
-            This document doesn't exist in the archive.
-            It may have been removed, or the reference number is incorrect.
-          </p>
+      <Link
+        to="/"
+        className="mt-10 inline-flex min-h-11 items-center gap-3 border border-notebook-border px-5 text-small text-ink-primary transition-colors duration-200 hover:border-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+      >
+        Return to the archive <ArrowRight size={14} aria-hidden="true" />
+      </Link>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Link
-              to="/"
-              className="group flex items-center gap-2 px-5 py-2.5 text-body-sm text-ink-primary border border-notebook-border hover:border-blueprint/20 transition-all duration-300"
-            >
-              <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform duration-300" />
-              <span>Return to Archive</span>
-            </Link>
-
-            <Link
-              to="/blog"
-              className="flex items-center gap-2 px-5 py-2.5 text-body-sm text-ink-muted hover:text-ink-primary transition-all duration-300"
-            >
-              <span>Browse Logbook</span>
-            </Link>
-          </div>
-
-          {/* Back link */}
-          <button
-            onClick={() => window.history.back()}
-            className="mt-6 font-mono text-meta text-ink-faint hover:text-ink-muted transition-colors duration-300"
-          >
-            ← Go back
-          </button>
-        </div>
-      </div>
+      <nav aria-label="Elsewhere in the archive" className="mt-12 max-w-xl border-t border-notebook-border pt-5">
+        <p className="meta-label">Or open</p>
+        <ul className="mt-2 flex flex-wrap gap-x-6">
+          {ROUTES.map((r) => (
+            <li key={r.to}><Link to={r.to} className={linkClass}>{r.label}</Link></li>
+          ))}
+        </ul>
+      </nav>
     </div>
-  );
-};
+  </div>
+);
 
 export default NotFoundPage;

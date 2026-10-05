@@ -76,15 +76,9 @@ export const annotations = {
     photography: [
       {
         id: 'photo-1',
-        text: 'Photography taught me observation. Observation influences engineering. Engineering builds systems.',
+        text: 'I started photographing in 2017 with a hand-me-down Nikon D3100. It taught me to watch closely before acting, the habit my engineering work depends on. The photographs below range from Himachal landscapes to concerts and crowds at VIT.',
         position: 'margin',
         side: 'left',
-      },
-      {
-        id: 'photo-2',
-        text: 'Current camera: Nikon Z50 with a 35mm prime. Learning to see before I shoot.',
-        position: 'margin',
-        side: 'right',
       },
     ],
     contact: [

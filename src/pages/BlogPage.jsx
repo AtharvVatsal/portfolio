@@ -1,60 +1,47 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { X, Search } from 'lucide-react';
-import { blogPosts, blogCategories } from '../data';
-import { SEO, DocumentHeader } from '../components/common';
+import { blogPosts } from '../data';
+import { SEO, DocumentHeader, EditorialHeading } from '../components/common';
 import { pageHeaders } from '../data/archiveMeta';
 import PageHeader from '../components/layout/PageHeader';
 
+// Field Notes: the writing index. Filters are the categories the entries
+// actually carry (with counts), plus one "All"; search filters as you type.
+
+const ALL = 'All';
+
+const categories = Object.entries(
+  blogPosts.reduce((acc, p) => ({ ...acc, [p.category]: (acc[p.category] || 0) + 1 }), {})
+)
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+  .map(([name, count]) => ({ name, count }));
+
+const filterClass = (active) => `inline-flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap border px-3 text-small transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+  active ? 'border-accent text-ink-primary' : 'border-notebook-border text-ink-muted hover:border-notebook-border-light hover:text-ink-primary'
+}`;
+
 const BlogPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(ALL);
+  const [query, setQuery] = useState('');
   const [imageErrors, setImageErrors] = useState({});
-  const [isIndexing, setIsIndexing] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => setIsLoaded(true), 100);
-  }, []);
-
   const header = pageHeaders.blog;
 
-  const handleImageError = (postId) => {
-    setImageErrors(prev => ({ ...prev, [postId]: true }));
-  };
-
-  // Search with indexing delay — feels like searching through files
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-
-  useEffect(() => {
-    if (!searchQuery) {
-      setDebouncedQuery('');
-      setIsIndexing(false);
-      return;
-    }
-    setIsIndexing(true);
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-      setIsIndexing(false);
-    }, 120);
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const filteredPosts = useMemo(() => blogPosts.filter((post) => {
-    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
-    const query = debouncedQuery;
-    if (!query) return matchesCategory;
-    const matchesSearch =
-      post.title.toLowerCase().includes(query.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(query.toLowerCase()) ||
-      post.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  }), [selectedCategory, debouncedQuery]);
+  const filteredPosts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return blogPosts.filter((post) => {
+      if (selectedCategory !== ALL && post.category !== selectedCategory) return false;
+      if (!q) return true;
+      return post.title.toLowerCase().includes(q)
+        || post.excerpt.toLowerCase().includes(q)
+        || post.tags.some((tag) => tag.toLowerCase().includes(q));
+    });
+  }, [selectedCategory, query]);
 
   return (
     <div className="min-h-screen bg-notebook-bg text-ink-primary">
       <SEO
-        title="Blog"
+        title="Field Notes"
         description="Field notes from Atharv Vatsal — writing to understand, not to teach."
         url="/blog"
         keywords={['blog', 'tech articles', 'machine learning blog', 'photography blog']}
@@ -62,166 +49,123 @@ const BlogPage = () => {
 
       <PageHeader title="Field Notes" />
 
-      {/* Page title */}
-      <section className="py-12 sm:py-16 border-b border-notebook-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <DocumentHeader
-              type={header.type}
-              docRef={header.ref}
-              classification={header.classification}
-              note={header.note}
-            />
-            <h1 className="font-editorial text-[2.5rem] sm:text-[3.5rem] text-ink-primary mt-6">
-              Field Notes
-            </h1>
-              <div className="flex items-center gap-3 mt-3 mb-8">
-              <span className="font-mono text-meta text-ink-muted">
-                {blogPosts.length} entries
-              </span>
-            </div>
-
-            {/* Search */}
-            <div className="max-w-md relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
-              <input
-                type="text"
-                placeholder="Search entries..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 bg-transparent border border-notebook-border text-ink-primary placeholder-ink-faint/50 text-meta font-mono focus:outline-none focus:border-blueprint/30 transition-all duration-300"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint hover:text-ink-muted transition-colors"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          </div>
+      <header className="archive-container pt-12 sm:pt-16 pb-10 sm:pb-12">
+        <div>
+          <DocumentHeader type={header.type} docRef={header.ref} classification={header.classification} note={header.note} />
         </div>
-      </section>
+        <EditorialHeading as="h1" variant="page" reveal="words" delay={100} className="mt-6">
+          Field Notes
+        </EditorialHeading>
+        <p className="mt-4 font-mono text-meta text-ink-muted">
+          {blogPosts.length} entries
+        </p>
+      </header>
 
-      {/* Category filters */}
-      <section className="py-4 border-b border-notebook-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3 overflow-x-auto pb-1">
-            <button
-              onClick={() => setSelectedCategory('All')}
-              className={`px-3 py-1.5 font-mono text-meta whitespace-nowrap transition-all duration-300 border ${
-                selectedCategory === 'All'
-                  ? 'border-blueprint/30 text-blueprint'
-                  : 'border-transparent text-ink-faint hover:text-ink-muted'
-              }`}
-            >
-              All
-            </button>
-            {blogCategories.map((category) => (
+      <section aria-label="Find an entry" className="archive-container border-t border-notebook-border pt-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div role="group" aria-label="Filter by category" className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+            {[{ name: ALL, count: blogPosts.length }, ...categories].map((c) => (
               <button
-                key={category.name}
-                onClick={() => setSelectedCategory(category.name)}
-                className={`px-3 py-1.5 font-mono text-meta whitespace-nowrap transition-all duration-300 border ${
-                  selectedCategory === category.name
-                    ? 'border-blueprint/30 text-blueprint'
-                    : 'border-transparent text-ink-faint hover:text-ink-muted'
-                }`}
+                key={c.name}
+                type="button"
+                aria-pressed={selectedCategory === c.name}
+                onClick={() => setSelectedCategory(c.name)}
+                className={filterClass(selectedCategory === c.name)}
               >
-                {category.name}
+                {c.name}
+                <span className={`font-mono text-meta ${selectedCategory === c.name ? 'text-accent' : 'text-ink-faint'}`}>{c.count}</span>
               </button>
             ))}
           </div>
+
+          <div className="relative w-full lg:max-w-xs">
+            <label htmlFor="entry-search" className="sr-only">Search entries</label>
+            <Search size={14} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+            <input
+              id="entry-search"
+              type="search"
+              placeholder="Search entries"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              className="min-h-11 w-full border border-notebook-border bg-transparent pl-9 pr-10 text-small text-ink-primary placeholder-ink-faint transition-colors duration-200 hover:border-notebook-border-light focus:border-accent focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center text-ink-faint hover:text-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus"
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
+        <p aria-live="polite" className="mt-4 font-mono text-meta text-ink-muted">
+          {filteredPosts.length === blogPosts.length
+            ? `All ${blogPosts.length} entries`
+            : `${filteredPosts.length} of ${blogPosts.length} entries`}
+        </p>
       </section>
 
-      {/* Posts — table of contents list */}
-      <section className="py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {isIndexing ? (
-            <div className="text-center py-16">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="w-1.5 h-1.5 rounded-full bg-blueprint/60 animate-pulse" />
-                <p className="font-mono text-meta text-ink-muted">Indexing documents</p>
-              </div>
-            </div>
-          ) : filteredPosts.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="font-mono text-meta text-ink-muted tracking-[0.2em] mb-2">
-                No entries found
-              </p>
-              <p className="text-body-sm text-ink-secondary">
-                Try adjusting your search or filter
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredPosts.map((post, index) => {
-                const hasValidImage = post.coverImage && !imageErrors[post.id];
-
-                return (
+      <section aria-label="Entries" className="archive-container pt-6 pb-16 sm:pb-20">
+        {filteredPosts.length === 0 ? (
+          <div className="border-t border-notebook-border py-16">
+            <p className="text-body-sm text-ink-secondary">No entry matches. Try another word or category.</p>
+          </div>
+        ) : (
+          <ol className="border-t border-notebook-border">
+            {filteredPosts.map((post) => {
+              const hasValidImage = post.coverImage && !imageErrors[post.id];
+              return (
+                <li key={post.id} className="border-b border-notebook-border">
                   <Link
-                    key={post.id}
                     to={`/blog/${post.slug}`}
-                    className={`doc-card group block border border-notebook-border hover:border-notebook-border-light rounded-lg overflow-hidden transition-all duration-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                    style={{ transitionDelay: `${index * 50}ms` }}
+                    className="group grid gap-5 py-6 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-8 lg:grid-cols-[14rem_minmax(0,1fr)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
                   >
-                    <div className="flex flex-col sm:flex-row">
-                      {/* Cover */}
-                      <div className="sm:w-48 lg:w-56 flex-shrink-0">
-                        <div className="relative h-40 sm:h-full overflow-hidden bg-notebook-surface border-b sm:border-b-0 sm:border-r border-notebook-border">
-                          {hasValidImage ? (
-                            <>
-                              <img
-                                src={post.coverImage}
-                                alt={post.title}
-                                className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all duration-700"
-                                onError={() => handleImageError(post.id)}
-                                loading="lazy"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-notebook-bg/30 to-transparent" />
-                            </>
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-3xl">
-                              {post.emoji}
-                            </div>
-                          )}
-                        </div>
-                      </div>
+                    <div className="relative aspect-[16/10] overflow-hidden border border-notebook-border bg-notebook-surface">
+                      {hasValidImage ? (
+                        <img
+                          src={post.coverImage}
+                          width={640}
+                          height={400}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          onError={() => setImageErrors((prev) => ({ ...prev, [post.id]: true }))}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span className="absolute inset-0 flex items-center justify-center font-mono text-meta uppercase text-ink-faint">{post.category}</span>
+                      )}
+                    </div>
 
-                      {/* Content */}
-                      <div className="flex-1 p-4 sm:p-5 lg:p-6">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="font-mono text-meta text-blueprint/80 uppercase tracking-wider">
-                            {post.category}
-                          </span>
-                          <span className="font-mono text-meta text-ink-muted">{post.date}</span>
-                          <span className="font-mono text-meta text-ink-muted hidden sm:inline">· {post.readTime}</span>
-                        </div>
-
-                        <h2 className="text-body font-semibold text-ink-primary mb-2 group-hover:text-blueprint-light transition-colors duration-300">
-                          {post.title}
-                        </h2>
-
-                        <p className="text-body-sm text-ink-muted line-clamp-2 mb-3">
-                          {post.excerpt}
-                        </p>
-
-                        <div className="flex flex-wrap gap-1.5">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <span key={tag} className="font-mono text-meta px-1.5 py-0.5 border border-notebook-border text-ink-muted">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta">
+                        <span className="uppercase text-accent">{post.category}</span>
+                        <span className="text-ink-faint">{post.date}</span>
+                        <span className="text-ink-faint">{post.readTime}</span>
+                      </p>
+                      <EditorialHeading
+                        as="h2"
+                        variant="subsection"
+                        delay={80}
+                        className="mt-2 !text-body sm:!text-title !leading-tight transition-colors duration-200 group-hover:!text-accent-strong"
+                      >
+                        {post.title}
+                      </EditorialHeading>
+                      <p className="mt-2 text-small text-ink-muted line-clamp-2">{post.excerpt}</p>
+                      <ul className="mt-3 flex flex-wrap gap-1.5" aria-label="Tags">
+                        {post.tags.slice(0, 3).map((tag) => (
+                          <li key={tag} className="border border-notebook-border px-1.5 py-0.5 font-mono text-meta text-ink-muted">{tag}</li>
+                        ))}
+                      </ul>
                     </div>
                   </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </section>
     </div>
   );

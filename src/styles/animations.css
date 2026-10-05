@@ -1,151 +1,29 @@
-/* ═══════════════════════════════════════════════
-   THE PERSONAL ARCHIVE — Motion System
-   Slow. Deliberate. Like opening a document.
-   ═══════════════════════════════════════════════ */
+/* Global extras outside Tailwind. Legacy keyframes (document/page/stamp/scan,
+   grain, grid pulse, typewriter blink) were removed in Phase 7: nothing used
+   them. Selection colours live in index.css. */
 
-/* Document reveal — like placing a sheet on a desk */
-@keyframes documentReveal {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.995);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Page unfold — sections opening, slower */
-@keyframes pageUnfold {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    clip-path: inset(0 0 0% 0);
-  }
-}
-
-/* Mechanical slide — precise, no bounce */
-@keyframes mechanicalSlide {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-/* Typewriter cursor */
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-/* Subtle reveal — for marginalia */
-@keyframes marginalReveal {
-  from {
-    opacity: 0;
-    transform: translateX(-4px);
-  }
-  to {
-    opacity: 0.6;
-    transform: translateX(0);
-  }
-}
-
-/* Stamp effect — for status badges */
-@keyframes stamp {
-  0% {
-    opacity: 0;
-    transform: scale(0.85) rotate(-2deg);
-  }
-  60% {
-    transform: scale(1.02) rotate(0deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-/* Line drawing — for SVG elements */
-@keyframes lineDraw {
-  from {
-    stroke-dashoffset: 100;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Grid pulse — for background elements */
-@keyframes gridPulse {
+/* Article skeleton: a slow, quiet pulse while a post loads (a real loading
+   state). The reduced-motion safety net in index.css stills it. */
+@keyframes scanPulse {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.6; }
 }
 
-/* Breathing light — ambient pulse */
-@keyframes breathe {
-  0%, 100% { opacity: 0.015; }
-  50% { opacity: 0.03; }
-}
-
-/* Film grain drift */
-@keyframes grainDrift {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(-2%, 1%); }
-  50% { transform: translate(1%, -1%); }
-  75% { transform: translate(-1%, 2%); }
-  100% { transform: translate(0, 0); }
-}
-
-/* Scrollbar — warm tones */
+/* Scrollbar: archive tokens */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0908;
+  background: rgb(var(--archive-ground));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #36342F;
+  background: rgb(var(--archive-divider));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #6B6966;
-}
-
-/* Selection — warm amber */
-::selection {
-  background: rgba(245, 166, 35, 0.25);
-  color: #EDE8E3;
-}
-
-::-moz-selection {
-  background: rgba(245, 166, 35, 0.25);
-  color: #EDE8E3;
-}
-
-/* Scan pulse — like a scanner moving across the page */
-@keyframes scanPulse {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
-}
-
-/* Scan line sweep — for case file section */
-@keyframes scan {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(60vh); }
-}
-
-/* Apple-style smooth easing */
-.transition-document {
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgb(var(--archive-ink-faint));
 }

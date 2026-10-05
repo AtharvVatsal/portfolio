@@ -14,7 +14,13 @@ const PageTransition = ({ children }) => {
       return;
     }
 
-    // Archive page transition — slow, deliberate
+    // Short hand-off between pages: the old page fades out (160ms), the new
+    // one fades in (320ms) while its own text reveals start. No transition
+    // at all under reduced motion.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setDisplayChildren(children);
+      return undefined;
+    }
     setIsVisible(false);
 
     const timeout = setTimeout(() => {
@@ -22,7 +28,7 @@ const PageTransition = ({ children }) => {
       requestAnimationFrame(() => {
         setIsVisible(true);
       });
-    }, 350);
+    }, 160);
 
     return () => clearTimeout(timeout);
   }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -31,7 +37,7 @@ const PageTransition = ({ children }) => {
     <div
       style={{
         opacity: isVisible ? 1 : 0,
-        transition: 'opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+        transition: `opacity ${isVisible ? 320 : 160}ms cubic-bezier(0.22, 1, 0.36, 1)`,
       }}
     >
       {displayChildren}
