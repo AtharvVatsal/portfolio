@@ -16,6 +16,12 @@ const MEASURED = {
   13: [2936, 4608], 14: [4000, 6000], 15: [2296, 4080], 16: [1080, 1920],
   17: [6000, 4000], 18: [4894, 3263], 19: [4000, 6000], 20: [6000, 4000],
   21: [6000, 4000], 22: [5734, 3823],
+  // No. 023-041 measured 2026-10-06 (fl_getinfo).
+  23: [2777, 2222], 24: [5734, 3823], 25: [6048, 4032], 26: [6000, 4000],
+  27: [8256, 5504], 28: [5514, 3676], 29: [6000, 4000], 30: [5653, 3769],
+  31: [6000, 4000], 32: [5259, 3506], 33: [6000, 4000], 34: [6048, 4032],
+  35: [3335, 5003], 36: [2895, 4342], 37: [3282, 4923], 38: [4032, 6048],
+  39: [5393, 3618], 40: [6048, 4032], 41: [6048, 4032],
 };
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -57,6 +63,11 @@ const exposureOf = (s = {}) =>
 
 export const observations = galleryPhotos
   .map((p) => {
+    // The wall's column geometry is computed from these sizes, so a photograph
+    // without one is laid out as 3:2 until it is measured.
+    if (!MEASURED[p.id] && process.env.NODE_ENV !== 'production') {
+      console.warn(`observations.js: No. ${pad(p.id)} has no measured size in MEASURED (fl_getinfo on ${p.publicId}).`);
+    }
     const [width, height] = MEASURED[p.id] || [3, 2];
     return {
       ...p,

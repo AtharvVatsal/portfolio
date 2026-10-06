@@ -639,7 +639,7 @@
 
   @media (min-width: 1024px) {
     .photo-desk {
-      aspect-ratio: 3 / 2;
+      aspect-ratio: 4 / 3;
     }
 
     .photo-print {
@@ -900,7 +900,8 @@
 /* ═══════════════════════════════════════════════
    OBSERVATIONS - the photographic archive (/gallery)
    One dark wall of photographs in columns (AnimatedPhotoWall). Every
-   photograph keeps its real proportions (--r = width / height, measured):
+   photograph keeps its real proportions: the image file decides its height
+   (its width/height attributes only reserve the space until it loads), so
    no aspect boxes, no object-fit crop, no filters, no overlays, square edges.
    The wall's 3D sequence is motion's useScroll/useTransform (see
    animatedGallery.jsx); on phones alternate frames drift a few pixels with a
@@ -911,7 +912,6 @@
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--r);
     background: theme('colors.notebook.surface');
   }
 

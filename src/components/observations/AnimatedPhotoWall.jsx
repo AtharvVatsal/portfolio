@@ -84,7 +84,6 @@ const PhotoArchiveItem = ({ o, side, index, parked, eager, onOpen }) => (
     data-i={index}
     data-orient={o.orientation}
     data-side={side}
-    style={{ '--r': o.ratio }}
   >
     <button
       type="button"

@@ -17,15 +17,20 @@ const PORT = '(min-width: 1024px) 17vw, (min-width: 768px) 42vw, 56vw';
 // used only to reserve space before each image loads.
 // lg: free-form composition (% of desk) \u00B7 sm/md: loose overlapping column.
 const DESK = [
-  { id: 22, ratio: [3, 2], sizes: LAND, lg: { x: '3%', y: '5%', w: '27%', r: -3 }, md: { x: '0%', w: '58%' }, sm: { x: '0%', w: '76%', r: -2 } },
-  { id: 3, ratio: [3, 2], sizes: LAND, lg: { x: '33%', y: '1%', w: '28%', r: 2 }, md: { x: '40%', w: '58%' }, sm: { x: '24%', w: '76%', r: 1.5 } },
-  { id: 8, ratio: [2, 3], sizes: PORT, lg: { x: '63%', y: '0%', w: '17%', r: -2.5 }, md: { x: '8%', w: '42%' }, sm: { x: '6%', w: '56%', r: -1.5 } },
-  { id: 7, ratio: [800, 491], sizes: LAND, lg: { x: '77%', y: '15%', w: '21%', r: 3 }, md: { x: '38%', w: '60%' }, sm: { x: '22%', w: '78%', r: 2 } },
-  { id: 13, ratio: [800, 1256], sizes: PORT, lg: { x: '7%', y: '45%', w: '15.5%', r: 3 }, md: { x: '54%', w: '42%' }, sm: { x: '40%', w: '56%', r: 2.5 } },
-  { id: 5, ratio: [3, 2], sizes: LAND, lg: { x: '22%', y: '52%', w: '29%', r: -1.5 }, md: { x: '2%', w: '58%' }, sm: { x: '2%', w: '76%', r: -2 } },
-  { id: 14, ratio: [2, 3], sizes: PORT, lg: { x: '53%', y: '43%', w: '16%', r: 2.5 }, md: { x: '52%', w: '42%' }, sm: { x: '38%', w: '56%', r: 1.5 } },
-  { id: 10, ratio: [3, 2], sizes: LAND, lg: { x: '66%', y: '56%', w: '28%', r: -3 }, md: { x: '26%', w: '58%' }, sm: { x: '10%', w: '76%', r: -1 } },
-  { id: 11, ratio: [3, 2], sizes: LAND, lg: { x: '38%', y: '35%', w: '26%', r: 1 }, md: { x: '4%', w: '58%' }, sm: { x: '24%', w: '76%', r: 1 } },
+  // Bottom row.
+  { id: 32, ratio: [3, 2], sizes: LAND, lg: { x: '8%', y: '64.7%', w: '27%', r: -1.5 }, md: { x: '0%', w: '58%' }, sm: { x: '0%', w: '76%', r: -2 } },
+  { id: 24, ratio: [3, 2], sizes: LAND, lg: { x: '38%', y: '68%', w: '28%', r: 2.5 }, md: { x: '40%', w: '58%' }, sm: { x: '24%', w: '76%', r: 1.5 } },
+  { id: 39, ratio: [800, 537], sizes: LAND, lg: { x: '69%', y: '65.3%', w: '27%', r: -2 }, md: { x: '4%', w: '58%' }, sm: { x: '2%', w: '76%', r: -1.5 } },
+  // Middle row.
+  { id: 11, ratio: [3, 2], sizes: LAND, lg: { x: '3%', y: '32.7%', w: '25%', r: 1.5 }, md: { x: '38%', w: '58%' }, sm: { x: '22%', w: '76%', r: 2 } },
+  { id: 14, ratio: [2, 3], sizes: PORT, lg: { x: '30%', y: '34.7%', w: '14%', r: -2.5 }, md: { x: '8%', w: '42%' }, sm: { x: '6%', w: '56%', r: -1.5 } },
+  { id: 5, ratio: [3, 2], sizes: LAND, lg: { x: '46%', y: '36.7%', w: '25%', r: 2 }, md: { x: '40%', w: '58%' }, sm: { x: '24%', w: '76%', r: 1.5 } },
+  { id: 10, ratio: [3, 2], sizes: LAND, lg: { x: '72.5%', y: '33.3%', w: '25%', r: -2 }, md: { x: '2%', w: '58%' }, sm: { x: '2%', w: '76%', r: -2 } },
+  // Top row.
+  { id: 3, ratio: [3, 2], sizes: LAND, lg: { x: '2%', y: '3.3%', w: '27%', r: -2.5 }, md: { x: '40%', w: '58%' }, sm: { x: '24%', w: '76%', r: 1 } },
+  { id: 8, ratio: [2, 3], sizes: PORT, lg: { x: '32%', y: '0%', w: '15%', r: 2 }, md: { x: '8%', w: '42%' }, sm: { x: '6%', w: '56%', r: -1.5 } },
+  { id: 41, ratio: [3, 2], sizes: LAND, lg: { x: '50%', y: '5.3%', w: '27%', r: -1.5 }, md: { x: '38%', w: '60%' }, sm: { x: '22%', w: '78%', r: 2 } },
+  { id: 13, ratio: [800, 1256], sizes: PORT, lg: { x: '81%', y: '1.6%', w: '15%', r: 3 }, md: { x: '6%', w: '42%' }, sm: { x: '4%', w: '56%', r: -2 } },
 ];
 
 const PRINTS = DESK
