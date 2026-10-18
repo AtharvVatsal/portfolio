@@ -143,9 +143,11 @@ const BlogPage = () => {
                     </div>
 
                     <div className="min-w-0">
-                      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta">
+                      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-meta">
                         <span className="uppercase text-accent">{post.category}</span>
+                        <span aria-hidden="true" className="text-ink-faint">·</span>
                         <span className="text-ink-faint">{post.date}</span>
+                        <span aria-hidden="true" className="text-ink-faint">·</span>
                         <span className="text-ink-faint">{post.readTime}</span>
                       </p>
                       <EditorialHeading

@@ -125,12 +125,16 @@ const BlogPostPage = () => {
 
       <header className="archive-container pt-10 sm:pt-14">
         <div className="max-w-3xl">
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-meta">
             <span className="uppercase text-accent">{post.category}</span>
+            <span aria-hidden="true" className="text-ink-faint">·</span>
             <span className="text-ink-faint"><time dateTime={parseDate(post.date)}>{post.date}</time></span>
+            <span aria-hidden="true" className="text-ink-faint">·</span>
             <span className="text-ink-faint">{post.readTime}</span>
+            <span aria-hidden="true" className="text-ink-faint">·</span>
             <span className="text-ink-faint">Entry {currentIndex + 1} of {blogPosts.length}</span>
             {/* Space is held from first paint so the count arriving shifts nothing. */}
+            <span aria-hidden="true" className={readCount === null ? 'invisible' : 'text-ink-faint'}>·</span>
             {readCount === null ? (
               <span aria-hidden="true" className="invisible">0 reads</span>
             ) : (
@@ -208,8 +212,9 @@ const BlogPostPage = () => {
                   <li key={related.id}>
                     <Link to={`/blog/${related.slug}`} className={tailLink}>
                       <GlowBorder />
-                      <p className="flex flex-wrap gap-x-3 font-mono text-meta">
+                      <p className="flex flex-wrap gap-x-2 font-mono text-meta">
                         <span className="uppercase text-accent">{related.category}</span>
+                        <span aria-hidden="true" className="text-ink-faint">·</span>
                         <span className="text-ink-faint">{related.readTime}</span>
                       </p>
                       <p className="mt-2 font-editorial text-body text-ink-primary leading-snug transition-colors duration-200 group-hover:text-accent-strong">{related.title}</p>

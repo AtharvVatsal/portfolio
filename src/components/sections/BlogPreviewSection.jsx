@@ -31,9 +31,11 @@ const NoteCard = ({ post }) => (
       )}
 
       <div className="flex-1 p-5 sm:p-6 lg:p-7">
-        <p className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-meta">
+        <p className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-meta">
           <span className="uppercase text-accent">{post.category}</span>
+          <span aria-hidden="true" className="text-ink-faint">·</span>
           <span className="text-ink-faint">{post.date}</span>
+          <span aria-hidden="true" className="text-ink-faint">·</span>
           <span className="text-ink-faint">{post.readTime}</span>
         </p>
 
