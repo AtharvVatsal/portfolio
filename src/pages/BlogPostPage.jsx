@@ -8,6 +8,7 @@ import { ArticleSkeleton } from '../components/common/Skeleton';
 import PageHeader from '../components/layout/PageHeader';
 import { GlowBorder } from '../components/ui/spotlight-card';
 import { TextAnimate } from '../components/ui/text-animate';
+import { useViewCount } from '../hooks';
 
 // A field note, inside the archive shell: trail, record line, title and
 // excerpt, then the cover (shown as it is: no darkening, nothing printed on
@@ -34,6 +35,7 @@ const BlogPostPage = () => {
   const post = blogPosts[currentIndex];
   const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
+  const readCount = useViewCount(post?.slug);
 
   const relatedPosts = post
     ? blogPosts
@@ -128,6 +130,14 @@ const BlogPostPage = () => {
             <span className="text-ink-faint"><time dateTime={parseDate(post.date)}>{post.date}</time></span>
             <span className="text-ink-faint">{post.readTime}</span>
             <span className="text-ink-faint">Entry {currentIndex + 1} of {blogPosts.length}</span>
+            {/* Space is held from first paint so the count arriving shifts nothing. */}
+            {readCount === null ? (
+              <span aria-hidden="true" className="invisible">0 reads</span>
+            ) : (
+              <span className="text-ink-faint">
+                {readCount.toLocaleString('en-US')} {readCount === 1 ? 'read' : 'reads'}
+              </span>
+            )}
           </p>
           <EditorialHeading as="h1" variant="page" reveal="lines" delay={80} className="mt-5">
             {post.title}
