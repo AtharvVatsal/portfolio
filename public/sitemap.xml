@@ -69,6 +69,11 @@
 
   <!-- Blog Posts -->
   <url>
+    <loc>https://atharvvatsal.com/blog/the-last-person-who-understands-everything</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://atharvvatsal.com/blog/autoFill</loc>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>

@@ -139,6 +139,7 @@ const BlogPage = () => {
                           height={400}
                           alt=""
                           className="h-full w-full object-cover"
+                          style={{ objectPosition: post.coverPosition }}
                           onError={() => setImageErrors((prev) => ({ ...prev, [post.id]: true }))}
                           loading="lazy"
                         />

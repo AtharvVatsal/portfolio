@@ -1,5 +1,23 @@
 export const blogPosts = [
   {
+    id: 9,
+    title: "The Last Person Who Understands Everything",
+    slug: "the-last-person-who-understands-everything",
+    excerpt: "Will humanity ever know more than any human can understand? On knowledge, complexity, science, and the strange world we are building with artificial intelligence.",
+    coverImage: "/blog/lastPerson/lastPerson.jpg",
+    // Optional: which part of the cover stays in view when it is cropped (CSS
+    // object-position). The figure stands at the bottom edge of this cover.
+    coverPosition: "center bottom",
+    // TODO (owner): record where the cover comes from once it is added, like the other entries.
+    coverSource: "To be recorded by the owner when the cover is added",
+    markdownFile: "/blog/posts/lastPerson.md",
+    category: "Thoughts",
+    date: "18-10-2026",
+    readTime: "11 min read",
+    emoji: "📚",
+    tags: ["Artificial Intelligence", "Philosophy", "Science", "Complexity", "Interpretability", "Education"],
+  },
+  {
   id: 1,
   title: "From Pixels to Meaning: How Machines Actually \"See\" Images",
   slug: "from-pixels-to-meaning",

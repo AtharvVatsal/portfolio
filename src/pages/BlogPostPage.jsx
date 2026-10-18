@@ -155,6 +155,7 @@ const BlogPostPage = () => {
               height={600}
               alt=""
               className="block aspect-[12/5] w-full object-cover"
+              style={{ objectPosition: post.coverPosition }}
               onError={() => setImageError(true)}
             />
           </div>

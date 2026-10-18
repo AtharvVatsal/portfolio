@@ -28,6 +28,7 @@ const NoteCard = ({ post, readCount }) => (
             height={400}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: post.coverPosition }}
             loading="lazy"
           />
         </div>
