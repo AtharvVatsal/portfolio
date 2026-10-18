@@ -7,11 +7,15 @@ import { pageHeaders } from '../data/archiveMeta';
 import PageHeader from '../components/layout/PageHeader';
 import { GlowBorder } from '../components/ui/spotlight-card';
 import { TextAnimate } from '../components/ui/text-animate';
+import ReadCount from '../components/blog/ReadCount';
+import { useViewCounts } from '../hooks';
 
 // Field Notes: the writing index. Filters are the categories the entries
 // actually carry (with counts), plus one "All"; search filters as you type.
+// Read counts are fetched once for every entry, so filtering refetches nothing.
 
 const ALL = 'All';
+const allSlugs = blogPosts.map((post) => post.slug);
 
 const categories = Object.entries(
   blogPosts.reduce((acc, p) => ({ ...acc, [p.category]: (acc[p.category] || 0) + 1 }), {})
@@ -27,6 +31,7 @@ const BlogPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(ALL);
   const [query, setQuery] = useState('');
   const [imageErrors, setImageErrors] = useState({});
+  const readCounts = useViewCounts(allSlugs);
   const header = pageHeaders.blog;
 
   const filteredPosts = useMemo(() => {
@@ -149,6 +154,7 @@ const BlogPage = () => {
                         <span className="text-ink-faint">{post.date}</span>
                         <span aria-hidden="true" className="text-ink-faint">·</span>
                         <span className="text-ink-faint">{post.readTime}</span>
+                        <ReadCount count={readCounts[post.slug]} />
                       </p>
                       <EditorialHeading
                         as="h2"

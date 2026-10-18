@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 
-// A field note's read count, from the counter at /api/views (api/views.js).
-// The count is fetched on arrival; the read itself is recorded only after the
-// note has been open and visible for DWELL_MS, once per tab session. The
-// server also deduplicates per visitor per 24 hours and ignores bots.
-// Returns null until a count is known, and stays null if the counter is
-// missing or unreachable (e.g. under `npm start`, which has no /api), so the
-// caller can simply hide it.
+// Field-note read counts, from the counter at /api/views (api/views.js).
+//
+// useViewCount(slug), for the note being read: the count is fetched on
+// arrival; the read itself is recorded only after the note has been open and
+// visible for DWELL_MS, once per tab session. The server also deduplicates per
+// visitor per 24 hours and ignores bots. Returns null until a count is known.
+//
+// useViewCounts(slugs), for lists: one request for every count, recording
+// nothing. Returns { slug: count }, empty until the counts arrive.
+//
+// Both stay empty if the counter is missing or unreachable (e.g. under
+// `npm start`, which has no /api), so callers can simply hide the count.
 
 const ENDPOINT = '/api/views';
 const DWELL_MS = 5000;
@@ -15,6 +20,26 @@ const SENT_KEY = 'fieldNoteRead:';
 const readJson = (res) => {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
+};
+
+const fetchCounts = (slugs) => fetch(`${ENDPOINT}?slugs=${slugs.map(encodeURIComponent).join(',')}`)
+  .then(readJson)
+  .then((data) => data.counts || {});
+
+export const useViewCounts = (slugs) => {
+  const key = slugs.join(',');
+  const [counts, setCounts] = useState({});
+
+  useEffect(() => {
+    if (!key) return undefined;
+    let cancelled = false;
+    fetchCounts(key.split(','))
+      .then((result) => { if (!cancelled) setCounts(result); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [key]);
+
+  return counts;
 };
 
 export const useViewCount = (slug) => {
@@ -32,9 +57,8 @@ export const useViewCount = (slug) => {
       setCount((prev) => (prev === null ? n : Math.max(prev, n)));
     };
 
-    fetch(`${ENDPOINT}?slugs=${encodeURIComponent(slug)}`)
-      .then(readJson)
-      .then((data) => show(data.counts?.[slug]))
+    fetchCounts([slug])
+      .then((counts) => show(counts[slug]))
       .catch(() => {});
 
     let alreadySent = false;

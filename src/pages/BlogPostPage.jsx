@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { blogPosts } from '../data';
 import { SEO, EditorialHeading } from '../components/common';
 import { MarkdownRenderer, extractHeadings, TableOfContents } from '../components/blog';
+import ReadCount from '../components/blog/ReadCount';
 import { ArticleSkeleton } from '../components/common/Skeleton';
 import PageHeader from '../components/layout/PageHeader';
 import { GlowBorder } from '../components/ui/spotlight-card';
@@ -133,15 +134,7 @@ const BlogPostPage = () => {
             <span className="text-ink-faint">{post.readTime}</span>
             <span aria-hidden="true" className="text-ink-faint">·</span>
             <span className="text-ink-faint">Entry {currentIndex + 1} of {blogPosts.length}</span>
-            {/* Space is held from first paint so the count arriving shifts nothing. */}
-            <span aria-hidden="true" className={readCount === null ? 'invisible' : 'text-ink-faint'}>·</span>
-            {readCount === null ? (
-              <span aria-hidden="true" className="invisible">0 reads</span>
-            ) : (
-              <span className="text-ink-faint">
-                {readCount.toLocaleString('en-US')} {readCount === 1 ? 'read' : 'reads'}
-              </span>
-            )}
+            <ReadCount count={readCount} />
           </p>
           <EditorialHeading as="h1" variant="page" reveal="lines" delay={80} className="mt-5">
             {post.title}

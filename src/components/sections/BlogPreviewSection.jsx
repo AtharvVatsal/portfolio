@@ -5,12 +5,15 @@ import EditorialHeading from '../common/EditorialHeading';
 import SectionHeading from '../common/SectionHeading';
 import { GlowBorder } from '../ui/spotlight-card';
 import { TextAnimate } from '../ui/text-animate';
+import ReadCount from '../blog/ReadCount';
+import { useViewCounts } from '../../hooks';
 
 const latest = blogPosts.slice(0, 3);
+const latestSlugs = latest.map((post) => post.slug);
 
 // Static cards (a repeated pattern). Hover and keyboard focus share one state: the border and title warm; the
 // cover stays as it is (no zoom, no grey-out).
-const NoteCard = ({ post }) => (
+const NoteCard = ({ post, readCount }) => (
   <li>
     <Link
       to={`/blog/${post.slug}`}
@@ -37,6 +40,7 @@ const NoteCard = ({ post }) => (
           <span className="text-ink-faint">{post.date}</span>
           <span aria-hidden="true" className="text-ink-faint">·</span>
           <span className="text-ink-faint">{post.readTime}</span>
+          <ReadCount count={readCount} />
         </p>
 
         <EditorialHeading
@@ -67,36 +71,39 @@ const NoteCard = ({ post }) => (
   </li>
 );
 
-const BlogPreviewSection = () => (
-  <section
-    id="blog"
-    aria-labelledby="blog-title"
-    className="relative pt-12 sm:pt-16 lg:pt-20 overflow-hidden"
-  >
-    <div className="archive-container relative z-10">
-      <SectionHeading number="04" id="blog-title" className="mb-8" reveal="lines">Field Notes</SectionHeading>
+const BlogPreviewSection = () => {
+  const readCounts = useViewCounts(latestSlugs);
+  return (
+    <section
+      id="blog"
+      aria-labelledby="blog-title"
+      className="relative pt-12 sm:pt-16 lg:pt-20 overflow-hidden"
+    >
+      <div className="archive-container relative z-10">
+        <SectionHeading number="04" id="blog-title" className="mb-8" reveal="lines">Field Notes</SectionHeading>
 
-      <ul className="space-y-5">
-        {latest.map((post) => (
-          <NoteCard key={post.id} post={post} />
-        ))}
-      </ul>
+        <ul className="space-y-5">
+          {latest.map((post) => (
+            <NoteCard key={post.id} post={post} readCount={readCounts[post.slug]} />
+          ))}
+        </ul>
 
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-notebook-border pt-6">
-        <span className="font-mono text-meta text-ink-faint">
-          {blogPosts.length - latest.length} more archived
-        </span>
-        <Link
-          to="/blog"
-          className="arrow-link inline-flex min-h-11 items-center gap-2 text-small text-ink-primary underline decoration-notebook-border-light underline-offset-4 transition-colors duration-200 hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-        >
-          Browse archive <span aria-hidden="true" className="arrow">→</span>
-        </Link>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-notebook-border pt-6">
+          <span className="font-mono text-meta text-ink-faint">
+            {blogPosts.length - latest.length} more archived
+          </span>
+          <Link
+            to="/blog"
+            className="arrow-link inline-flex min-h-11 items-center gap-2 text-small text-ink-primary underline decoration-notebook-border-light underline-offset-4 transition-colors duration-200 hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+          >
+            Browse archive <span aria-hidden="true" className="arrow">→</span>
+          </Link>
+        </div>
       </div>
-    </div>
 
-    <div aria-hidden="true" className="py-5 sm:py-6" />
-  </section>
-);
+      <div aria-hidden="true" className="py-5 sm:py-6" />
+    </section>
+  );
+};
 
 export default BlogPreviewSection;

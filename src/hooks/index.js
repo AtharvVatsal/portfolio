@@ -1,2 +1,2 @@
 export { useAnalytics } from './useAnalytics';
-export { useViewCount } from './useViewCount';
+export { useViewCount, useViewCounts } from './useViewCount';
