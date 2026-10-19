@@ -86,8 +86,8 @@ const AboutSection = () => {
                   <div className="relative overflow-hidden">
                     <img
                       src="/avPhoto.webp"
-                      width={3000}
-                      height={2000}
+                      width={1301}
+                      height={883}
                       loading="lazy"
                       decoding="async"
                       alt="Atharv Vatsal"
