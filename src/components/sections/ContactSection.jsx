@@ -43,8 +43,7 @@ const ContactSection = () => {
     finally { setSubmitting(false); }
   };
 
-  // Handles are read from the links themselves (config/links.js), so the
-  // label shown always matches the profile it opens.
+  // Handles are read from the links themselves (config/links.js), so the label shown always matches the profile it opens.
   const socialLinks = [
     { icon: Github, url: SOCIAL_LINKS.github, label: 'GitHub', handle: `@${handleOf(SOCIAL_LINKS.github)}` },
     { icon: Linkedin, url: SOCIAL_LINKS.linkedin, label: 'LinkedIn', handle: handleOf(SOCIAL_LINKS.linkedin) },

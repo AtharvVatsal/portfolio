@@ -84,6 +84,7 @@ const PhotoArchiveItem = ({ o, side, index, parked, eager, onOpen }) => (
     data-i={index}
     data-orient={o.orientation}
     data-side={side}
+    style={{ '--r': o.ratio }}
   >
     <button
       type="button"
@@ -254,8 +255,7 @@ const AnimatedPhotoWall = ({ items, onOpen }) => {
     );
   }
 
-  // Static (reduced motion, a short selection, or before the first measure)
-  // and the phone stream: the same columns in normal flow.
+  // Static (reduced motion, a short selection, or before the first measure) and the phone stream: the same columns in normal flow.
   const mode = cols === 1 ? (reduce ? 'static' : 'stream') : 'static';
   return (
     <div ref={rootRef} className="obs-wall" data-mode={mode} data-cols={cols}>
