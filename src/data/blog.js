@@ -4,7 +4,7 @@ export const blogPosts = [
     title: "Your Camera Doesn't Capture Reality",
     slug: "your-camera-doesnt-capture-reality",
     excerpt: "The fascinating science behind how a little piece of glass and silicon turns light into something we call a photograph.",
-    coverImage: "/blog/camera/cover.jpg",
+    coverImage: "/blog/camera/cover.png",
     coverSource: "Google Images search for 'Dark Side of The Moon Pink Floyd' (2026-10-05); licence terms not verified, so no credit or licence is claimed",
     markdownFile: "/blog/posts/cameraReality.md",
     category: "Photography",
