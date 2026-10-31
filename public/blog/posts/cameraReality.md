@@ -316,3 +316,5 @@ A few interesting resources for anyone who wants to go deeper:
 - [High Dynamic Range Imaging – OpenCV](https://docs.opencv.org/4.x/d3/db7/tutorial_hdr_imaging.html)
 
 *Photography is a science, an art, and perhaps a little bit of interpretation. Keep looking.*
+
+<small><em>Image Disclaimer: Some images used in this article were AI-generated, while others were found through Google Images and are used for illustrative purposes. I do not claim ownership of these images or their copyrights. All rights remain with their respective creators and copyright holders. For attribution or removal requests, please get in touch.</em></small>

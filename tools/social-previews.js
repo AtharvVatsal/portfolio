@@ -1,19 +1,26 @@
-// Link previews for field notes (runs after `react-scripts build`; see the
-// "build" script in package.json).
+// Link previews (runs after `react-scripts build`; see the "build" script in
+// package.json).
 //
 // WhatsApp, Facebook, LinkedIn, X, Slack, Discord and the like read a page's
 // <meta> tags without running JavaScript, so the tags <SEO> sets in the browser
-// never reach them: every URL would show build/index.html's site-wide card.
-// This writes build/blog/<slug>/index.html for every note in src/data/blog.js:
-// the same app shell (the page boots exactly as before), with the note's title,
-// excerpt, date and cover in its tags. The host serves that file for
-// /blog/<slug> ahead of its fallback to index.html.
+// never reach them: they see only the HTML file the host serves. This sets the
+// cards in those files:
 //
-// Each cover is cropped to 1200 × 630 (the 1.91:1 card every platform uses,
-// following the note's coverPosition) and saved as a JPEG under 300 KB
-// (WhatsApp drops larger previews) at build/og/blog/<slug>-<hash>.jpg. The hash
-// changes with the cover, so a replaced cover is fetched afresh rather than
-// served from a platform's cache. A note without a cover keeps the site card.
+// - every route: build/index.html carries the site card, public/og-photo.webp
+//   (as a JPEG: not every platform takes WebP). The host serves this file for
+//   any path that has no file of its own.
+// - /gallery: build/gallery/index.html carries the featured photograph, the
+//   first record marked `featured: true` in src/data/gallery.js (also the home
+//   hero), cropped by Cloudinary.
+// - /blog/<slug>: build/blog/<slug>/index.html for every note in
+//   src/data/blog.js carries its title, excerpt, date and cover. A note without
+//   a cover keeps the site card.
+//
+// Each of these files is the same app shell; the page boots exactly as before.
+// Local images are cropped to 1200 × 630 (the 1.91:1 card every platform uses)
+// as JPEGs under 300 KB (WhatsApp drops larger previews) in build/og/, named
+// with a hash of their source, so a replaced image is fetched afresh rather
+// than served from a platform's cache.
 //
 // Nothing to do per note: add it to blog.js with a coverImage and the next
 // build makes its preview.
@@ -26,6 +33,13 @@ const crypto = require('crypto');
 // www, and preview crawlers should not have to follow a redirect for the image.
 const ORIGIN = 'https://www.atharvvatsal.com';
 const SITE_NAME = 'Atharv Vatsal';
+const SITE_IMAGE = '/og-photo.webp';
+const CLOUDINARY = 'https://res.cloudinary.com/dg5o8qvwp/image/upload'; // src/config/cloudinary.js
+// The gallery's title and description, as GalleryPage.jsx's <SEO> sets them.
+const GALLERY = {
+  title: 'Observations',
+  description: 'Observation log by Atharv Vatsal — landscapes, wildlife, concerts, street photography.',
+};
 const CARD = { width: 1200, height: 630 };
 const MAX_BYTES = 300 * 1024;
 
@@ -36,13 +50,18 @@ const PUBLIC = path.join(ROOT, 'public');
 const escapeAttr = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-// blog.js is an ES module with no imports: load it as one, without a bundler.
-async function loadPosts() {
-  const source = fs.readFileSync(path.join(ROOT, 'src/data/blog.js'), 'utf8');
-  const mod = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
-  if (!Array.isArray(mod.blogPosts)) throw new Error('src/data/blog.js does not export blogPosts');
-  return mod.blogPosts;
+// The data files are ES modules: load one as a data: URL, with its relative
+// imports (other data and config files) loaded the same way. No bundler needed.
+function moduleUrl(file) {
+  const source = fs.readFileSync(file, 'utf8').replace(/from\s+(['"])(\.{1,2}\/[^'"]+)\1/g, (_, q, spec) => {
+    const base = path.resolve(path.dirname(file), spec);
+    const target = [base, `${base}.js`, path.join(base, 'index.js')].find((f) => fs.existsSync(f) && fs.statSync(f).isFile());
+    if (!target) throw new Error(`${path.relative(ROOT, file)}: cannot resolve ${spec}`);
+    return `from ${q}${moduleUrl(target)}${q}`;
+  });
+  return `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`;
 }
+const loadModule = (rel) => import(moduleUrl(path.join(ROOT, rel)));
 
 // Replace a <meta> tag (matched by its property or name), or add it before </head>.
 function setMeta(html, key, content) {
@@ -54,6 +73,49 @@ function setMeta(html, key, content) {
 
 function removeMeta(html, key) {
   return html.replace(new RegExp(`<meta[^>]*\\b(?:property|name)="${key}"[^>]*>`, 'g'), '');
+}
+
+function setPage(html, { title, description, type, url }) {
+  let out = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeAttr(title === SITE_NAME ? title : `${title} | ${SITE_NAME}`)}</title>`);
+  out = setMeta(out, 'description', description);
+  out = setMeta(out, 'og:type', type);
+  out = setMeta(out, 'og:title', title);
+  out = setMeta(out, 'og:description', description);
+  out = setMeta(out, 'og:url', url);
+  out = setMeta(out, 'twitter:title', title);
+  out = setMeta(out, 'twitter:description', description);
+  return out;
+}
+
+function setImage(html, card, alt) {
+  let out = setMeta(html, 'og:image', card.url);
+  out = setMeta(out, 'twitter:image', card.url);
+  out = setMeta(out, 'og:image:alt', alt);
+  out = setMeta(out, 'twitter:image:alt', alt);
+  if (card.width) {
+    out = setMeta(out, 'og:image:type', 'image/jpeg');
+    out = setMeta(out, 'og:image:width', String(card.width));
+    out = setMeta(out, 'og:image:height', String(card.height));
+  } else {
+    // An unprocessed original: its size and type are not known here, so claim none.
+    out = removeMeta(out, 'og:image:type');
+    out = removeMeta(out, 'og:image:width');
+    out = removeMeta(out, 'og:image:height');
+  }
+  return out;
+}
+
+// Write build/<route>/index.html, unless a folder copied from public/ is
+// already there (the route would shadow its files).
+function writePage(route, html) {
+  const dir = path.join(BUILD, route);
+  if (fs.existsSync(dir) && !fs.existsSync(path.join(dir, 'index.html'))) {
+    console.warn(`  ! /${route}: build/${route}/ already exists (from public/), skipped`);
+    return false;
+  }
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'index.html'), html);
+  return true;
 }
 
 // CSS object-position keywords ("center bottom") -> a sharp crop position.
@@ -74,20 +136,18 @@ let sharp = null;
 try {
   sharp = require('sharp');
 } catch {
-  // Without sharp the original cover is used as is (still a valid preview).
+  // Without sharp the original image is used as is (still a valid preview).
 }
 
-async function makeCard(post) {
-  const file = path.join(PUBLIC, decodeURI(post.coverImage));
-  if (!fs.existsSync(file)) {
-    console.warn(`  ! ${post.slug}: cover ${post.coverImage} is not in public/, so the site card is used`);
-    return null;
-  }
-  if (!sharp) return { url: `${ORIGIN}${encodeURI(decodeURI(post.coverImage))}` };
+// A public/ image -> a 1200 × 630 JPEG card in build/og/<folder>/.
+async function makeCard(publicPath, folder, name, cssPosition) {
+  const file = path.join(PUBLIC, decodeURI(publicPath));
+  if (!fs.existsSync(file)) return null;
+  if (!sharp) return { url: `${ORIGIN}${encodeURI(decodeURI(publicPath))}` };
 
-  const position = cropPosition(post.coverPosition);
+  const position = cropPosition(cssPosition);
   const hash = crypto.createHash('sha256').update(fs.readFileSync(file)).update(position).digest('hex').slice(0, 10);
-  const name = `${post.slug}-${hash}.jpg`;
+  const fileName = `${name}-${hash}.jpg`;
   let data;
   for (const quality of [82, 74, 66, 58]) {
     data = await sharp(file)
@@ -98,67 +158,60 @@ async function makeCard(post) {
       .toBuffer();
     if (data.length <= MAX_BYTES) break;
   }
-  const dir = path.join(BUILD, 'og', 'blog');
+  const dir = path.join(BUILD, 'og', folder);
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, name), data);
+  fs.writeFileSync(path.join(dir, fileName), data);
   const { width } = await sharp(file).metadata();
-  return { url: `${ORIGIN}/og/blog/${name}`, ...CARD, type: 'image/jpeg', bytes: data.length, upscaled: width < CARD.width };
+  return { url: `${ORIGIN}/og/${folder}/${fileName}`, ...CARD, bytes: data.length, upscaled: width < CARD.width };
 }
+
+const describe = (card) =>
+  card.bytes
+    ? `${Math.round(card.bytes / 1024)} KB${card.upscaled ? ' (source narrower than 1200px, enlarged)' : ''}`
+    : 'original image';
 
 async function main() {
   const shellPath = path.join(BUILD, 'index.html');
   if (!fs.existsSync(shellPath)) throw new Error('build/index.html not found: run react-scripts build first');
-  const shell = fs.readFileSync(shellPath, 'utf8');
-  const posts = await loadPosts();
-  if (!sharp) console.warn('  ! sharp is not installed: covers are used uncropped');
+  if (!sharp) console.warn('  ! sharp is not installed: images are used uncropped');
+  console.log('Link previews');
 
-  console.log(`Link previews for ${posts.length} field notes`);
-  for (const post of posts) {
-    const outDir = path.join(BUILD, 'blog', post.slug);
-    if (fs.existsSync(outDir) && !fs.existsSync(path.join(outDir, 'index.html'))) {
-      // A folder of the same name came from public/blog/: don't shadow its files' route.
-      console.warn(`  ! ${post.slug}: build/blog/${post.slug}/ already exists (from public/), skipped`);
-      continue;
-    }
+  // 1. The site card, on build/index.html: every route without a page of its own.
+  const siteCard = await makeCard(SITE_IMAGE, 'site', 'atharv-vatsal');
+  if (!siteCard) throw new Error(`public${SITE_IMAGE} not found`);
+  const shell = setImage(fs.readFileSync(shellPath, 'utf8'), siteCard, `${SITE_NAME}: personal archive`);
+  fs.writeFileSync(shellPath, shell);
+  console.log(`  every route  site card, ${describe(siteCard)}`);
 
-    const url = `${ORIGIN}/blog/${post.slug}`;
-    const title = `${post.title} | ${SITE_NAME}`;
-    let html = shell.replace(/<title>[^<]*<\/title>/, `<title>${escapeAttr(title)}</title>`);
-    html = setMeta(html, 'description', post.excerpt);
-    html = setMeta(html, 'og:type', 'article');
-    html = setMeta(html, 'og:title', post.title);
-    html = setMeta(html, 'og:description', post.excerpt);
-    html = setMeta(html, 'og:url', url);
-    html = setMeta(html, 'twitter:title', post.title);
-    html = setMeta(html, 'twitter:description', post.excerpt);
+  // 2. The gallery: its featured photograph.
+  const { galleryPhotos } = await loadModule('src/data/gallery.js');
+  const featured = galleryPhotos.find((p) => p.featured) || galleryPhotos[0];
+  let html = setPage(shell, { ...GALLERY, type: 'website', url: `${ORIGIN}/gallery` });
+  if (featured) {
+    html = setImage(
+      html,
+      { url: `${CLOUDINARY}/w_${CARD.width},h_${CARD.height},c_fill,g_auto,q_auto:good,f_jpg/${featured.publicId}`, ...CARD },
+      `${featured.title}, photographed by ${SITE_NAME}${featured.location ? ` in ${featured.location}` : ''}`,
+    );
+  }
+  if (writePage('gallery', html)) console.log(`  /gallery  ${featured ? `“${featured.title}” (Cloudinary)` : 'site card'}`);
+
+  // 3. Field notes: their covers.
+  const { blogPosts } = await loadModule('src/data/blog.js');
+  for (const post of blogPosts) {
+    let page = setPage(shell, { title: post.title, description: post.excerpt, type: 'article', url: `${ORIGIN}/blog/${post.slug}` });
     const published = isoDate(post.date);
-    if (published) html = setMeta(html, 'article:published_time', published);
+    if (published) page = setMeta(page, 'article:published_time', published);
 
-    const card = post.coverImage ? await makeCard(post) : null;
-    if (card) {
-      html = setMeta(html, 'og:image', card.url);
-      html = setMeta(html, 'twitter:image', card.url);
-      html = setMeta(html, 'og:image:alt', `Cover of the field note “${post.title}”`);
-      html = setMeta(html, 'twitter:image:alt', `Cover of the field note “${post.title}”`);
-      if (card.width) {
-        html = setMeta(html, 'og:image:type', card.type);
-        html = setMeta(html, 'og:image:width', String(card.width));
-        html = setMeta(html, 'og:image:height', String(card.height));
-      } else {
-        // Uncropped original: its size is unknown here, so claim none.
-        html = removeMeta(html, 'og:image:width');
-        html = removeMeta(html, 'og:image:height');
-      }
+    let card = null;
+    if (post.coverImage) {
+      card = await makeCard(post.coverImage, 'blog', post.slug, post.coverPosition);
+      if (!card) console.warn(`  ! ${post.slug}: cover ${post.coverImage} is not in public/, so the site card is used`);
     }
-
-    fs.mkdirSync(outDir, { recursive: true });
-    fs.writeFileSync(path.join(outDir, 'index.html'), html);
-    const note = !post.coverImage
-      ? 'no cover, site card'
-      : card?.bytes
-        ? `${Math.round(card.bytes / 1024)} KB${card.upscaled ? ' (cover narrower than 1200px, enlarged)' : ''}`
-        : card ? 'original cover' : 'site card';
-    console.log(`  /blog/${post.slug}  ${note}`);
+    if (card) page = setImage(page, card, `Cover of the field note “${post.title}”`);
+    if (writePage(path.join('blog', post.slug), page)) {
+      console.log(`  /blog/${post.slug}  ${card ? describe(card) : 'site card (no cover)'}`);
+    }
   }
 }
 
