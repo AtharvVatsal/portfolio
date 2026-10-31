@@ -1001,6 +1001,23 @@
 }
 
 /* ═══════════════════════════════════════════════
+   MARKDOWN MATHS - a display formula wider than the column (on a phone)
+   scrolls sideways inside its own box instead of widening the page.
+   MarkdownRenderer makes only an overflowing formula a focusable, named
+   region, so the keyboard can scroll it too.
+   ═══════════════════════════════════════════════ */
+.markdown-content .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-block: 0.25em;
+}
+
+.markdown-content .katex-display:focus-visible {
+  outline: 2px solid rgb(var(--archive-focus));
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════
    MARKDOWN LISTS - list items are flex rows with a glyph; ordered
    lists swap the glyph for a real counter so steps keep their numbers.
    ═══════════════════════════════════════════════ */

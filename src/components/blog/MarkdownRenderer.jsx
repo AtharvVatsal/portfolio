@@ -111,32 +111,63 @@ const CodeBlock = ({ children, className }) => {
 // rules, and returns what the page renders:
 //   - a leading "# Title" is dropped: the page's own <h1> is the title, so it
 //     is never set twice or listed in the contents;
-//   - a leading italic-only line becomes the note's dek (its subtitle), set in
-//     one style above the contents - unless it only repeats the header's
-//     metadata ("12 min read · …"), which is dropped;
+//   - the note's subtitle becomes its dek, set in one style above the
+//     contents: an italic-only line, or a "###" heading, directly under the
+//     title (a "###" before any section can only be a subtitle);
+//   - an italic line there that only repeats the header's metadata
+//     ("12 min read · …", "Estimated reading time: …") is dropped;
 //   - the rule that opens the article, and any rule written just before a
-//     heading, are dropped: every "##" section opens with the same hairline.
-// Rules elsewhere (e.g. before a closing note) stay as written.
+//     "#" or "##" section, are dropped: those sections open with the same
+//     hairline. Rules elsewhere (before a "###", a closing note) stay.
+//   - TeX's \[ … \] and \( … \) are read as $$ … $$ and $ … $ (remark-math
+//     knows only the dollar forms), outside code blocks.
 const RULE = /^ {0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/;
-const HEADING = /^ {0,3}#{1,6}\s/;
+const SECTION = /^ {0,3}#{1,2}\s/;
+const SUBTITLE = /^ {0,3}#{3,6}\s+(.+?)\s*#*\s*$/;
 const FENCE = /^ {0,3}(```|~~~)/;
+const METADATA = /\b(?:min(?:ute)?s? read|reading time)\b/i;
 // `*text*` or `_text_` alone on a line (not **bold**). No lookbehind: older
 // Safari cannot parse one, and that would break the whole module.
 const ITALIC_LINE = /^\s*([*_])(?!\1)(.*[^*_\s])\1\s*$/;
 
+// \[ … \] and \( … \) to dollar maths, in prose only (never inside fences).
+const texToDollars = (lines) => {
+  const out = [];
+  let prose = [];
+  const flush = () => {
+    if (!prose.length) return;
+    out.push(prose.join('\n')
+      .replace(/\\\[([\s\S]+?)\\\]/g, (_, tex) => `$$${tex}$$`)
+      .replace(/\\\(([\s\S]+?)\\\)/g, (_, tex) => `$${tex}$`));
+    prose = [];
+  };
+  let inCode = false;
+  lines.forEach((line) => {
+    if (FENCE.test(line)) { if (!inCode) flush(); inCode = !inCode; out.push(line); return; }
+    if (inCode) out.push(line); else prose.push(line);
+  });
+  flush();
+  return out.join('\n').split('\n');
+};
+
 export const prepareNote = (markdown = '') => {
-  const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+  const lines = texToDollars(markdown.replace(/\r\n?/g, '\n').split('\n'));
   let i = 0;
   const skipBlank = () => { while (i < lines.length && !lines[i].trim()) i += 1; };
+  const alone = () => !(lines[i + 1] || '').trim(); // a one-line paragraph
 
   skipBlank();
   if (/^ {0,3}#\s/.test(lines[i] || '')) { i += 1; skipBlank(); }
 
+  // Up to two opening lines: the subtitle and/or a metadata line, either order.
   let dek = null;
-  const italic = ITALIC_LINE.exec(lines[i] || '');
-  if (italic && !(lines[i + 1] || '').trim()) {
-    const text = italic[2].trim();
-    if (!/\bmin read\b/i.test(text)) dek = text;
+  for (let n = 0; n < 2; n += 1) {
+    const subtitle = SUBTITLE.exec(lines[i] || '');
+    const italic = alone() && ITALIC_LINE.exec(lines[i] || '');
+    if (subtitle && !dek) dek = subtitle[1].trim();
+    else if (italic && METADATA.test(italic[2])) { /* repeats the header */ }
+    else if (italic && !dek) dek = italic[2].trim();
+    else break;
     i += 1;
     skipBlank();
   }
@@ -151,7 +182,7 @@ export const prepareNote = (markdown = '') => {
   let inCode = false;
   rest.forEach((line, k) => {
     if (FENCE.test(line)) inCode = !inCode;
-    else if (!inCode && RULE.test(line) && HEADING.test(nextContent(k + 1))) return;
+    else if (!inCode && RULE.test(line) && SECTION.test(nextContent(k + 1))) return;
     body.push(line);
   });
   return { dek, body: body.join('\n').trim() };
@@ -177,12 +208,32 @@ export const extractHeadings = (markdown) => {
   return headings;
 };
 
+// An image whose file is not there yet: the archive's empty mounting slot
+// (the case files' photo corners) holding the image's description, never a
+// broken image. Putting the file at its path fills the slot; the Markdown
+// does not change. Phrasing content only, as it sits inside a <p>.
+const ImageToCome = ({ alt }) => (
+  <span
+    role="img"
+    aria-label={alt ? `Image to come: ${alt}` : 'Image to come'}
+    className="relative my-8 flex aspect-[16/9] w-full flex-col items-center justify-center border border-notebook-border bg-notebook-surface px-6 py-10 text-center"
+  >
+    <span aria-hidden="true" className="case-pending__corner case-pending__corner--tl" />
+    <span aria-hidden="true" className="case-pending__corner case-pending__corner--tr" />
+    <span aria-hidden="true" className="case-pending__corner case-pending__corner--bl" />
+    <span aria-hidden="true" className="case-pending__corner case-pending__corner--br" />
+    <span aria-hidden="true" className="meta-label">Image to come</span>
+    {alt && <span aria-hidden="true" className="mt-3 max-w-md text-small text-ink-muted">{alt}</span>}
+  </span>
+);
+
 // Markdown wraps images in <p>, so everything rendered in place is phrasing
 // content (a button and spans). The enlarged view is a modal dialog rendered
 // in a portal: focus moves to its close button, stays inside, Esc closes it,
 // and focus returns to the image that opened it.
 const ZoomableBlogImage = ({ src, alt }) => {
   const [zoomed, setZoomed] = useState(false);
+  const [missing, setMissing] = useState(false);
   const triggerRef = useRef(null);
   const closeRef = useRef(null);
 
@@ -203,6 +254,8 @@ const ZoomableBlogImage = ({ src, alt }) => {
     };
   }, [zoomed]);
 
+  if (missing) return <ImageToCome alt={alt} />;
+
   return (
     <>
       <button
@@ -217,6 +270,7 @@ const ZoomableBlogImage = ({ src, alt }) => {
           alt={alt || ''}
           className="w-full border border-notebook-border"
           loading="lazy"
+          onError={() => setMissing(true)}
         />
         <span aria-hidden="true" className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center border border-notebook-border-light bg-notebook-bg/90 text-ink-secondary opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
           <Maximize2 size={13} />
@@ -431,14 +485,47 @@ const MarkdownRenderer = ({ content }) => {
     img: ({ src, alt }) => <ZoomableBlogImage src={src} alt={alt} />,
   }), []);
 
+  // A display formula wider than the column scrolls sideways in its own box
+  // (MARKDOWN MATHS in index.css). Only a formula that actually overflows
+  // becomes a focusable, named region, so the keyboard can scroll it; checked
+  // again when the column's width changes and once the maths fonts are in.
+  const ref = useRef(null);
+  useEffect(() => {
+    const root = ref.current;
+    if (!root) return undefined;
+    const update = () => {
+      const boxes = root.querySelectorAll('.katex-display');
+      boxes.forEach((box, i) => {
+        if (box.scrollWidth > box.clientWidth + 1) {
+          box.tabIndex = 0;
+          box.setAttribute('role', 'region');
+          // Regions need distinct names: each says which formula it is.
+          box.setAttribute('aria-label', `Formula ${i + 1} of ${boxes.length} (scrolls sideways)`);
+        } else {
+          box.removeAttribute('tabindex');
+          box.removeAttribute('role');
+          box.removeAttribute('aria-label');
+        }
+      });
+    };
+    update();
+    let alive = true;
+    document.fonts?.ready.then(() => { if (alive) update(); });
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    observer?.observe(root);
+    return () => { alive = false; observer?.disconnect(); };
+  }, [content]);
+
   return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-      components={components}
-    >
-      {content}
-    </ReactMarkdown>
+    <div ref={ref}>
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+        components={components}
+      >
+        {content}
+      </ReactMarkdown>
+    </div>
   );
 };
 

@@ -114,6 +114,10 @@ const BlogPostPage = () => {
   }
 
   const hasValidImage = post.coverImage && !imageError;
+  // The dek is never set twice: when the note's subtitle is also its excerpt
+  // (already under the title), the article opens with its first paragraph.
+  const plain = (t) => (t || '').replace(/[*_`]/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
+  const showDek = note.dek && plain(note.dek) !== plain(post.excerpt);
   const headings = note.body ? extractHeadings(note.body) : [];
 
   return (
@@ -173,7 +177,7 @@ const BlogPostPage = () => {
 
       <article className="archive-container pt-12 pb-16 lg:pt-16">
         <div className={COLUMN}>
-          {!isLoadingContent && note.dek && (
+          {!isLoadingContent && showDek && (
             <p data-note-dek className="mb-10 font-editorial text-lead italic leading-[1.45] text-ink-secondary">
               <InlineMarkdown content={note.dek} />
             </p>

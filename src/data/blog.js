@@ -1,15 +1,26 @@
 export const blogPosts = [
   {
+    id: 10,
+    title: "Your Camera Doesn't Capture Reality",
+    slug: "your-camera-doesnt-capture-reality",
+    excerpt: "The fascinating science behind how a little piece of glass and silicon turns light into something we call a photograph.",
+    coverImage: "/blog/camera/cover.jpg",
+    coverSource: "Google Images search for 'Dark Side of The Moon Pink Floyd' (2026-10-05); licence terms not verified, so no credit or licence is claimed",
+    markdownFile: "/blog/posts/cameraReality.md",
+    category: "Photography",
+    date: "31-10-2026",
+    readTime: "10–12 min read",
+    emoji: "📷",
+    tags: ["Photography", "Computational Photography", "Image Sensors", "Image Processing", "Science"],
+  },
+  {
     id: 9,
     title: "The Last Person Who Understands Everything",
     slug: "the-last-person-who-understands-everything",
     excerpt: "Will humanity ever know more than any human can understand? On knowledge, complexity, science, and the strange world we are building with artificial intelligence.",
     coverImage: "/blog/lastPerson/lastPerson.jpg",
-    // Optional: which part of the cover stays in view when it is cropped (CSS
-    // object-position). The figure stands at the bottom edge of this cover.
     coverPosition: "center bottom",
-    // TODO (owner): record where the cover comes from once it is added, like the other entries.
-    coverSource: "To be recorded by the owner when the cover is added",
+    coverSource: "Google Images search for 'complexity science' (2026-10-05); licence terms not verified, so no credit or licence is claimed",
     markdownFile: "/blog/posts/lastPerson.md",
     category: "Thoughts",
     date: "18-10-2026",
