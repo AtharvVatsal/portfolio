@@ -39,7 +39,9 @@ const TableRegion = ({ children }) => {
   );
 };
 
-const CodeBlock = ({ children, className, ...props }) => {
+// A fenced code block, always set as a block (a one-line fence too), so every
+// note shows code the same way. Inline `code` is the `code` component below.
+const CodeBlock = ({ children, className }) => {
   const [copied, setCopied] = React.useState(false);
   const match = /language-(\w+)/.exec(className || '');
   const language = match ? match[1] : '';
@@ -50,17 +52,6 @@ const CodeBlock = ({ children, className, ...props }) => {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  if (!className && !codeString.includes('\n')) {
-    return (
-      <code
-        className="bg-notebook-surface px-1.5 py-0.5 font-mono text-[0.9em] text-accent-strong"
-        {...props}
-      >
-        {children}
-      </code>
-    );
-  }
 
   return (
     <div className="relative group my-6 border border-notebook-border overflow-hidden">
@@ -113,6 +104,57 @@ const CodeBlock = ({ children, className, ...props }) => {
       </SyntaxHighlighter>
     </div>
   );
+};
+
+// Every note is set the same way, whatever conventions it was written with.
+// The Markdown files are left as written; this reads their opening and their
+// rules, and returns what the page renders:
+//   - a leading "# Title" is dropped: the page's own <h1> is the title, so it
+//     is never set twice or listed in the contents;
+//   - a leading italic-only line becomes the note's dek (its subtitle), set in
+//     one style above the contents - unless it only repeats the header's
+//     metadata ("12 min read · …"), which is dropped;
+//   - the rule that opens the article, and any rule written just before a
+//     heading, are dropped: every "##" section opens with the same hairline.
+// Rules elsewhere (e.g. before a closing note) stay as written.
+const RULE = /^ {0,3}(?:-{3,}|\*{3,}|_{3,})\s*$/;
+const HEADING = /^ {0,3}#{1,6}\s/;
+const FENCE = /^ {0,3}(```|~~~)/;
+// `*text*` or `_text_` alone on a line (not **bold**). No lookbehind: older
+// Safari cannot parse one, and that would break the whole module.
+const ITALIC_LINE = /^\s*([*_])(?!\1)(.*[^*_\s])\1\s*$/;
+
+export const prepareNote = (markdown = '') => {
+  const lines = markdown.replace(/\r\n?/g, '\n').split('\n');
+  let i = 0;
+  const skipBlank = () => { while (i < lines.length && !lines[i].trim()) i += 1; };
+
+  skipBlank();
+  if (/^ {0,3}#\s/.test(lines[i] || '')) { i += 1; skipBlank(); }
+
+  let dek = null;
+  const italic = ITALIC_LINE.exec(lines[i] || '');
+  if (italic && !(lines[i + 1] || '').trim()) {
+    const text = italic[2].trim();
+    if (!/\bmin read\b/i.test(text)) dek = text;
+    i += 1;
+    skipBlank();
+  }
+  if (RULE.test(lines[i] || '')) { i += 1; }
+
+  const rest = lines.slice(i);
+  const nextContent = (from) => {
+    for (let k = from; k < rest.length; k += 1) if (rest[k].trim()) return rest[k];
+    return '';
+  };
+  const body = [];
+  let inCode = false;
+  rest.forEach((line, k) => {
+    if (FENCE.test(line)) inCode = !inCode;
+    else if (!inCode && RULE.test(line) && HEADING.test(nextContent(k + 1))) return;
+    body.push(line);
+  });
+  return { dek, body: body.join('\n').trim() };
 };
 
 export const extractHeadings = (markdown) => {
@@ -225,9 +267,12 @@ const createHeadingComponent = (level, tag = level) => {
 
     const Tag = `h${tag}`;
     
+    // A section ("#" or "##") opens with a hairline, as case-file sections
+    // do; the article's first block needs none.
+    const section = 'mt-14 border-t border-notebook-border pt-8 first:mt-0 first:border-t-0 first:pt-0';
     const sizeClasses = {
-      1: 'text-title sm:text-headline mt-14 mb-6 font-editorial',
-      2: 'text-title mt-12 mb-4 font-editorial',
+      1: `text-title sm:text-headline mb-6 font-editorial ${section}`,
+      2: `text-title mb-4 font-editorial ${section}`,
       3: 'text-lead mt-10 mb-3 font-editorial',
     };
 
@@ -253,36 +298,63 @@ const createHeadingComponent = (level, tag = level) => {
   return HeadingComponent;
 };
 
+const Strong = ({ children }) => (
+  <strong className="text-ink-primary font-semibold">{children}</strong>
+);
+
+const Emphasis = ({ children }) => (
+  <em className="text-ink-secondary italic">{children}</em>
+);
+
+const Anchor = ({ href, children }) => (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-accent-strong underline decoration-accent/50 underline-offset-4 transition-colors duration-200 hover:decoration-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+  >
+    {children}
+  </a>
+);
+
+// True when a paragraph's only content is one <em> (whitespace aside).
+const isAside = (node) => {
+  const kids = (node?.children || []).filter((c) => !(c.type === 'text' && !c.value.trim()));
+  return kids.length === 1 && kids[0].type === 'element' && kids[0].tagName === 'em';
+};
+
+// A short run of Markdown set inline (the note's dek): links, bold and
+// italics keep the article's treatment; no paragraph of its own.
+const INLINE_COMPONENTS = {
+  p: ({ children }) => <>{children}</>,
+  strong: Strong,
+  em: ({ children }) => <em>{children}</em>,
+  a: Anchor,
+};
+export const InlineMarkdown = ({ content }) => (
+  <ReactMarkdown remarkPlugins={[remarkGfm]} components={INLINE_COMPONENTS}>{content}</ReactMarkdown>
+);
+
 const MarkdownRenderer = ({ content }) => {
   const components = useMemo(() => ({
     h1: createHeadingComponent(1, 2),
     h2: createHeadingComponent(2),
     h3: createHeadingComponent(3),
 
-    p: ({ children }) => (
-      <p className="mb-6 text-small sm:text-body-sm text-ink-secondary">
+    // A paragraph that is only italic text is an aside (a closing note, a
+    // gloss under a formula): one quieter style in every note.
+    p: ({ node, children }) => (
+      <p className={isAside(node)
+        ? 'mb-6 text-small text-ink-muted [&_em]:text-ink-muted'
+        : 'mb-6 text-small sm:text-body-sm text-ink-secondary'}
+      >
         {children}
       </p>
     ),
 
-    strong: ({ children }) => (
-      <strong className="text-ink-primary font-semibold">{children}</strong>
-    ),
-
-    em: ({ children }) => (
-      <em className="text-ink-secondary italic">{children}</em>
-    ),
-
-    a: ({ href, children }) => (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-accent-strong underline decoration-accent/50 underline-offset-4 transition-colors duration-200 hover:decoration-accent-strong focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-      >
-        {children}
-      </a>
-    ),
+    strong: Strong,
+    em: Emphasis,
+    a: Anchor,
 
     ul: ({ children }) => (
       <ul className="md-list space-y-2 mb-6 ml-4">
@@ -303,22 +375,23 @@ const MarkdownRenderer = ({ content }) => {
       </li>
     ),
 
-    code: ({ inline, className, children, ...props }) => {
-      if (inline) {
-        return (
-          <code className="bg-notebook-surface px-1.5 py-0.5 font-mono text-[0.9em] text-accent-strong">
-            {children}
-          </code>
-        );
-      }
-      return <CodeBlock className={className} {...props}>{children}</CodeBlock>;
-    },
+    // Inline `code`. A fenced block arrives as <pre><code>, so `pre` sets it
+    // as a block (react-markdown 10 no longer marks code as inline).
+    code: ({ children }) => (
+      <code className="bg-notebook-surface px-1.5 py-0.5 font-mono text-[0.9em] text-accent-strong">
+        {children}
+      </code>
+    ),
 
-    pre: ({ children }) => <>{children}</>,
+    pre: ({ children }) => {
+      const code = React.Children.toArray(children)[0];
+      return <CodeBlock className={code?.props?.className}>{code?.props?.children}</CodeBlock>;
+    },
 
     blockquote: ({ children }) => (
       <blockquote className="my-8 border-l-2 border-accent pl-6">
-        <div className="font-editorial text-body italic text-ink-secondary [&_p]:mb-0 [&_p]:font-editorial [&_p]:text-body">{children}</div>
+        {/* A quote keeps the quote style even when its text is all italic. */}
+        <div className="font-editorial text-body italic text-ink-secondary [&_p]:mb-0 [&_p]:font-editorial [&_p]:text-body [&_p]:text-ink-secondary [&_em]:text-ink-secondary">{children}</div>
       </blockquote>
     ),
 

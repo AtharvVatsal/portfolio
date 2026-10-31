@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { blogPosts } from '../data';
 import { SEO, EditorialHeading } from '../components/common';
-import { MarkdownRenderer, extractHeadings, TableOfContents } from '../components/blog';
+import { MarkdownRenderer, extractHeadings, prepareNote, InlineMarkdown, TableOfContents } from '../components/blog';
 import ReadCount from '../components/blog/ReadCount';
 import { ArticleSkeleton } from '../components/common/Skeleton';
 import PageHeader from '../components/layout/PageHeader';
@@ -11,16 +11,22 @@ import { GlowBorder } from '../components/ui/spotlight-card';
 import { TextAnimate } from '../components/ui/text-animate';
 import { useViewCount } from '../hooks';
 
-// A field note, inside the archive shell: trail, record line, title and
-// excerpt, then the cover (shown as it is: no darkening, nothing printed on
+// A field note, inside the archive shell, set on one centred reading axis
+// (COLUMN, 48rem: about 75 characters a line): trail, record line, title and
+// excerpt, contents, article and tail all share it, and the cover is the one
+// element that breaks out, wider (64rem) and centred on the same axis. Text
+// stays left-aligned within the column. Then: the cover (shown as it is: no darkening, nothing printed on
 // it), the article, and the note's tail (topics, related notes, previous/next).
 // The article body is never wrapped in a reveal: reading must not depend on an
-// observer firing.
+// observer firing. Every note is set the same way (prepareNote): no repeated
+// title, one dek style, one section rhythm, whatever the Markdown's habits.
 
 const parseDate = (dateStr) => {
   const [day, month, year] = dateStr.split('-');
   return `${year}-${month}-${day}`;
 };
+
+const COLUMN = 'mx-auto max-w-3xl';
 
 const tailLink = 'group relative isolate block border border-notebook-border p-4 transition-colors duration-200 hover:border-notebook-border-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus';
 
@@ -37,6 +43,7 @@ const BlogPostPage = () => {
   const prevPost = currentIndex > 0 ? blogPosts[currentIndex - 1] : null;
   const nextPost = currentIndex < blogPosts.length - 1 ? blogPosts[currentIndex + 1] : null;
   const readCount = useViewCount(post?.slug);
+  const note = useMemo(() => prepareNote(markdownContent), [markdownContent]);
 
   const relatedPosts = post
     ? blogPosts
@@ -89,23 +96,25 @@ const BlogPostPage = () => {
     return (
       <div className="min-h-screen bg-notebook-bg text-ink-primary">
         <SEO title="Note not found" description="This field note is not in the archive." noIndex />
-        <PageHeader title="Not found" trail={[{ label: 'Field Notes', to: '/blog' }]} />
+        <PageHeader title="Not found" trail={[{ label: 'Field Notes', to: '/blog' }]} column={COLUMN} />
         <div className="archive-container pt-12 sm:pt-16 pb-24">
-          <p className="font-mono text-meta uppercase text-ink-faint">Field note · not found</p>
-          <EditorialHeading as="h1" variant="page" className="mt-4">This note is not in the archive</EditorialHeading>
-          <p className="mt-4 max-w-2xl text-body-sm text-ink-secondary">
-            The address may be mistyped, or the note may have been moved.
-          </p>
-          <Link to="/blog" className="mt-8 inline-flex min-h-11 items-center gap-2 text-small text-ink-primary underline decoration-notebook-border-light underline-offset-4 hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus">
-            <ArrowLeft size={14} aria-hidden="true" /> All field notes
-          </Link>
+          <div className={COLUMN}>
+            <p className="font-mono text-meta uppercase text-ink-faint">Field note · not found</p>
+            <EditorialHeading as="h1" variant="page" className="mt-4">This note is not in the archive</EditorialHeading>
+            <p className="mt-4 max-w-2xl text-body-sm text-ink-secondary">
+              The address may be mistyped, or the note may have been moved.
+            </p>
+            <Link to="/blog" className="mt-8 inline-flex min-h-11 items-center gap-2 text-small text-ink-primary underline decoration-notebook-border-light underline-offset-4 hover:decoration-ink-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus">
+              <ArrowLeft size={14} aria-hidden="true" /> All field notes
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   const hasValidImage = post.coverImage && !imageError;
-  const headings = markdownContent ? extractHeadings(markdownContent) : [];
+  const headings = note.body ? extractHeadings(note.body) : [];
 
   return (
     <div className="min-h-screen bg-notebook-bg text-ink-primary">
@@ -122,10 +131,10 @@ const BlogPostPage = () => {
       {/* Reading position: the same CSS scroll-timeline rule as the home page. */}
       <div aria-hidden="true" className="archive-progress" />
 
-      <PageHeader title={`Entry ${String(currentIndex + 1).padStart(2, '0')}`} trail={[{ label: 'Field Notes', to: '/blog' }]} />
+      <PageHeader title={`Entry ${String(currentIndex + 1).padStart(2, '0')}`} trail={[{ label: 'Field Notes', to: '/blog' }]} column={COLUMN} />
 
       <header className="archive-container pt-10 sm:pt-14">
-        <div className="max-w-3xl">
+        <div className={COLUMN}>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-meta">
             <span className="uppercase text-accent">{post.category}</span>
             <span aria-hidden="true" className="text-ink-faint">·</span>
@@ -147,7 +156,7 @@ const BlogPostPage = () => {
 
       {hasValidImage && (
         <figure className="archive-container mt-10 sm:mt-12">
-          <div className="relative isolate max-w-5xl overflow-hidden border border-notebook-border bg-notebook-surface">
+          <div className="relative isolate mx-auto max-w-5xl overflow-hidden border border-notebook-border bg-notebook-surface">
             <GlowBorder inset />
             <img
               src={post.coverImage}
@@ -163,7 +172,13 @@ const BlogPostPage = () => {
       )}
 
       <article className="archive-container pt-12 pb-16 lg:pt-16">
-        <div className="max-w-3xl">
+        <div className={COLUMN}>
+          {!isLoadingContent && note.dek && (
+            <p data-note-dek className="mb-10 font-editorial text-lead italic leading-[1.45] text-ink-secondary">
+              <InlineMarkdown content={note.dek} />
+            </p>
+          )}
+
           {!isLoadingContent && headings.length > 0 && (
             <TableOfContents headings={headings} />
           )}
@@ -184,7 +199,7 @@ const BlogPostPage = () => {
             </div>
           ) : (
             <div className="markdown-content">
-              <MarkdownRenderer content={markdownContent} />
+              <MarkdownRenderer content={note.body} />
             </div>
           )}
 

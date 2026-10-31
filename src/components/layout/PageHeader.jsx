@@ -5,11 +5,13 @@ import { ArrowLeft } from 'lucide-react';
 // The archive trail at the top of every sub-page: "← Archive / Section /
 // Entry". One arrow (the icon), one treatment on every route. The global
 // navigation bar sits above it; this only says where the page is filed.
-//   title  the current page (last crumb)
-//   trail  crumbs between the archive and the page: [{ label, to }]
-const PageHeader = ({ title, trail = [] }) => (
+//   title   the current page (last crumb)
+//   trail   crumbs between the archive and the page: [{ label, to }]
+//   column  optional classes for the trail's own width, so a page with a
+//           centred reading column (a field note) keeps the trail on its axis
+const PageHeader = ({ title, trail = [], column = '' }) => (
   <nav aria-label="Breadcrumb" className="archive-container pt-6 sm:pt-8">
-    <ol className="flex flex-wrap items-center gap-x-2 font-mono text-meta uppercase text-ink-faint">
+    <ol className={`flex flex-wrap items-center gap-x-2 font-mono text-meta uppercase text-ink-faint ${column}`.trim()}>
       <li>
         <Link
           to="/"
