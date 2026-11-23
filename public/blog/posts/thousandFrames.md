@@ -4,7 +4,7 @@
 
 I still remember arriving at VIT Vellore for the first time. Coming from a small town tucked away in the mountains, where the entire population was roughly equivalent to the number of people I was about to share a university with, it was quite a transition. Everything felt bigger, unfamiliar and different. The weather, the people, the campus, the opportunities and the sheer scale of everything around me.
 
-![A wide view of VIT Vellore or a campus landmark, capturing the scale of arriving for the first time.](/blog/college/vit-arrival.jpg)
+![The First View I Saw When I Entered.](/blog/college/vit-arrival.jpg)
 
 I came here to pursue an engineering degree. Like most people joining college, I had a rough idea of what the next four years might look like. A degree, a few friends, some projects, a little exploration and eventually, a job. I had plans, interests and things I wanted to try. What I didn't realise was just how much these four years would end up giving me, and how much of myself I would discover along the way.
 
@@ -18,13 +18,13 @@ And then there was photography.
 
 I came to college with an interest in photography and, over the years, got the opportunity to turn that interest into something much bigger. From photographing just the stunt show in Riviera 2024 to whole of Rivera in 2025 to returning for Rivera 2026, from figuring out how college festival teams worked to eventually becoming a Student Organizer in the Press & Media team of graVITas'26, the journey was something I could hardly have imagined on my first day here.
 
-![A lively Riviera 2024 event photograph, an early memory from your college festival photography.](/blog/college/riviera-2024.jpg)
+![Riviera 2025 -SAE Stunt SHow.](/blog/college/riviera-2024.jpg)
 
-![A Riviera 2026 photograph showing how your perspective or role had changed when you returned.](/blog/college/riviera-2026.jxl)
+![Sunidhi Chauhan - Riviera 2026](/blog/college/riviera-2026.jxl)
 
 I got to stand behind the camera, capture moments, work with wonderful people and eventually become part of the teams creating those moments in the first place. There were events, shoots, late nights, deadlines, backstage chaos and memories that will probably find their way into my photographs for years to come.
 
-![The graVITas 2026 Press & Media team preparing and coordinating behind the scenes.](/blog/college/gravitas-team.jpg)
+![The graVITas 2026 Press & Media team](/blog/college/gravitas-team.jpg)
 
 I think that's one of the things I will cherish most about college. It gave me the freedom to explore different sides of myself. I wasn't just a Computer Science student. I got to be an engineer, a photographer, a project enthusiast, a team member, an organiser and, most importantly, someone who was constantly discovering something new.
 
@@ -34,13 +34,13 @@ It's the people.
 
 The people you meet in classrooms, the friends you make while figuring out assignments, the teammates who stay up with you to get something done, the people you randomly run into on campus, and even those you only exchange a few words with every day. You don't always realise how much these little interactions mean until you start thinking about a time when they won't be part of your everyday routine anymore.
 
-![A candid moment with friends on campus.](/blog/college/friends.jpg)
+!(/blog/college/friends.jpg)
 
 And I know I am going to miss that.
 
 I am going to miss the crowd, the noise, the constant movement and the liveliness of this campus. The random conversations, the terrible jokes that somehow never stop being funny, the unplanned plans, the last-minute gatherings and the feeling that there is always something happening somewhere.
 
-![An ordinary student-life moment between classes.](/blog/college/first-yr.jpg)
+!(/blog/college/first-yr.jpg)
 
 I am even going to miss the things I probably complained about the most.
 
@@ -62,7 +62,7 @@ And that brings me to something I have been thinking about quite a lot lately.
 
 I genuinely feel fulfilled with the college life I have had. Not because everything went perfectly, or because I did everything I wanted to do, but because I gave myself the opportunity to explore, participate, experiment, fail, learn and experience things outside my comfort zone. There are certainly a few things I would do differently. A few opportunities I wish I had explored sooner and a few moments I would love to revisit. But looking at the bigger picture, I wouldn't change much.
 
-![A photograph from your first year at VIT, an early memory of a place that later felt like home.](/blog/college/first-year.jpg)
+!(/blog/college/first-year.jpg)
 
 If I were given the opportunity to live these four years again, I would gladly take it.
 
