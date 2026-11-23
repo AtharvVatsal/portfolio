@@ -1,5 +1,16 @@
 export const blogPosts = [
   {
+    id: 11,
+    title: "A Thousand Frames, Four Years, and a Life Worth Remembering",
+    slug: "a-thousand-frames-four-years-life-worth-remembering",
+    excerpt: "Four years at VIT Vellore, remembered through the people, projects, campus days and photographs that made college feel like home.",
+    markdownFile: "/blog/posts/thousandFrames.md",
+    category: "Life",
+    date: "24-11-2026",
+    readTime: "7 min read",
+    tags: ["College", "VIT", "Photography", "Rivera", "graVITas", "Memories"],
+  },
+  {
     id: 10,
     title: "Your Camera Doesn't Capture Reality",
     slug: "your-camera-doesnt-capture-reality",
