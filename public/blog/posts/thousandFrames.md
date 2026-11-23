@@ -20,7 +20,7 @@ I came to college with an interest in photography and, over the years, got the o
 
 ![Riviera 2025 -SAE Stunt SHow.](/blog/college/riviera-2024.jpg)
 
-![Sunidhi Chauhan - Riviera 2026](/blog/college/riviera-2026.jxl)
+![Sunidhi Chauhan - Riviera 2026](/blog/college/riviera-2026.webp)
 
 I got to stand behind the camera, capture moments, work with wonderful people and eventually become part of the teams creating those moments in the first place. There were events, shoots, late nights, deadlines, backstage chaos and memories that will probably find their way into my photographs for years to come.
 
