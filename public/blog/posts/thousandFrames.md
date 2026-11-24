@@ -1,12 +1,12 @@
-# A Thousand Frames, Four Years, and a Life Worth Remembering
+# A Thousand Frames, and a College Life Worth Remembering
 
-*Somewhere between the first day of college and the last few months, four years quietly passed by. And I don't think I was quite ready for them to.*
+*Somewhere between my first day of college and now, the familiar rhythm of everyday campus life has begun to change. And I don't think I was quite ready for that.*
 
 I still remember arriving at VIT Vellore for the first time. Coming from a small town tucked away in the mountains, where the entire population was roughly equivalent to the number of people I was about to share a university with, it was quite a transition. Everything felt bigger, unfamiliar and different. The weather, the people, the campus, the opportunities and the sheer scale of everything around me.
 
 ![The First View I Saw When I Entered.](/blog/college/vit-arrival.jpg)
 
-I came here to pursue an engineering degree. Like most people joining college, I had a rough idea of what the next four years might look like. A degree, a few friends, some projects, a little exploration and eventually, a job. I had plans, interests and things I wanted to try. What I didn't realise was just how much these four years would end up giving me, and how much of myself I would discover along the way.
+I came here to pursue an engineering degree. Like most people joining college, I had a rough idea of what college might look like. A degree, a few friends, some projects, a little exploration and eventually, a job. I had plans, interests and things I wanted to try. What I didn't realise was just how much this experience would end up giving me, and how much of myself I would discover along the way.
 
 Looking back, I find it almost amusing how quickly everything happened.
 
@@ -24,11 +24,9 @@ I came to college with an interest in photography and, over the years, got the o
 
 I got to stand behind the camera, capture moments, work with wonderful people and eventually become part of the teams creating those moments in the first place. There were events, shoots, late nights, deadlines, backstage chaos and memories that will probably find their way into my photographs for years to come.
 
-![The graVITas 2026 Press & Media team](/blog/college/gravitas-team.jpg)
-
 I think that's one of the things I will cherish most about college. It gave me the freedom to explore different sides of myself. I wasn't just a Computer Science student. I got to be an engineer, a photographer, a project enthusiast, a team member, an organiser and, most importantly, someone who was constantly discovering something new.
 
-But if there is one thing that makes these four years truly special, it isn't a project, a position, an event or an achievement.
+But if there is one thing that makes my time here truly special, it isn't a project, a position, an event or an achievement.
 
 It's the people.
 
@@ -56,7 +54,7 @@ Yet, somehow, this place became another home. Not necessarily because of its wea
 
 ![A quiet VIT campus evening around the SJT building.](/blog/college/sjt.jpg)
 
-I don't think I ever fully understood how much could happen in four years. There were moments of excitement, uncertainty, stress, happiness and everything in between. Some days were incredibly productive, some were completely ordinary, and some were days I would rather not repeat. But together, they made up an experience that I wouldn't exchange for anything else.
+I don't think I ever fully understood how much could happen during college. There were moments of excitement, uncertainty, stress, happiness and everything in between. Some days were incredibly productive, some were completely ordinary, and some were days I would rather not repeat. But together, they made up an experience that I wouldn't exchange for anything else.
 
 And that brings me to something I have been thinking about quite a lot lately.
 
@@ -64,7 +62,7 @@ I genuinely feel fulfilled with the college life I have had. Not because everyth
 
 !(/blog/college/first-year.jpg)
 
-If I were given the opportunity to live these four years again, I would gladly take it.
+If I were given the opportunity to live this chapter again, I would gladly take it.
 
 Perhaps that is the best thing I can say about my time here.
 
@@ -84,9 +82,9 @@ Take those photographs. Record those random videos. Save those silly conversatio
 
 You don't have to turn every single day into an achievement. Not every experience needs to be productive, and not every opportunity has to lead somewhere. Sometimes, the best memories come from the most ordinary days.
 
-Because here's something I can assure you: **college goes by much faster than you think.**
+Because here's something I can assure you: **college life changes much faster than you think.**
 
-One moment you're figuring out your first semester, trying to understand the campus and getting used to an entirely new environment. Before you know it, you're attending your final few classes, looking at old photographs and wondering where all those semesters went.
+One moment you're figuring out your first semester, trying to understand the campus and getting used to an entirely new environment. Before you know it, the daily routine you took for granted has changed. The people you used to see between classes are becoming familiar faces in old photographs, and the campus that once felt like an ordinary part of your day is becoming somewhere you remember through the moments you collected there.
 
 The people you see every day will eventually go their separate ways. The familiar faces in the corridors will become occasional appearances on social media. The campus that once felt like an ordinary part of your routine will become a place you revisit through photographs and memories. Even the things you once complained about will find a special place in your heart.
 
@@ -98,15 +96,15 @@ Photography has taught me that sometimes, you only understand the importance of 
 
 I think college has been much the same for me.
 
-Over these four years, I have collected thousands of frames, countless experiences and more memories than I could ever fit into a single blog. Some of those memories are captured on my camera, while others exist only in conversations, friendships and moments that I will probably never be able to recreate.
+During my time at college, I have collected thousands of frames, countless experiences and more memories than I could ever fit into a single blog. Some of those memories are captured on my camera, while others exist only in conversations, friendships and moments that I will probably never be able to recreate.
 
-As I approach the end of this chapter, I know I am going to miss almost everything about it. The people, the campus, the crowd, the chaos, the opportunities, the good days and even some of the not-so-good ones.
+As my everyday life on campus begins to draw to a close, I know I am going to miss almost everything about it. The people, the campus, the crowd, the chaos, the opportunities, the good days and even some of the not-so-good ones.
 
-I came here from a small town in the mountains, carrying my expectations and a whole lot of curiosity. I am leaving with a degree, a camera full of memories, experiences I will always be grateful for, friendships I hope will last a lifetime and a version of myself that is very different from the one who first walked through these gates.
+I came here from a small town in the mountains, carrying my expectations and a whole lot of curiosity. I am stepping away from this everyday campus life with a camera full of memories, experiences I will always be grateful for, friendships I hope will last a lifetime and a version of myself that is very different from the one who first walked through these gates.
 
-I came here to study engineering. I leave having learnt a little about life, a lot about people and so much about myself.
+I came here to study engineering. Along the way, I learnt a little about life, a lot about people and so much about myself.
 
-Four years might sound like a long time when you're just beginning. Trust me, it isn't.
+College might feel like a long stretch when you're just beginning. Somehow, the ordinary days still pass faster than you're ready for.
 
 So, wherever you are in your college journey, make the most of it. Don't wait until your final semester to realise how wonderful the little things were.
 
@@ -114,4 +112,4 @@ Because someday, you will look back at what feels like an ordinary day today and
 
 And when that day comes, I hope you have a thousand frames of your own to look back at.
 
-**Here's to four years, a thousand frames and a life worth remembering.**
+**Here's to the campus days, a thousand frames and a college life worth remembering.**
