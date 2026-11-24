@@ -4,7 +4,7 @@ export const blogPosts = [
     title: "A Thousand Frames, and a College Life Worth Remembering",
     slug: "a-thousand-frames-college-life-worth-remembering",
     excerpt: "The people, projects, campus days and photographs that made VIT feel like home, as everyday campus life begins to change.",
-    coverImage: "/blog/college/sjt.jpg",
+    coverImage: "/blog/college/gravitas-team.jpg",
     coverPosition: "center bottom",
     coverSource: "Own photograph: graVITas 2026 Press & Media team",
     markdownFile: "/blog/posts/thousandFrames.md",
